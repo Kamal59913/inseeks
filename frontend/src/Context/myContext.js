@@ -16,13 +16,10 @@ const userlistnotfollowed = "http://localhost:8000/api/v1/users/getusersnotfollo
 /*url to like a post*/
 const likepost = "http://localhost:8000/api/v1/like/toggle/like"
 
-/*get like details*/
-const getlikedetails = "http://localhost:8000/api/v1/like/getlike"
 
 export const UserListProvider = ({ children }) => {
   const [data, setUserList] = useState(null);
   const [datanotfollowed, setUserListnotfollowed] = useState(null);
-  const [likedata, setlikedata] = useState(null);
 
   const fetchData = async () => {
     // Your logic to fetch data
@@ -50,30 +47,11 @@ export const UserListProvider = ({ children }) => {
       })
   };
 
-  const LikeAPost = async (data) => {
-    axios.post(likepost, data, {
-      withCredentials: true
-    })
-    .then((res)=> {
-      console.log("reached", res)
-    })
-    .catch((err)=> {
-      console.log(err)
-    })
-  }
 
-  const GetLikes = async (data) => {
-    axios.post(getlikedetails, data, { withCredentials: true })
-    .then((res)=> {
-      console.log(res,"fetched data like")
-    })
-    .catch((err)=> {
-      console.log(err)
-    })
-  }
+
 
   return (
-    <DataContext.Provider value={{ data, fetchData, avatar, datanotfollowed, fetchDataNotFollowed, LikeAPost, GetLikes}}>
+    <DataContext.Provider value={{ data, fetchData, avatar, datanotfollowed, fetchDataNotFollowed}}>
       {children}
     </DataContext.Provider>
   );

@@ -10,11 +10,9 @@ import { Likes } from "../models/likes.model.js"
 import mongoose from "mongoose";
 
 const LikePost = asyncHandler(async (req,res) => {
-
      const {PostId, type} = req.body
-     console.log(PostId, type)
 
-     let find
+     let find;
 
      let likedPost;
 
@@ -26,7 +24,9 @@ const LikePost = asyncHandler(async (req,res) => {
          });
      }
 
-     console.log(likedPost)
+     if(likedPost) {
+          await Likes.findByIdAndDelete(likedPost._id)
+     }
 
      if (!likedPost) {
           {
@@ -51,29 +51,7 @@ const LikePost = asyncHandler(async (req,res) => {
      
           }
 
-     } else {
-          {
-               if(type == 'image') {
-                    find = await Likes.findOneAndDelete({
-                         image : PostId,
-                         likedBy: req.user._id,
-                    })
-               }
-               else if(type == 'video') {
-                    find = await Likes.findOneAndDelete({
-                         video : PostId,
-                         likedBy: req.user._id,
-                    })
-               }         
-               else if(type == 'blogpost') {
-                    find = await Likes.findOneAndDelete({
-                         blogpost : PostId,
-                         likedBy: req.user._id,
-                    })
-               }
-     
-          }
-     }
+     } 
 
      return res
      .status(200)
@@ -93,36 +71,37 @@ const GetPostLike = asyncHandler(async (req,res) => {
      else if (type === 'blogpost') matchField = '$blogpost';
      else matchField = null; // Handle other types if needed
  
-     if (!matchField) {
-         return res.status(400).json(new ApiResponse(400, null, "Invalid post type"));
-     }
-     const likedetails = await Likes.aggregate([  
+     
+     const likedetails = await Likes.aggregate([
+          /*pipeline 1 to match specific genre of post*/
           {
                $match: {
-                    [matchField] : new mongoose.Types.ObjectId(PostId),
+                    [type]: new mongoose.Types.ObjectId(PostId)
                }
           },
+
+          /*pipeline 2 to check if the post is liked by the current user*/
           {
                $addFields: {
-                    isLiked : {
+                    isLiked: {
                          $cond: {
-                              if: { $eq: ["$likedBy", req.user?._id]},
+                              if: {$eq: [req.user?._id, "$likedBy"]},
                               then: true,
                               else: false
                          }
-                    }
+                    },                          
                }
-          }
+          },
      ])
-  
      
-     console.log(likedetails)
      return res
      .status(200)
      .json(
-          new ApiResponse(200, likedetails, "Successfully liked the post")
+          new ApiResponse(200, likedetails, "Successfully retrieved like details")
      )
 })
+
+
 
 export {
     LikePost,
