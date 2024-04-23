@@ -1,0 +1,50 @@
+$maincolor-dark: #202124;
+$maincolor-light: #f7f7f7;
+$boundary-color: white;
+$right-side-bar-fixed-width: 20vh;
+$input-color: #020305;
+$main-color-2:#202327;
+
+.SideBar{
+    height: 730px;
+    width: 220px;
+    background-color: $main-color-2;
+    display: flex;
+    gap: 14px;
+    flex-direction: column;
+    border-right: 1px solid grey;
+    overflow: hidden;
+}
+.SideBarTwo, .SideBarThree,.SideBarFour,.SideBarFive,.SideBarSix, .SideBarSeven{
+    font-size: 12px;
+    height: 24px;
+    width: 24px;
+    padding: 8px;
+    margin-left: 90px;
+    margin-top: 16px;
+    color: white;
+    border-radius: 8px;
+    border: 1px solid grey;
+  }
+  .SideBarOne{
+    margin-top: 65px;
+  }
+  .SideBarTwo{
+    margin-top: 45px;  
+  }
+  .SideBarSeven{
+    margin-top: 62px;
+  }
+  .SideBarOne,.SideBarSeven{
+    height: 30px;
+    width: 30px;
+    padding: 7px;
+    margin-left: 88px;
+    color: white;
+  }
+  @media only screen and (min-width: 320px) and (max-width: 479px) {
+.SideBar{
+  display: none;
+}
+    }
+  

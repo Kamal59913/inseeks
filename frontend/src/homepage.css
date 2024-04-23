@@ -1,0 +1,665 @@
+
+  .newContainer{
+    display: flex;
+    flex-direction: row;
+    gap: 2vh;
+  }
+  .SideBar{
+    height: 100vh;
+    width: 30vh;
+    background-color: #666bed;
+    display: flex;
+    gap: 2vh;
+    flex-direction: column;
+  }
+  .AccountsInformation{
+    margin-left: 16vw;
+    width: 64vw;
+    height: 100vh;
+    /* min-height: 140vh; */
+    display: flex;
+    flex-direction: column;
+    gap: 1vh;
+    position: fixed;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    scrollbar-width: none; /* Hide the scrollbar for Firefox */
+    -ms-overflow-style: none; /* Hide the scrollbar for IE and Edge */
+  }
+
+
+  .BasicInformationSection{
+    margin-top: 2.6vh;
+    height: 60vh;
+    width: 84vw;
+    color: black;
+    display: flex;
+    gap: 5px;
+    flex-direction: row;
+  }
+  .column1,.column2{
+    height: 80vh;
+    width: 58vh;
+    background-color: green;
+  }
+  .column1{
+    margin-left: 8vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .column2{
+    margin-left: 5vh;
+    /* background-color: green;   */
+  }
+
+  .fa-magnifying-glass-one{
+    position: absolute;
+    margin-top: 5.2vh;
+    margin-left: 1.4vh;
+  }
+  .column1a,.column1b{
+    width: 54vh;
+    /* margin-left: 4vh; */
+    background-color: white;
+    border-radius: 1vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .column1a{
+    /* margin-top: 3vh; */
+    height: 20vh;
+    /* background-color: pink; */
+  }
+  .column1b{
+    margin: 0 0 3vh 0;
+    /* height: 80vh; */
+    /* background-color: pink; */
+  }
+  .column1a{
+    margin-bottom:3vh;
+  }
+  .postBox{
+    height: 6vh;
+    width: 40vh;
+    margin-top: 3vh;
+    margin-left: 3vh;
+    /* background-color: green; */
+    display: flex;
+    flex-direction: row;
+  }
+  .postBox-notification{
+    height: 6vh;
+    width: 95%;
+    margin-top: 3vh;
+    margin-left: 3vh;
+    display: flex;
+    flex-direction: row;
+  }
+  .profileimageuser{
+    height: 5vh;
+    width: 5vh;
+    border-radius: 8px;
+    background-color: powderblue;
+  }
+.whatAreYouThinking{
+    margin-top: 8.4px;
+    margin-left: 2vh;
+    color: grey;
+    font-size: 14px;
+}
+.whatAreYouThinking-notification{
+  width: 90%;
+  margin-top: 8.4px;
+  margin-left: 2vh;
+  color: grey;
+  font-size: 14px;
+}
+.three-dot-notification{
+  margin: 1.4vh 0 0 0;
+  color: grey;
+}
+.postBox2{
+    /* background-color: green; */
+    height: 5vh;
+    margin-top: 4vh;
+    display: flex;
+    flex-direction: row;
+    gap: 2vh;
+}
+.postBox2-notification{
+  height: 5vh;
+  margin-top: 4vh;
+  display: flex;
+  flex-direction: row;
+  gap: 2vh;
+}
+.postBox2Image, .postBox2Video, .postBox2Plus{
+    margin-top: 4px;
+    height: 4vh;
+    width: 4.2vh;
+    background-color: #f7f7f7;
+    color: #8f92a1;
+    border-radius: 6px;
+}
+.postBox2Image{
+    margin-left: 3vh;
+}
+.wrap-img-vid-plus{
+  height: 5vh;
+  width: 84%;
+  display: flex;
+  flex-direction: row;
+  gap: 1.6vh;
+}
+.postBox2Share{
+    height: 3.6vh;
+    width: 8vh;
+    background-color: #666bed;
+    margin-left: 18vh;
+    margin-top: 3px;
+    padding-left: 1.5vh;
+    padding-top: 0.5vh;
+    border-radius: 4px;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: context-menu;
+}
+.postBox2Share-notification{
+  height: 3.6vh;
+  width: 8vh;
+  background-color: #666bed;
+  margin-top: 3px;
+  padding-left: 1.5vh;
+  padding-top: 0.5vh;
+  border-radius: 4px;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: context-menu;
+}
+.posticons{
+    margin: 14px 0px 0px 8px;
+}
+.column1b1{
+    margin-top: 2vh;
+    height: 8vh;
+    width: 90%;
+    /* background-color: green; */
+    margin-left: 2.6vh;
+    display: flex;
+    flex-direction: row;
+}
+.column1b2{
+    margin-top: 4px;
+    height: 4vh;
+    width: 90%;
+    background-color: white;
+    margin-left: 2.6vh;
+}
+.column1b3{
+    margin-top: 4px;
+    height: 30vh;
+    width: 90%;
+    background-color: grey;
+    margin-left: 2.6vh;
+    display: grid;
+    grid-template-rows: 14.5vh 14.5vh;
+    grid-template-columns: auto 120px;
+    grid-row-gap: 1vh;
+    grid-column-gap: 1vh;
+}
+.column1b4{
+    margin-top: 4px;
+    height: 5vh;
+    width: 90%;
+    background-color: white;
+    margin-left: 2.6vh;
+    display: flex;
+}
+.column1b5{
+    margin-top: 4px;
+    height: 5vh;
+    width: 90%;
+    margin-left: 2.6vh;
+    display: flex;
+}
+.profileimageuser2{
+    margin: 1vh 0 0 1vh;
+    height: 6vh;
+    width: 6vh;
+    border-radius: 8px;
+    background-color: powderblue;
+  }
+  .profileName{
+    height: 6vh;
+      width: 36vh;
+      margin-top: 8.4px;
+      margin-left: 1vh;
+      color: black;
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      flex-direction: column;
+  }
+  .profileName-hpb{
+    height: 6vh;
+      width: 24vh;
+      margin-top: 8.4px;
+      margin-left: 1vh;
+      color: white;
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      flex-direction: column;
+  }
+  .profileName-src{
+      height: 6vh;
+      width: 40vw;
+      margin-top: 8.4px;
+      margin-left: 1vh;
+      color: black;
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      flex-direction: column;
+  }
+  .profileNameSub{
+    margin: 0;
+    cursor: context-menu;
+  }
+  .postedTime{
+    margin: 1px;
+    font-size: 12px;
+    color: #8f92a1;
+  }
+  .postBody{
+    font-size: 14px;
+    margin-left: 1vh;
+    margin-top: 1px;
+    color: grey;
+    font-weight: 500;
+  }
+
+  .posticons2{
+    margin: 14px 0px 0px 8px;
+}
+.column1b4heart, .column1b4comment{
+    margin-top: 4px;
+    height: 4vh;
+    width: 8vh;
+    color: #8f92a1;
+    border-radius: 6px;
+}
+.column1b4comment{
+    margin-left: 1vh;
+}
+
+.column1b4heart2, .column1b4comment2{
+  margin-top: 4px;
+  height: 4vh;
+  width: 6vh;
+  color: #8f92a1;
+  border-radius: 6px;
+}
+.column1b4comment{
+  margin-left: 1vh;
+}
+.likeCommentCount{
+    position: absolute;
+    font-size: 13px;
+    color: rgba(0, 0, 0, 0.71);
+    /* background-color: red; */
+    margin: 4px 0 0 4px;
+    font-weight: 600;
+    cursor: context-menu;
+}
+.likeCommentCount2{
+  position: absolute;
+  font-size: 11px;
+  color: rgba(0, 0, 0, 0.71);
+  margin: 6px 0 0 4px;
+  font-weight: 600;
+  cursor: context-menu;
+}
+.column1b4Share{
+    height: 3.6vh;
+    width: 8vh;
+    /* background-color: #666bed; */
+    margin-left: 21vh;
+    margin-top: 6px;
+    padding-left: 1.5vh;
+    padding-top: 0.5vh;
+    border-radius: 4px;
+    color: rgba(0, 0, 0, 0.737);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: context-menu;
+}
+#searchbar2{
+    height: 5vh;
+    width: 40vh;
+    max-width: 119vh;
+    padding-left: 1vh;
+    padding-right: 10vh;
+    border: 2px solid rgba(128, 128, 128, 0.571);
+    font-size: 14px;
+    /* font-weight: bold; */
+    border-radius: 4px;
+  }
+  .comment-icons{
+    display: flex;
+    position: absolute;
+    margin:1.5vh 0 0 40vh;
+  }
+  .comment-icons-sm{
+    display: flex;
+    position: absolute;
+    margin:1.5vh 0 0 35.2vh;
+  }
+  .plane-comment{
+    margin-left: 2vh;
+    color: #666bed;
+  }
+  .smile-comment{
+    color: grey;
+  }
+  .likesReplyUnderCommentPart{
+    margin: 0;
+    /* background-color: grey; */
+    display: flex;
+  }
+ 
+  .commentUserInfo{
+    width: 49vh;
+    margin: 1vh 0 0 0;
+    border-radius: 1vh;
+    display: flex;
+    flex-direction: row;
+    /* background-color: pink; */
+  }
+
+  .profileNameSub3{
+    font-size: 12px;
+    font-weight: 800;
+    margin: 0;
+    color: white;
+    cursor:context-menu;
+  }
+  
+  .profileNameSub-hpb{
+    font-size: 12px;
+    font-weight: 800;
+    margin: 0;
+    color: white;
+    cursor:context-menu;
+  }
+  .profileNameSub3-src{
+    width: 13vw;
+    font-size: 14px;
+    font-weight: 700;
+    margin: 0;
+    color: black;
+    cursor:context-menu;
+  }
+
+  .postedTime2{
+    margin: 12px 0 0 26vh;
+    font-size: 11px;
+    color: #8f92a1;
+  }
+  .postedTime2-sm{
+    margin: 12px 0 0 20vh;
+    font-size: 11px;
+    color: #8f92a1;
+  }
+  .postBody2{
+    font-size: 12px;
+    margin: 1vh 0 0 1vh;
+    color: white;
+    font-weight: 500;
+  }
+  .postTitleQuestion{
+    font-size: 14px;
+    margin-left: 1vh;
+    margin-top: 1px;
+    color: black;
+    font-weight: 600;
+  }
+  .column1b3QuestionBody{
+    background-color: red;
+    width: 90%;  
+    margin-left: 2.6vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .columnQuestionBody{
+    font-size: 12px;
+    margin: 4px 0 0 0;
+  }
+  .columnQuestionReadMore{
+    margin: 2px 0 0 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #666bed;
+    cursor: pointer;
+  }
+  .imageOne{
+    background-color: green;
+    grid-row-start: 1;
+    grid-row-end: 3;
+    border-radius: 10px;
+    cursor: context-menu;
+  }
+  .imageTwo{
+    background-color: red;
+    border-radius: 10px;
+  }
+  .imageThree{
+    background-color: yellow;
+    border-radius: 10px;
+  }
+.seventeenMore{
+  font-size: 12px;
+  margin: 6vh 0 0 5vh;
+  color: grey;
+  font-weight: 600;
+  cursor: context-menu;
+}
+.Rightbar{
+  right: 0;
+  height: 100vh;
+  width: 19.2vw;
+  background-color: black;
+  position: fixed;
+  border-top-left-radius: 34px;
+  border-bottom-left-radius: 30px;
+  display: flex;
+  flex-direction: column;
+}
+.homePageLogo{
+  width: 10vh;
+  background-color: red;
+}
+.rightbar-two{
+  /* background-color: green; */
+  width: 24vw;
+  margin: 4vh 0 0 1.4vh;
+  display: flex;
+  flex-direction: column;
+  color: white;
+}
+.rightbar-three{
+  height: 34vh;
+  width: 16.8vw;
+  margin: 4vh 0 0 4vh;
+  color: white;
+}
+.rightbar-three-homepage{
+  height: 34vh;
+  width: 20vw;
+  margin: 4vh 0 0 0;
+}
+.rightbar-four{
+  height: 30vh;
+  width: 16.8vw;
+  margin: 2vh 0 0 3.4vh;
+}
+.rightbar-two-features-stories{
+  margin: 0 0 0 5px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: context-menu;
+}
+
+
+.rightbar-three-who-to-follow{
+  height: 4vh;
+  width: 30vh;
+  margin: 0 0 0 5px;
+}
+.rightbar-three-who-to-follow-hp{
+  color: white;
+  height: 4vh;
+  width: 30vh;
+}
+.who-to-follow{
+  margin: 0 0 0 2px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor:context-menu;
+}
+.who-to-follow-hp{
+  margin: 0 0 0 1.8vh;
+  color: white;
+  font-size: 15px;
+  font-weight: 700;
+  cursor:context-menu;
+}
+.trend-topics-hp{
+  color: white;
+  margin: 2vh 0 1.6vh 0.8vh;
+  font-size: 15px;
+  font-weight: 700;
+  cursor:context-menu;
+}
+
+.rightbar-three-user-details-hpb{
+  font-size: 14px;
+  font-weight: 500;
+  margin: 3vh 0 0 4vh;
+  display: flex;
+  flex-direction: row;
+  color: white;
+  background-color: black;
+  border-style: none;
+  border-radius: 0.4vh;
+}
+.rightbar-three-user-details-src{
+  height: 8vh;
+  width: 46vh;
+  margin: 2vh 0 0 1.4vh;
+  display: flex;
+  flex-direction: row;
+}
+.profileimageuser4{
+  margin: 1vh 0 0 1vh;
+  height: 5vh;
+  width: 5vh;
+  border-radius: 8px;
+  background-color: powderblue;
+}
+.profileimageuser4-src{
+  margin: 1vh 0 0 1vh;
+  height: 6vh;
+  width: 6vh;
+  border-radius: 8px;
+  background-color: powderblue;
+}
+.postedTime3{
+  margin: 0;
+  font-size: 11px;
+  color: white;
+  cursor: context-menu;
+}
+.postedTime-hpb{
+  margin: 0;
+  font-size: 11px;
+  color:#8f92a1a7;
+  cursor: context-menu;
+}
+.postedTime3-src{
+  margin: 0;
+  font-size: 11px;
+  color: grey;
+  cursor: context-menu;
+}
+.follow-plus{
+  margin: 1.6vh 1vh 0 0;
+}
+.follow-plus-hpb{
+  color: white;
+  margin: 1.6vh 1vh 0 0;
+}
+.see-more{
+  margin: 2vh 0 0 0;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: context-menu;
+}
+.see-more2{
+  margin: 1.4vh 0 0 1vh;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: context-menu;
+}
+.rank-topic{
+  margin: 0.8vh 0 0 0;
+  font-size: 14px;
+  font-weight: 600;
+  height: 3.5vh;
+  width: 2.4vh;
+  background-color:#666bed;
+  color: white;
+  padding: 4px 0 0 10px;
+  border-radius: 10px;
+}
+.rightbar-four-details{
+  height: 5vh;
+  width: 34vh;
+  margin: 1px 0 0 5px;
+  display: flex;
+  flex-direction: row;
+  color: white;
+}
+.column1b-sm{
+  width: 48vh;
+  /* margin-left: 4vh; */
+  background-color: white;
+  border-radius: 1vh;
+  display: flex;
+  flex-direction: column;
+}
+.column1b1-sm{
+  margin-top: 2vh;
+  height: 8vh;
+  width: 90%;
+  /* background-color: green; */
+  margin-left: 2.6vh;
+  display: flex;
+  flex-direction: row;
+}
+.column1b4Share-sm{
+  height: 3.6vh;
+  width: 10vh;
+  /* background-color: #666bed; */
+  margin-left: 20vh;
+  margin-top: 5px;
+  padding-left: 1.5vh;
+  padding-top: 0.5vh;
+  border-radius: 4px;
+  color: rgba(0, 0, 0, 0.737);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: context-menu;
+}

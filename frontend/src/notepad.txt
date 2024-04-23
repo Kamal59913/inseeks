@@ -1,0 +1,35 @@
+import { useEffect, useState } from 'react';
+import './App.css';
+import CHILD from './Components/childcomponent'
+
+function App() {
+  const [counter, setCounter] = useState(0);
+  const [countSqure, setcountSqure] = useState(0);
+
+  useEffect(() => {
+    let num =  counter;
+    let square = num*num;
+    setcountSqure(square);
+  },[counter]);
+  
+
+  const increaseCount = () => {
+    let new_count = counter + 1;
+    if(new_count<=10){
+      setCounter(new_count);
+    } else {
+      setCounter(0);
+    }
+}
+
+  return (   
+    <div className="App">
+      <h1> Keeping the count </h1>
+      <h1> {counter} </h1>
+      <h1> The square of the count : {countSqure}</h1>
+      <CHILD newcounter = {increaseCount}/>
+    </div>
+  );
+}
+
+export default App;

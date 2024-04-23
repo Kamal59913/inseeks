@@ -1,0 +1,165 @@
+$maincolor-dark: #202124;
+$maincolor-light: #f7f7f7;
+$boundary-color: white;
+$right-side-bar-fixed-width: 140px;
+$input-color: hsl(214, 10%, 14%);
+$main-color-2:black;
+$theme: #32CD32;
+
+.messagePopupAlreadyExist,
+.messagePopupPleaseEnterValidMail,
+.messagePopupSuccess{
+    font-size: 18px;
+    width: 100vw;
+    height: 60px;
+    position: absolute;
+    font-weight: 700;
+    color: $maincolor-light;
+    background-color: $maincolor-dark;
+    border-bottom: 1px solid ;
+    display: flex;
+
+}
+.popUpMessage{
+    margin: 18px 0 0 20px;
+    width: 500px;
+}
+
+.headerSignup {
+    /* font-family: 'Lacquer'; */
+    font-family: 'Lumanosimo', cursive;
+
+}
+
+.signup {
+    background-color: $maincolor-dark;
+    display: flex;
+    height: 750px;
+    width: 100vw;
+    margin: 0;
+}
+
+.containerSignup {
+    background-color: red;
+    display: flex;
+    flex-direction: row;
+    width: 60%;
+    border-radius: 10px;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.brandContainerSignup {
+    color: $maincolor-light;
+    width: 700px;
+    height: 200px;
+    margin: 260px 0 0 110px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.iconMediaSignup{
+    margin: 20px 0 0 0;
+    display: flex;
+    flex-direction: row;
+    gap: 80px;
+}
+.formContainerSignup {
+    color: $maincolor-light;
+    border: 1px solid grey;
+    width: 320px;
+    margin: 110px 0 0 40px;
+    height: 480px;
+    border-radius: 10px 10px 10px 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 20px;
+}
+.formContainerSignup:hover{
+    border: 1px solid $theme;
+}
+
+.formContainerSignup h1 {
+    text-align: center;
+    margin-bottom: 70px;
+    margin-top: 70px;
+}
+.inputField{
+    background-color: $maincolor-dark; /* Set your desired background color */
+    color: $maincolor-light;
+}
+
+.formContainerSignup form {
+    display: flex;
+    flex-direction: column;
+}
+
+.formContainerSignup input,
+.formContainerSignup button {
+    padding: 10px;
+    margin-bottom: 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+}
+.formContainerSignup button {
+    border-style: none;
+    background-color: $maincolor-light;
+    color: $maincolor-dark;
+}
+.formContainerSignup input {
+    border: 1px solid grey;
+}
+.googleAuth {
+    /* Add styles for the google-auth anchor */
+    display: block;
+    /* Make the anchor a block-level element */
+    margin-top: 20px;
+    /* Add some spacing between the form and the anchor */
+    text-align: center;
+    /* Center the image horizontally */
+}
+
+.googleImage {
+    /* Add styles for the image inside the google-auth anchor */
+    width: 200px;
+    /* Set the desired width of the image */
+    height: auto;
+    /* Automatically adjust the height to maintain aspect ratio */
+}
+.redirectSigninSignup{
+    margin: 10px 0 0 0;
+    cursor: pointer;
+}
+.submitButton{
+    background-color: $maincolor-dark;
+    color: $maincolor-light;
+
+    border-style: none;
+}
+.headerLeftSignup{
+    margin-left:40px;
+    margin-right: 30px;
+    margin-bottom: 20px;
+}
+
+
+@media screen and (max-width: 700px) {
+
+    .container-signup {
+        flex-direction: column;
+        width: 95%;
+        height: 80%;
+    }
+
+    .formContainerSignup {
+        border-radius: 0 0 10px 10px;
+    }
+
+    .brand-container-signup {
+        border-radius: 10px 10px 0 0;
+    }
+}

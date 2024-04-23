@@ -1,0 +1,36 @@
+.RightbarEventsUserNotificationAndProfileImage{
+    height: 60px;
+    width: 168px;
+    margin: 18px 0 0 auto;
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+    color: white;
+}
+.rightbarOneNotification{
+    height: 46px;
+    width: 46px;
+    background-color:#666bed;
+    border-radius: 10px;
+}
+.rightbarOneImage{
+    height: 46px;
+    width: 46px;
+    background-color:#666bed;
+    border-radius: 10px;
+    margin-left: 14px;
+    margin-right: 21px;
+  }
+  .Bell{
+    margin: 15px 0 0 16px;
+    color: white;
+  }
+  .commentIcons{
+    display: flex;
+    position: absolute;
+    margin:10.5px 0 0 280px;
+  }
+  .planeComment{
+    margin-left: 14px;
+    color: #666bed;
+  }

@@ -1,0 +1,342 @@
+$maincolor-dark: #202124;
+$maincolor-light: #f7f7f7;
+$boundary-color: white;
+$right-side-bar-fixed-width: 140px;
+$input-color: hsl(214, 10%, 14%);
+$main-color-2:black;
+
+
+.SecondBoxEvents3Col1{
+  width: 250px;
+  display: flex;
+  flex-direction: column;
+}
+.Eventsevent1Img{
+  margin: 11.2px 0 0 13.3px;
+  border-top-left-radius: 12.6px;
+  border-top-right-radius: 12.6px;
+  max-width: 274px;
+  height: 161px;
+}
+p{
+    cursor: context-menu; 
+   }
+   .newContainer{ /*Keep*/
+       display: flex;
+       flex-direction: row;
+       gap: 14px;
+   }
+     .pagename{
+       margin-top: 28px;
+       margin-left: 28px;
+       font-size: 15px;
+       font-weight: 700;
+     }
+     .Environment1{
+       margin: 14px 0 0 7px;
+       height: 147px;
+       width: 240px;
+       display: flex;
+       flex-direction: column;
+       gap: 2px;
+     }
+     .eventSeeMore{
+       margin: 14px 0 0 7px;
+       height: 42px;
+       width: 160px;
+     }
+   
+     .SecondBoxEvents{ /*keep*/
+       margin-left: 160px;
+       width: 560px;
+       height: 700px;
+       /* min-height: 140vh; */
+       display: flex;
+       flex-direction: column;
+       gap: 7px;
+       position: fixed;
+       overflow-y: scroll;
+       overflow-x: hidden;
+       scrollbar-width: none; /* Hide the scrollbar for Firefox */
+       -ms-overflow-style: none; /* Hide the scrollbar for IE and Edge */
+       display: flex;
+       flex-direction: column;
+       gap: 2px;
+     }
+     //save
+     .SecondBoxEvents1{
+       height: 42px;
+       width: 510px;
+       margin: 0 0 0 56px;
+      color: $maincolor-light;
+      }
+     .SecondBoxEvents2{
+      color: $maincolor-light;
+       height: 42px;
+       width: 510px;
+       margin: 0 0 0 56px;
+       display: flex;
+       flex-direction: row;
+     } 
+     .optionsEvents{
+       margin-left: 14px;
+       height: 14px;
+       font-size: 12px;
+       padding: 0 7px 2px 7px;
+       font-weight: 700;
+     }
+     .optionsEvents1{
+       height: 14px;
+       font-size: 12px;
+       padding: 0 7px 2px 0;
+       font-weight: 700;
+     }
+     .SecondBoxEvents3{
+       height: 548px;
+       width: 820px;
+       margin: 0 0 0 56px;
+       display: flex;
+       flex-direction: row;
+       gap: 14px;
+     }
+     .SecondBoxEvents3Col1{
+       min-height: 560px;
+       width: 420px;
+       display: flex;
+       flex-direction: column;
+     }
+     .Eventsevent1{
+       width: 300px;
+       margin: 28px 0 0 56px;
+       border-radius: 14px;
+       display: flex;
+       flex-direction: column;
+       color: $maincolor-light;
+       border: 1px solid $maincolor-light;
+     }
+     .Eventsevent1TitleDescription{
+       width: 180px;
+     }
+     .ESTTitle{
+       max-height: 50.4px;
+       margin: 0 0 0 20.3px;
+       font-size: 16px;
+       font-weight: 600;
+     }
+     .ESTDescription{
+       margin: 0 0 0 20.3px;
+       font-size: 12px;
+       color: #8f92a1;
+     }
+     .Eventsevent1InterestedOnes{
+       height: 42px;
+       width: 180px;
+       display: flex;
+       flex-direction: row;
+       gap: 1px;
+       padding-bottom: 8.4px;
+     }
+     .Eventsevent1InterestedFaces1{
+       margin: 6px 0 0 14px;
+       height: 23.8px;
+       width: 23.8px;
+       border-radius: 4px;
+       background-color: blue;
+     }
+     .Eventsevent1InterestedFaces2{
+       margin: 6px 0 0 -6px;
+       height: 23.8px;
+       width: 23.8px;
+       border-radius: 4px;
+       background-color: yellow;
+     }
+     .Eventsevent1InterestedFaces3{
+       margin: 6px 0 0 -6px;
+       height: 3.4vh;
+       width: 28px;
+       border-radius: 4px;
+       background-color: black;
+       z-index: 100;
+     }
+     .interestPlus{
+       color: white;
+       font-size: 10px;
+       margin:6px 0 0 4px;
+     }
+   
+     .interestedBtnText{
+      font-size: 14px;
+      margin: 7px 0 0 21px;
+      padding: 4.2px 0 4.2px 7px;
+      width: 63px;
+      border-radius: 4px;
+      background-color: green;
+     }
+     .interestedBtn{
+      width: 67%;
+    }
+    .rightbarTeventsFeaturesStories{
+      margin: 22.4px 0 0 7px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: context-menu;
+    }
+    .rightbarTwoEvents{
+      height: 602px;
+      width: 220px;
+      margin: 14px 0 0 21px;
+      display: flex;
+      flex-direction: column;
+      color: white;
+    }
+
+     .Eventsevent1Time{
+      margin: 10px 0 0 20px;
+      height: 30px;
+      width: 240px;
+      border-radius: 7px;
+      display: flex;
+      flex-direction: row;
+      gap: 2px;
+    }
+    // .Eventsevent1TimeCol2{
+    //   background-color: red;
+    //   // margin: 7px 0 0 0;
+    //   height: 10px;
+    //   width: 240px;
+    //   border-radius: 4px;
+    //   display: flex;
+    //   flex-direction: column;
+    // }
+     .Eventsevent1TimeCol2{
+       margin: 7px 0 0 3px;
+       height: 37.8px;
+       width: 140px;
+       border-radius: 4px;
+       display: flex;
+       flex-direction: column;
+     }
+     .dateEVTC1{
+      height: 35px;
+      width: 35px;
+       margin: 7px 0 0 0;
+       font-size: 17px;
+       font-weight: 600;
+       color: $maincolor-light;
+       border-style: none;
+       border-radius: 7px;
+       background-color:$maincolor-dark;
+       border: 1px solid $maincolor-light;
+     }
+     .dayEVTC1Text{
+      width: 200px;
+      margin: 0 0 0 0;
+      font-size: 14px;
+      font-weight: 600;
+      color: $maincolor-light;
+     }
+
+     .dayEVTC1{
+       height: 14px;
+       width: 70px;
+       margin: 0 0 0 0;
+       font-size: 12px;
+       font-weight: 600;
+       color: black;
+     }
+     .EventdayEVTC1{
+       height: 14px;
+       width: 120px;
+       margin: 0 0 0 0vh;
+       font-size: 12px;
+       font-weight: 600;
+       color: white;
+     }
+     .monthEVTC1{
+       height: 14px;
+       width: 126px;
+       margin: 4px 0 0 0vh;
+       font-size: 12px;
+       font-weight: 600;
+       color: grey;
+     }
+     .Eventsevent1TitleDescription{
+      width: 280px;
+    }
+    .ESTTitle{
+      max-height: 50.4px;  
+      margin: 0 0 0 20.3px;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .ESTDescription{
+      margin: 0 0 0 20.3px;
+      font-size: 12px;
+      color: #8f92a1;
+    }
+    .Eventsevent1InterestedOnes{
+      height: 42px;
+      width: 300px;
+      display: flex;
+      flex-direction: row;
+      gap: 1px;
+      padding-bottom: 8.4px;
+    }
+     .Eventsevent2{
+       width: 180px;
+       margin: 28px 0 0 14px;    
+       border-radius: 14px;
+       background-color: white;
+       display: flex;
+       flex-direction: column;
+     }
+     .SecondBoxEventsText{
+      color: $maincolor-light;
+       margin: 14px 0 0 0;
+       font-size: 22px;
+       font-weight: 600;
+     }
+    
+   .imageEvent{
+     height: 100px;
+     width: 180px;
+     background-color: yellow;
+     border-radius: 7px;
+   }
+   .titleEvent{
+     margin: 0;
+     height: 16.8px;
+     width: 140px;
+     color: white;
+     font-size: 13.2px;
+     font-weight: 600;
+   
+   }
+   .bodyEvent{
+     margin: 0;
+     height: 21px;
+     width: 150px;
+     color: white;
+     font-size: 12px;
+     display: flex;
+     flex-direction: row;
+     gap: 4px;
+   }
+   .tickEvent{
+     margin-left: 18.2px;
+     margin-bottom: 7px;
+     height: 21px;
+     width: 22.4px;
+     background-color:#666bed;
+     border-radius: 2px;
+   }
+   .tick{
+     padding: 6px;
+   }
+   .eventTime{
+     width: 161px;
+     margin: 0;
+   }
+   .eventTextSeeMore{
+     margin: 6px 0 0 0;
+   }

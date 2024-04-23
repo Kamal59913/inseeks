@@ -1,0 +1,225 @@
+  .newContainer{
+    display: flex;
+    flex-direction: row;
+    gap: 2vh;
+  }
+  .pagename{
+    margin-top: 4vh;
+    margin-left: 4vh;
+    font-size: 15px;
+    font-weight: 700;
+  }
+  .SideBar{
+    height: 100vh;
+    width: 30vh;
+    background-color: #666bed;
+    display: flex;
+    gap: 2vh;
+    flex-direction: column;
+  }
+  .AccountsInformation{
+    margin-left: 16vw;
+    width: 64vw;
+    height: 100vh;
+    /* min-height: 140vh; */
+    display: flex;
+    flex-direction: column;
+    gap: 1vh;
+    position: fixed;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    scrollbar-width: none; /* Hide the scrollbar for Firefox */
+    -ms-overflow-style: none; /* Hide the scrollbar for IE and Edge */
+  }
+  .AccountsInformationTagline-stories{
+    height: 9vh;
+    width: 60vw;
+    /* background-color: #f7f7f7; */
+    color: black;
+    margin-top: 2.8vh;
+    /* margin-left: 8vh; */
+  }
+
+  .BasicInformationSection{
+    margin-top: 2.6vh;
+    height: 60vh;
+    width: 84vw;
+    color: black;
+    display: flex;
+    gap: 5px;
+    flex-direction: row;
+  }
+  .column1,.column2{
+    height: 80vh;
+    width: 58vh;
+    /* background-color: green; */
+  }
+  .column1{
+    margin-left: 8vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .column2{
+    margin-left: 5vh;
+    /* background-color: green;   */
+  }
+  #searchbar-stories{
+    height: 6vh;
+    width: 76vh;
+    padding: 0 10vh 0 5vh;
+    margin: -2vh 0 0 7vh;
+    border-style: none;
+    border-radius: 1vh;
+  }
+  .filters-stories{
+    position: absolute;
+    margin-left: 90vh;
+    margin-top: 3.6vh;
+    font-size: 12px;
+    color: grey;
+  }
+  .stories-glass{
+    position: absolute;
+    margin-top: 3.68vh;
+    margin-left: 8.4vh;
+  }
+  .column1a,.column1b{
+    width: 54vh;
+    /* margin-left: 4vh; */
+    background-color: white;
+    border-radius: 1vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .column1a{
+    /* margin-top: 3vh; */
+    height: 20vh;
+    /* background-color: pink; */
+  }
+  .column1b{
+    margin: 0 0 3vh 0;
+    /* height: 80vh; */
+    /* background-color: pink; */
+  }
+  .column1a{
+    margin-bottom:3vh;
+  }
+  .postBox{
+    height: 6vh;
+    width: 40vh;
+    margin-top: 3vh;
+    margin-left: 3vh;
+    /* background-color: green; */
+    display: flex;
+    flex-direction: row;
+  }
+
+.RightbarStories{
+  right: 0;
+  height: 100vh;
+  width: 82vw;
+  background-color: black;
+  position: fixed;
+  border-top-left-radius: 34px;
+  /* border-bottom-left-radius: 30px; */
+  display: flex;
+  flex-direction: column;
+}
+.rightbar-one-stories{
+  height: 15vh;
+  width: 82vw;
+  /* margin: 4vh 0 0 4vh; */
+  display: flex;
+  flex-direction: row;
+  /* justify-content: end; */
+  color: white;
+  /* background-color: red; */
+}
+.rightbar-two-stories{
+  height: 11vh;
+  width: 16.8vw;
+  margin: 4vh 0 0 4vh;
+  display: flex;
+  flex-direction: column;
+  color: white;
+}
+.rightbar-one-notification-stories{
+  margin: 4vh 0 0 26vh;
+  height: 6vh;
+  width: 6vh;
+  background-color:#666bed;
+  border-radius: 10px;
+}
+.rightbar-one-image-stories{
+  height: 6vh;
+  width: 6vh;
+  background-color:#666bed;
+  border-radius: 10px;
+  margin: 4vh 3vh 0 2vh;
+  margin-left: 2vh;
+}
+.rightbar-two-features-stories-stories{
+  margin: 0 0 0 3vh;
+  font-size: 24px;
+  font-weight: 600;
+  cursor: context-menu;
+}
+.rightbar-two-images-array-stories{
+  height: 7vh;
+  width: 70vh;
+  margin: 1vh 0 0 3vh;
+  display: flex;
+  flex-direction: row;
+  gap: 2vh;
+  overflow-y: scroll;
+  scrollbar-width: none; /* Hide the scrollbar for Firefox */
+  -ms-overflow-style: none; /* Hide the scrollbar for IE and Edge */
+}
+.options-stories{
+    font-size: 12px;
+    cursor: context-menu;
+    font-weight: 700;
+    color: grey;
+}
+.rightbar-stories{
+    height: 64vh;
+    width: 56vw;
+    margin: 5.6vh 0 0 7.6vh;
+    display: grid;
+    grid-template-rows: 26vh 26vh;
+    grid-template-columns: 20vh 20vh 20vh 20vh 20vh;
+    grid-row-gap: 4vh;
+    grid-column-gap: 4vh;
+    overflow-y: scroll;
+    scrollbar-width: none;
+}
+.rightbar-stories-1,.storyImage{
+    background-color: blue;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+}
+.storyImage{
+    height: 26vh;
+    /* width: 20vh; */
+}
+.User-storie-image{
+    height: 5.4vh;
+    width: 6vh;
+    border-radius: 12px;
+    background-color: green;
+    margin: -10vh 0 0 6.4vh;
+}
+.User-storie-name{
+    margin: 0.8vh 0 0 0;
+    font-size: 12px;
+    text-align: center;
+    font-weight: 800;
+    color: white;
+}
+
+
+.bell{
+  margin: 3vh 0 0 1.6vh;
+  color: white;
+}

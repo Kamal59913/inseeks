@@ -1,0 +1,14 @@
+{
+  "scripts": {
+    "frontend": "cd frontend && npm start",
+    "backend": "cd backend && npm run dev",
+    "dev": "concurrently \"npm run frontend\" \"npm run backend\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "dependencies": {
+    "react-helmet": "^6.1.0",
+    "react-spinners": "^0.13.8"
+  }
+}
