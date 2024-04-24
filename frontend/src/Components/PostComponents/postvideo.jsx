@@ -73,10 +73,11 @@ const onLikeClick = () => {
     textDecoration: "none", // Remove underline
     color: "inherit", // Inherit color from parent
   };
+  console.log()
+
   const sendData = () => {
     props.changeToggleVideoPost(props)
   }
-
   return (
     <div className="ml-[26px] lg:ml-[22px] p-1 w-[380px] rounded-md border">
     <div className="flex items-center m-2">
