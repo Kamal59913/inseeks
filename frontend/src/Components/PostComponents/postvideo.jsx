@@ -103,13 +103,18 @@ const onLikeClick = () => {
  controls // Add the controls attribute here
 />
 <div className="pl-5 pb-2">
-{props.likesCount}
-  <i
+
+{likedata&& 
+  <>
+  {likecount}  
+  <i 
     type="button"
-    className={`${likebuttontoggle? `fa-solid` : `fa-regular`} fa-heart px-2.5 py-1 text-[14px] text-white shadow-sm hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black`}
+    className={`${isliked ? 'fa-solid' : 'fa-regular'} fa-heart px-2.5 py-1 text-[14px] text-white shadow-sm hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black`}
     onClick={onLikeClick}
   >
   </i>
+    </>
+    }
   
   <i
     type="button"
