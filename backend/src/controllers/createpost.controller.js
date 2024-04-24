@@ -10,8 +10,9 @@ import mongoose from "mongoose";
 
 const createPost = asyncHandler(async (req, res) => {
     const {title, description} = req.body;
-
     const imagePath = req.file?.path;
+
+    console.log(title, description, imagePath)
 
     let image;
     if(imagePath) {
@@ -30,7 +31,6 @@ const createPost = asyncHandler(async (req, res) => {
         description,
         PostAuthor: req.user._id
     }
-
     if(image) {
         postData.image = image.url;
     }
@@ -75,10 +75,11 @@ const createVideoPost = asyncHandler(async (req, res) => {
     const {description} = req.body;
     
     const videoPath = req.file?.path;
-
+    console.log(videoPath,"videoPath")
     let video;
     if(videoPath) {
         video = await uploadOnCloudinary(videoPath)
+        console.log(video)
         if(!video.url) {
             throw new ApiError(400, "Error while uploading on video")
         }
@@ -133,6 +134,7 @@ const createImagePost = asyncHandler(async (req, res) => {
     const { title } = req.body;
     const files = req.files;
 
+    console.log(files)
     if(title === "") {
         throw new ApiError(400, "Adding a title is required")
     }
@@ -146,7 +148,7 @@ const createImagePost = asyncHandler(async (req, res) => {
         for(const element of files)  {
             imagePath = element.path
             uploadedImage = await uploadOnCloudinary(imagePath)
-
+            console.log(uploadedImage)
             if(uploadedImage) {
                 imagesArray.push(uploadedImage.url)
             }
@@ -155,14 +157,13 @@ const createImagePost = asyncHandler(async (req, res) => {
 
     await imageUpload(files)
   
-
     const postImages = {
         title,
         PostAuthor: req.user._id,
         images: imagesArray
-    };
+    }; 
+   const post = await ImagePost.create(postImages);
 
-    const post = await ImagePost.create(postImages);
 
     const UserAggregate = await ImagePost.aggregate([
         {

@@ -1,21 +1,73 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import DataContext from '../../Context/myContext';
+import axios from 'axios';
 
 export default function PostVideos(props) {
-  const { LikeAPost } = useContext(DataContext)
+
   const [likebuttontoggle, setlikebuttontoggle] = useState(false)
+  const [likedata, setlikedata] = useState(null);
+
+  /*to handle like toggle on front-end*/
+  const [likecount, setlikecount ] = useState(null)
+  const [isliked, setIsLiked] = useState(null)
+
+  /*get like details*/
+const getlikedetails = "http://localhost:8000/api/v1/like/getlike"
+
+/*url to like a post*/
+const likepost = "http://localhost:8000/api/v1/like/toggle/like"
+
+const LikeAPost = async (data) => {
+  axios.post(likepost, data, {
+    withCredentials: true
+  })
+  .then((res)=> {
+    console.log("reached", res)
+  })
+  .catch((err)=> {
+    console.log(err)
+  })
+}
+
+const getLikes = () => {
+  const data = {
+    PostId: props.postId,
+    type: props.type
+  }
+  axios.post(getlikedetails, data, { withCredentials: true })
+  .then((res)=> {
+  setlikedata(res.data.data)
+  setlikecount(res.data.data.length)
+  if (res.data.data[0]) {
+    setIsLiked(res.data.data[0].isLiked);
+  }  })
+.catch((err)=> {
+  console.log(err)
+})
+}
+
+useEffect(() => {
+  getLikes()
+}, [likebuttontoggle])
 
 
-  /*To handle the like*/
-  const onLikeClick = () => {
-    likebuttontoggle? setlikebuttontoggle(false) : setlikebuttontoggle(true)
-    const data = {
+/*To handle the like*/
+const onLikeClick = () => {
+  const newLikeStatus = !isliked; // Toggle the like status
+  setIsLiked(newLikeStatus); // Update the like status immediately
+
+  // Update the like count based on the new like status
+  const newLikeCount = newLikeStatus ? likecount + 1 : likecount - 1;
+  setlikecount(newLikeCount);
+
+  
+  const data = {
       PostId: props.postId,
       type: props.type
-    }
-    LikeAPost(data)
   }
+  LikeAPost(data)
+}
+
 
   const linkStyle = {
     textDecoration: "none", // Remove underline

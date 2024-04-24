@@ -780,13 +780,13 @@ const getUserListThree = asyncHandler(async (req, res) => {
           },
           /*pipeline 4 for limiting*/
           {
-               $limit: 3
-          },
-          /*pipeline 5 for users are supposed be only following*/
-          {
                $match: {
                     isFollowing: false
                }
+          },
+          /*pipeline 5 for users are supposed be only following*/
+          {
+               $limit: 3
           }
      ])
      return res

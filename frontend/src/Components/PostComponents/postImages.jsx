@@ -1,6 +1,5 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import DataContext from '../../Context/myContext';
 import axios from 'axios';
 
 export default function PostImages(props) {

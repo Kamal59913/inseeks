@@ -1,28 +1,77 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import DataContext from '../../Context/myContext';
+import axios from 'axios';
 
 export default function Post(props) {
-  const { LikeAPost } = useContext(DataContext)
   const [likebuttontoggle, setlikebuttontoggle] = useState(false)
+  const [likedata, setlikedata] = useState(null);
 
+    /*to handle like toggle on front-end*/
+    const [likecount, setlikecount ] = useState(null)
+    const [isliked, setIsLiked] = useState(null)
   
-  /*To handle the like*/
-  const onLikeClick = () => 
-  {
-    console.log(props.postId)
-    likebuttontoggle? setlikebuttontoggle(false) : setlikebuttontoggle(true)
+  /*get like details*/
+  const getlikedetails = "http://localhost:8000/api/v1/like/getlike"
+
+  /*url to like a post*/
+  const likepost = "http://localhost:8000/api/v1/like/toggle/like"
+  
+  const LikeAPost = async (data) => {
+    axios.post(likepost, data, {
+      withCredentials: true
+    })
+    .then((res)=> {
+      console.log("reached", res)
+    })
+    .catch((err)=> {
+      console.log(err)
+    })
+  }
+  
+  const getLikes = () => {
     const data = {
       PostId: props.postId,
       type: props.type
     }
+    axios.post(getlikedetails, data, { withCredentials: true })
+    .then((res)=> {
+    setlikedata(res.data.data)
+    setlikecount(res.data.data.length)
+    if (res.data.data[0]) {
+      setIsLiked(res.data.data[0].isLiked);
+    }  })
+  .catch((err)=> {
+    console.log(err)
+  })
+  }
+  
+  useEffect(() => {
+    getLikes()
+  }, [likebuttontoggle])
+  
+  
+  /*To handle the like*/
+  const onLikeClick = () => {
+    const newLikeStatus = !isliked; // Toggle the like status
+    setIsLiked(newLikeStatus); // Update the like status immediately
+  
+    // Update the like count based on the new like status
+    const newLikeCount = newLikeStatus ? likecount + 1 : likecount - 1;
+    setlikecount(newLikeCount);
+  
+    
+    const data = {
+        PostId: props.postId,
+        type: props.type
+    }
     LikeAPost(data)
   }
-
-  const linkStyle = {
-    textDecoration: "none", // Remove underline
-    color: "inherit", // Inherit color from parent
-  };
+  
+  
+    const linkStyle = {
+      textDecoration: "none", // Remove underline
+      color: "inherit", // Inherit color from parent
+    };
 
   const sendData = () => {
     props.changeToggleBlogPost(props)
@@ -54,13 +103,19 @@ export default function Post(props) {
   <p className="text-sm text-black-600">
     {props.description}
   </p>
-  {props.likesCount}
-  <i
+
+  {likedata&& 
+  <>
+  {likecount}  
+  <i 
     type="button"
-    className={`${likebuttontoggle? `fa-solid` : `fa-regular`} fa-heart px-2.5 py-1 text-[14px] text-white shadow-sm hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black`}
+    className={`${isliked ? 'fa-solid' : 'fa-regular'} fa-heart px-2.5 py-1 text-[14px] text-white shadow-sm hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black`}
     onClick={onLikeClick}
   >
   </i>
+    </>
+    }
+
   <i
     type="button"
     className="fa-regular fa-comment px-2.5 py-1 text-[14px] font-semibold text-white shadow-sm hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"

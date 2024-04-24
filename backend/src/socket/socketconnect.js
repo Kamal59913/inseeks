@@ -17,7 +17,6 @@ export const SocketConnect = (httpServer) => {
         });
     
         socket.on('chat message', async (msg) => {
-            console.log('message: ', msg);
             io.emit('chat message', msg);
           });
       });
