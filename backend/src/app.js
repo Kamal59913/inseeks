@@ -28,6 +28,7 @@ import createpostRouter from './routes/createpost.routes.js'
 import followRouter from './routes/follow.routes.js'
 import commentRouter from './routes/comment.routes.js'
 import likeRouter from './routes/like.route.js'
+import createEnvRouter from './routes/env.route.js'
 
 //routes declaration
 app.use("/api/v1/users", userRouter)
@@ -35,5 +36,6 @@ app.use("/api/v1/createpost", createpostRouter)
 app.use("/api/v1/follow", followRouter)
 app.use("/api/v1/comment", commentRouter)
 app.use("/api/v1/like", likeRouter)
+app.use("/api/v1/env", createEnvRouter)
 
 export {app}

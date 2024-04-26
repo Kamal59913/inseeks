@@ -11,7 +11,8 @@ export default function LeftBar(props) {
     <span className='font-bold'> Social </span>
     <i className='fa-solid fa-sliders pl-5'></i>
     <Link to='/h' style={linkStyle}><i className='fa-solid fa-house pl-5'></i></Link>
-    <i className='fa-solid fa-seedling pl-5'></i>
+    <Link to='/environments' style={linkStyle}><i className='fa-solid fa-seedling pl-5'></i></Link>
+
     <i className='fa-solid fa-envelope pl-5'></i>
     <Link to='/profile' style={linkStyle}><i className='fa-solid fa-user pl-5'></i></Link>
     <Link to='/settings' style={linkStyle}><i className='fa-solid fa-gear pl-5'></i></Link>
