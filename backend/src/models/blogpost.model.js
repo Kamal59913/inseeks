@@ -21,6 +21,9 @@ const blogPostSchema = new Schema(
             type: Number,
             default: 0
         },
+        community: {
+            type: String
+        },
         isPublished: {
             type: Boolean,
             default: true

@@ -3,7 +3,7 @@ import {BrowserRouter, Routes, Route, Link} from 'react-router-dom'
 
 export default function SharePost(props) {
   return (
-    <div className="ml-[26px] lg:ml-[22px] p-1 w-[380px] rounded-md border">
+    <div className="bg-[#131d35] ml-[26px] lg:ml-[22px] p-1 w-[400px] rounded-sm">
     <div className="flex items-center m-2">
   <div className="h-10 w-10 flex-shrink-0">
     <img
@@ -13,7 +13,7 @@ export default function SharePost(props) {
     />
   </div>
   <div className="ml-4 mb-2" onClick={props.changetoggleany}>
-    <div className="text-sm font-medium text-white w-[280px] h-7 bg-slate-600 outline-none" type='text'>What is on your mind?</div>
+    <div className="text-sm font-medium text-white w-[280px] h-7 outline-none" type='text'>What is on your mind?</div>
   </div>
 </div>
 

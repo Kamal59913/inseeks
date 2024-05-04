@@ -42,6 +42,11 @@ export function PostImages(props) {
     console.log("Clicked")
     let formData = new FormData()
     formData.append('title',title)
+    if(props.envname) {
+      formData.append('envname',props.envname)
+    } else {
+      formData.append('envname',"")
+    }
     images.forEach((image,index) => {
       formData.append(`images`,image);
     });

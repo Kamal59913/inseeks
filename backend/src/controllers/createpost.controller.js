@@ -9,10 +9,8 @@ import { User } from "../models/user.model.js";
 import mongoose from "mongoose";
 
 const createPost = asyncHandler(async (req, res) => {
-    const {title, description} = req.body;
+    const {title, description, envname} = req.body;
     const imagePath = req.file?.path;
-
-    console.log(title, description, imagePath)
 
     let image;
     if(imagePath) {
@@ -29,7 +27,8 @@ const createPost = asyncHandler(async (req, res) => {
     const postData = {
         title,
         description,
-        PostAuthor: req.user._id
+        PostAuthor: req.user._id,
+        community: envname
     }
     if(image) {
         postData.image = image.url;
@@ -72,7 +71,7 @@ const createPost = asyncHandler(async (req, res) => {
 })
 
 const createVideoPost = asyncHandler(async (req, res) => {
-    const {description} = req.body;
+    const {description, envname} = req.body;
     
     const videoPath = req.file?.path;
     console.log(videoPath,"videoPath")
@@ -92,7 +91,8 @@ const createVideoPost = asyncHandler(async (req, res) => {
     const post = await VideoPost.create({       
             description,
             PostAuthor: req.user._id,
-            video: video.url
+            video: video.url,
+            community: envname
         
     })
 
@@ -131,7 +131,7 @@ const createVideoPost = asyncHandler(async (req, res) => {
 })
 
 const createImagePost = asyncHandler(async (req, res) => {
-    const { title } = req.body;
+    const { title, envname } = req.body;
     const files = req.files;
 
     console.log(files)
@@ -160,7 +160,8 @@ const createImagePost = asyncHandler(async (req, res) => {
     const postImages = {
         title,
         PostAuthor: req.user._id,
-        images: imagesArray
+        images: imagesArray,
+        community: envname
     }; 
    const post = await ImagePost.create(postImages);
 

@@ -15,6 +15,9 @@ const videoPostSchema = new Schema(
             type: String,
             default: "video"
         },
+        community: {
+            type: String
+        },
         views: {
             type: Number,
             default: 0

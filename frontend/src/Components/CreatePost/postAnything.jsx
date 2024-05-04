@@ -24,7 +24,11 @@
       formData.append('title',title)
       formData.append('description',description)
       formData.append('image',image)
-
+      if(props.envname) {
+        formData.append('envname',props.envname)
+      } else {
+        formData.append('envname',"")
+      }
       console.log(formData)
       axios.post(postAnythingUrl, formData , {
         headers: {

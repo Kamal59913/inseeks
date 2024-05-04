@@ -10,7 +10,10 @@ const envSchema = new Schema({
     description: {
         type: String,
     },
-    JoinedBy: {
+    envAvatar: {
+        type: String
+    },
+    CreatedBy: {
         type: Schema.Types.ObjectId,
         ref: "User"
     },

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useNavigate, useParams } from "react-router-dom"
 import axios from 'axios'
 import NavBar from '../Utilities/NavBar';
 import LeftBar from '../Utilities/LeftBar';
@@ -16,7 +16,9 @@ import BlogPost from './blogpost';
 import VideoPost from './videopost';
 import ImagePost from './imagepost';
 
-export default function Homepage() {
+export default function EnvHomepage() {
+
+  const {envname} = useParams()
   const linkStyle = {
     textDecoration: "none", // Remove underline
     color: "inherit", // Inherit color from parent
@@ -28,21 +30,21 @@ export default function Homepage() {
   /*dummy profile pic*/
   const [avatar, setAvatar] = useState('https://res.cloudinary.com/dogyotgp5/image/upload/v1713078910/avatar-dummy-social-app_fx9x9f.png');
 
-
+  
   /*declaring the axios urls*/
   const logoutUrl = "http://localhost:8000/api/v1/users/logout"
 
   /*declaring the route for getallposts*/
-  const getallposts = "http://localhost:8000/api/v1/createpost/getposts/h"
+  const getallposts = `http://localhost:8000/api/v1/env/getposts/env/${envname}`
 
   /*declaring the route for only blog posts*/
-  const getallblogposts = "http://localhost:8000/api/v1/createpost/getposts/h/blogs"
+  const getallblogposts = `http://localhost:8000/api/v1/env/getposts/env/blogs/${envname}`
 
   /*declaring the route for only image posts*/
-  const getallimageposts = "http://localhost:8000/api/v1/createpost/getposts/h/images"
+  const getallimageposts = `http://localhost:8000/api/v1/env/getposts/env/images/${envname}`
   
   /*declaring the route for only image posts*/
-  const getallvideoposts = "http://localhost:8000/api/v1/createpost/getposts/h/videos"
+  const getallvideoposts = `http://localhost:8000/api/v1/env/getposts/env/videos/${envname}`
   /*url to get the current user*/
   const currentuser = "http://localhost:8000/api/v1/users/current-user"
 
@@ -106,12 +108,11 @@ export default function Homepage() {
 
   /*UseEffect hook to get allposts*/
   useEffect(() => {
-    axios.post(getallposts, null, {
+    axios.get(getallposts, {
       withCredentials: true 
     })
     .then((res)=> {
       setposts(res.data.done)
-      console.log(res.data.done)
       underlineManager('explore')
     })
     .catch((err)=>{
@@ -251,7 +252,7 @@ const filterPosts = (data) => {
   } else if(data == 'blogs') {
   url = getallblogposts
   }
-  axios.post(url, null, { withCredentials: true })
+  axios.get(url, { withCredentials: true })
   .then((res) => {
     setposts(res.data.done)
     underlineManager(data)
@@ -284,28 +285,28 @@ const connectionRequest = (data, i) => {
 }
   return (
     <>
-    {togglePostAny && <PostAnyThing changetoggleany={changeToggleAny} updatepost={updatepost}/>} 
-    {togglePostImage && <PostImages changetoggleimage = {changeToggleImage} updatepost={updatepost}/>}
-    {togglePostVideo && <PostVideo changetogglevideo = {changeToggleVideo} updatepost={updatepost}/>}
+    {togglePostAny && <PostAnyThing changetoggleany = {changeToggleAny} updatepost={updatepost} envname={envname}/>} 
+    {togglePostImage && <PostImages changetoggleimage = {changeToggleImage} updatepost={updatepost} envname={envname}/>}
+    {togglePostVideo && <PostVideo changetogglevideo = {changeToggleVideo} updatepost={updatepost} envname={envname}/>}
     
     {toggleImagePost && <ImagePost changeToggleImagePost = {changeToggleImagePost} temp={imagetemp}/>}
     {toggleVideoPost && <VideoPost changeToggleVideoPost = {changeToggleVideoPost} temp={videotemp}/>}
     {toggleBlogPost && <BlogPost changeToggleBlogPost = {changeToggleBlogPost} temp={blogtemp}/>}
 
     <NavBar/>
-    <div className='bg-[#0f172a] flex flex-col lg:flex-row md:flex-col h-screen overflow-hidden'>
+    <div className='flex flex-col lg:flex-row md:flex-col h-screen overflow-hidden'>
           <LeftBar logout={logout}/>
-          <div className='h-full w-full border-r-2 border-[#40536b] lg:h-screen md:h-full md:max-w-full lg:w-8/12 flex lg:flex-col overflow-x-scroll items-center'>
+          <div className='h-full w-full lg:h-screen md:h-full md:max-w-full lg:w-8/12 bg-slate-600 flex lg:flex-col overflow-x-scroll items-center'>
             <div className='w-full mt-3 md:mt-2'>
               <SearchBar/>
             </div>
-            <div className='text-slate-200 mt-8 flex mr-auto ml-[88px] gap-4'>
+            <div className='text-slate-200 mt-8 flex mr-auto ml-[100px] gap-4'>
                <div className={`${exploreUnderline} font-semibold cursor-context-menu`} onClick={()=> filterPosts('explore')}>Explore</div>  
                <div className={`${imagesUnderline} cursor-context-menu`} onClick={()=> filterPosts('images')}>Images</div> 
                <div className={`${videosUnderline} cursor-context-menu`} onClick={()=> filterPosts('videos')}>Videos</div>
                <div className={`${blogsUnderline} cursor-context-menu`} onClick={()=> filterPosts('blogs')}>Blogs</div>
             </div>
-            <div className='w-[900px] ml-[36px] grid grid-cols-2 grid-rows-18 mt-4 gap-y-6 gap-x-2'>
+            <div className='w-[840px] grid grid-cols-2 grid-rows-18 mt-4 gap-y-6 gap-x-3'>
                     <div className='col-span-1 row-span-2 mb-2'>
                         <SharePost changetoggleimage={changeToggleImage} changetoggleany={changeToggleAny} changetogglevideo = {changeToggleVideo} changetogglestory = {changeToggleStory} avatar={currentUser&& currentUser.avatar || avatar}/>
                   </div>
@@ -343,13 +344,13 @@ const connectionRequest = (data, i) => {
             </div>
 
           </div>
-          <div className='hidden shrink-0 h-full lg:h-screen md:h-full md:w-full lg:w-3/12 lg:flex lg:flex-col'>
+          <div className='hidden shrink-0 h-full lg:h-screen md:h-full md:w-full lg:w-3/12 bg-slate-800 lg:flex lg:flex-col'>
             <div className='flex'>
                    <div className='ml-[220px] mt-4 bg-slate-400 h-12 w-12 flex items-center justify-center rounded-full'>
                         <i className='fa-solid fa-bell text-white text-xl'></i>
                     </div>
                     <div className='ml-5 mt-4'>
-                        <UserImage avatar={currentUser && currentUser.avatar}/>
+                        <UserImage avatar={avatar}/>
                     </div>
             </div>
             <p className='text-white text-md mt-4 ml-8'> Recent Stories </p>

@@ -153,7 +153,7 @@ const filterPosts = (data) => {
       })
     }
   return (
-    <div className='flex flex-col lg:flex-row md:flex-col h-screen overflow-hidden bg-slate-400'>
+    <div className='bg-[#0f172a] flex flex-col lg:flex-row md:flex-col h-screen overflow-hidden'>
         <LeftBar/>
         <div className='w-[388px] h-[720px] flex flex-col overflow-y-scroll overflow-x-hidden ml-[80px] justify-center'>
             <div className='w-[360px] h-[640px] bg-slate-50 flex flex-col items-center rounded-[1.6vh]'>

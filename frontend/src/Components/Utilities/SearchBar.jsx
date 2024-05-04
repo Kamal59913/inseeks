@@ -8,9 +8,9 @@ export default function SearchBar() {
         <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
             <i className='fa-solid fa-search ga444'></i>
         </div>
-        <input type="text" id="simple-search" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Search branch name..." required />
+        <input type="text" id="simple-search" class="bg-[#131d35] text-gray-900 text-sm rounded-lg block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" placeholder="Search branch name..." required />
     </div>
-    <button type="submit" class="p-2.5 ms-2 text-sm font-medium text-black rounded-sm focus:ring-4 focus:outline-none bg-slate-100">
+    <button type="submit" class="h-[38px] w-[60px] ms-2 text-sm font-medium text-black rounded-sm focus:ring-4 focus:outline-none bg-slate-100">
       Search
     </button>
 </form>

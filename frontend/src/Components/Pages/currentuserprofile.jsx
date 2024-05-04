@@ -126,9 +126,9 @@ export default function MyProfile() {
     } 
 
   return (
-    <div className="flex flex-col lg:flex-row md:flex-col h-screen overflow-hidden">
+    <div className="bg-[#0f172a] flex flex-col lg:flex-row md:flex-col h-screen overflow-hidden">
         <LeftBar/>
-        <div className='h-full w-full lg:h-screen md:h-full md:max-w-full lg:w-8/12 bg-slate-600 flex lg:flex-col overflow-x-scroll items-center'>
+        <div className='h-full w-full lg:h-screen md:h-full md:max-w-full lg:w-8/12 flex lg:flex-col overflow-x-scroll items-center'>
             <div className='w-full mt-3 md:mt-2'>
               <SearchBar/>
             </div>

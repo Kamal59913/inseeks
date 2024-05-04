@@ -90,9 +90,9 @@ useEffect(() => {
     <>
     {togglechangeprofilepic && <ReplaceImage togglePic={togglePic} toggleForProfileImageFetch={toggleForProfileImageFetch}/>}
     {toggledeleteprofilepic && <DeleteImage toggleDeletePic={toggleDeletePic} toggleForProfileImageFetch={toggleForProfileImageFetch}/>}
-    <div className="flex flex-col lg:flex-row md:flex-col h-screen overflow-hidden">
+    <div className="bg-[#0f172a] flex flex-col lg:flex-row md:flex-col h-screen overflow-hidden">
       <LeftBar/>
-      <div className='h-full w-full lg:h-screen md:h-full md:max-w-full lg:w-8/12 bg-slate-600 flex lg:flex-col overflow-x-scroll items-center pl-8'>
+      <div className='h-full w-full lg:h-screen md:h-full md:max-w-full lg:w-8/12 flex lg:flex-col overflow-x-scroll items-center pl-8'>
         <div className='@apply h-[70px] w-[59.2vw] text-[black] mt-[7px]'>
           <p className='@apply text-slate-200 text-xl font-bold mt-7 ml-2'>Accounts Information</p>
         </div>
@@ -115,12 +115,11 @@ useEffect(() => {
             <div className='text-md font-semibold text-slate-200'>Change Password</div>
           </div>
           <form onSubmit={handlesubmit} method='POST'>
-          <div className='w-[94%] flex'>
-          <div className='h-[70px] w-[420px]'>
+              <div className='h-[70px] w-[420px] mt-4'>
               <label for="title" className='text-slate-200'>FULLNAME</label> <br/>
                   <input type="text"
                   name="Occupation"
-                  className='h-[37.8px] w-[20vw] text-slate-600 font-medium bg-slate-400 border mt-[7px] pl-3.5 rounded-md border-[none] border-solid border-[grey]'
+                  className='h-[37.8px] w-[20vw] text-slate-200 font-medium border-b bg-transparent'
                   value={fullname}
                   onChange={(e)=>setfullname(e.target.value)}
                   /><br/>
@@ -129,18 +128,16 @@ useEffect(() => {
               <label for="title" className='text-slate-200'>USERNAME</label> <br/>
                   <input type="text"
                   name="Occupation"
-                  className='h-[37.8px] w-[20vw] text-slate-600 font-medium bg-slate-400 border mt-[7px] pl-3.5 rounded-md border-[none] border-solid border-[grey]'
+                  className='h-[37.8px] w-[20vw] text-slate-200 font-medium border-b bg-transparent'
                   value={username}
                   onChange={(e)=> setUsername(e.target.value)}
                   /><br/>
               </div>
-          </div>
-          <div className='input-form-profile-page-basic-information-input-row-2'>
-          <div className='h-[70px] w-[420px]'>
+              <div className='h-[70px] w-[420px] mt-4'>
               <label for="title" className='text-slate-200'>EMAIL</label> <br/>
                   <input type="text"
                   name="Occupation"
-                  className='h-[37.8px] w-[20vw] text-slate-600 font-medium bg-slate-400 border mt-[7px] pl-3.5 rounded-md border-[none] border-solid border-[grey]'
+                  className='h-[37.8px] w-[20vw] text-slate-200 font-medium border-b bg-transparent'
                   value={email}
                   onChange={(e)=> setEmail(e.target.value)}
                   /><br/>
@@ -149,12 +146,11 @@ useEffect(() => {
               <label for="title" className='text-slate-200'>ABOUT</label> <br/>
                   <textarea
                   name="Occupation"
-                  className='max-h-[60.8px] min-h-[37.8px] w-[20vw] text-slate-600 font-medium bg-slate-400 border mt-[7px] pl-3.5 rounded-md border-[none] border-solid border-[grey]'
+                  className='h-[37.8px] w-[20vw] text-slate-200 font-medium border-b bg-transparent'
                   value={about}
                   onChange={(e)=>setAbout(e.target.value)}
                   /><br/>
               </div>
-          </div>
           <div className='divider'></div>
           <button type='submit' className='mr-auto mt-2 text-lg h-14 min-w-[210px] bg-slate-200 text-slate-600 font-semibold rounded-[70px] border-none'> {buttonname} </button>
           </form>

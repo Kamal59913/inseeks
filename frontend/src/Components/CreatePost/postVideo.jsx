@@ -21,8 +21,11 @@ export function PostVideo(props) {
     let formData = new FormData()
     formData.append('description',description)
     formData.append('video',video)
-
-    console.log(formData)
+    if(props.envname) {
+      formData.append('envname',props.envname)
+    } else {
+      formData.append('envname',"")
+    }
     axios.post(postVideoUrl, formData , {
       headers: {
         'Content-Type': 'multipart/form-data',

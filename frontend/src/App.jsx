@@ -11,6 +11,8 @@ import BlogPost from './Components/Pages/blogpost'
 import VideoPost from './Components/Pages/videopost'
 import ImagePost from './Components/Pages/imagepost'
 import Environments from './Components/Pages/environments'
+import EnvSpecificHomePage from './Components/Pages/envSpecificHomePage'
+import Messages from './Components/messages'
 
 import "./styles/color.css";
 import "./styles/font.css";
@@ -39,6 +41,9 @@ function App() {
         <Route path='/h/video' element={<VideoPost/>}></Route>
         <Route path='/h/image' element={<ImagePost/>}></Route>
         <Route path='/environments' element={<Environments/>}></Route>
+        <Route path='/env-home-page/:envname' element={<EnvSpecificHomePage/>}></Route>
+        <Route path='/h/messages' element={<Messages/>}></Route>
+
        </Routes>
     </BrowserRouter>
     </UserListProvider>

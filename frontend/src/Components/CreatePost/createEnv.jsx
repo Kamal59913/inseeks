@@ -13,18 +13,18 @@
     //putting it all in a json variable
     const handleenvCoverImageChange = (e) => {
       console.log(e.target.files[0])
-        setenvCoverImage(e.target.files[0]);
+      setenvCoverImage(e.target.files[0]);
     }
 
     const handleSubmit = (e) => {
+      console.log("does the file entering into the handlesubmit", envCoverImage)
       e.preventDefault();
       setLoader(true)
       let formData = new FormData()
-      formData.append('envName',envName)
-      formData.append('EnvDescription',EnvDescription)
-      formData.append('envCoverImage',envCoverImage)
+      formData.append('envName', envName)
+      formData.append('EnvDescription', EnvDescription)
+      formData.append('envCoverImage', envCoverImage)
 
-      console.log(formData, "here is it")
       axios.post(postAnythingUrl, formData , {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -42,10 +42,9 @@
       .catch((err) => {
         console.log(err)
       })
-
     }
     return (
-      <div className="absolute rounded-md bg-slate-600 p-2 w-full h-screen flex items-center justify-center bg-opacity-25">
+      <div className="absolute rounded-md bg-slate-600 p-2 w-full h-screen flex items-center justify-center bg-opacity-25 z-10">
         <div className="relative flex justify-center bg-white px-4 py-4 sm:px-6 sm:py-16 lg:px-8 w-[460px] rounded-md">
           <div className="xl:mx-auto xl:w-full xl:max-w-sm 2xl:max-w-md">
           <i className='fa-solid fa-backward absolute ml-[400px] text-slate-600' onClick={props.toggleCreate}></i>
