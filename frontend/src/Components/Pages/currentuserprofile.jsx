@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import PANDN from '../Utilities/notifcationandprofile'
 import LeftBar from '../Utilities/LeftBar'
 import SearchBar from '../Utilities/SearchBar'
 import Post from '../PostComponents/post'
@@ -8,206 +7,164 @@ import PostImage from '../PostComponents/postImages'
 import axios from 'axios'
 import { Link } from 'react-router-dom'
 
+const FILTERS = [
+  { key: 'explore', label: 'All Posts' },
+  { key: 'images',  label: 'Photos' },
+  { key: 'videos',  label: 'Videos' },
+  { key: 'blogs',   label: 'Blogs' },
+]
+
 export default function MyProfile() {
-  const linkStyle = {
-    textDecoration: "none", // Remove underline
-    color: "inherit", // Inherit color from parent
-  };
-
-  /*User posts links*/
-  /*declaring the route for getallposts*/
-  const getallpostsUser = "http://localhost:8000/api/v1/createpost/getalluserposts"
-
-  /*declaring the route for only blog posts*/
-  const getallblogpostsUser = "http://localhost:8000/api/v1/createpost/getuserposts/blogs"
-   
-  /*declaring the route for only image posts*/
-  const getallimagepostsUser = "http://localhost:8000/api/v1/createpost/getuserposts/images"
-      
-  /*declaring the route for only image posts*/
-  const getallvideopostsUser = "http://localhost:8000/api/v1/createpost/getuserposts/videos"
-  
-  /*url to get the current user*/
-  const currentuser = "http://localhost:8000/api/v1/users/current-user"
-
-
+  const [avatar] = useState('https://res.cloudinary.com/dogyotgp5/image/upload/v1713078910/avatar-dummy-social-app_fx9x9f.png')
+  const [currentUser, setCurrentUser] = useState()
   const [posts, setposts] = useState()
-  const [imagesUnderline, setImagesUnderline] = useState('');
-  const [videosUnderline, setVideosUnderline] = useState('');
-  const [blogsUnderline,  setBlogsUnderline] = useState('');
-  const [exploreUnderline, setexploreUnderline] = useState('');
+  const [activeFilter, setActiveFilter] = useState('explore')
 
-  const underlineManager = (value) => {
-    if(value == 'explore') {
-      setImagesUnderline('')
-      setVideosUnderline('')
-      setBlogsUnderline('')
-      setexploreUnderline('underline underline-offset-2')
-    } else if(value == 'images') {
-      setImagesUnderline('underline underline-offset-2')
-      setVideosUnderline('')
-      setBlogsUnderline('')
-      setexploreUnderline('')
-    } else if(value == 'videos') {
-      setImagesUnderline('')
-      setVideosUnderline('underline underline-offset-2')
-      setBlogsUnderline('')
-      setexploreUnderline('')
-    } else if(value == 'blogs') {
-      setImagesUnderline('')
-      setVideosUnderline('')
-      setBlogsUnderline('underline underline-offset-2')
-      setexploreUnderline('')
+  const getallpostsUser     = `${process.env.REACT_APP_API_URL}/createpost/getalluserposts`
+  const getallblogpostsUser = `${process.env.REACT_APP_API_URL}/createpost/getuserposts/blogs`
+  const getallimagepostsUser= `${process.env.REACT_APP_API_URL}/createpost/getuserposts/images`
+  const getallvideopostsUser= `${process.env.REACT_APP_API_URL}/createpost/getuserposts/videos`
+  const currentuser         = `${process.env.REACT_APP_API_URL}/users/current-user`
+
+  useEffect(() => {
+    axios.get(currentuser, { withCredentials: true }).then(res => setCurrentUser(res.data.data))
+  }, [])
+
+  useEffect(() => {
+    if (!currentUser) return
+    axios.get(`${getallpostsUser}/${currentUser.username}`, { withCredentials: true })
+      .then(res => setposts(res.data.done)).catch(() => {})
+  }, [currentUser])
+
+  const filterPosts = (key) => {
+    if (!currentUser) return
+    setActiveFilter(key)
+    const urls = {
+      explore: `${getallpostsUser}/${currentUser.username}`,
+      images:  `${getallimagepostsUser}/${currentUser.username}`,
+      videos:  `${getallvideopostsUser}/${currentUser.username}`,
+      blogs:   `${getallblogpostsUser}/${currentUser.username}`,
     }
-}
+    axios.get(urls[key], { withCredentials: true }).then(res => setposts(res.data.done)).catch(() => {})
+  }
 
-    /*dummy profile pic*/
-    const [avatar, setAvatar] = useState('https://res.cloudinary.com/dogyotgp5/image/upload/v1713078910/avatar-dummy-social-app_fx9x9f.png');
-
-    /*hook to store current user*/
-    const [currentUser, setCurrentUser] = useState();
-
-    /*UseEffect hook to get current user data*/
-    useEffect(() => {
-      axios.get(currentuser, {
-        withCredentials: true
-      })
-      .then((res)=>{
-        console.log(res.data.data)
-        setCurrentUser(res.data.data)
-      })
-    }, [])
-
-    /*UseEffect hook to get allposts*/
-    useEffect(() => {
-      if(currentUser) {
-        console.log(currentUser)
-        axios.get(`${getallpostsUser}/${currentUser.username}`, {
-          withCredentials: true   
-        })
-        .then((res)=> {
-          console.log(res.data.done)
-          setposts(res.data.done)
-          underlineManager('explore')
-        })
-        .catch((err)=>{
-          console.log(err)
-        }) 
-      }
-
-      }, [currentUser])
-
-    /*To filter the posts*/
-    const filterPosts = (data) => {
-      let url;
-      switch (data) {
-        case 'images':
-          url = `${getallimagepostsUser}/${currentUser.username}`;
-          break;
-        case 'videos':
-          url = `${getallvideopostsUser}/${currentUser.username}`;
-          break;
-        case 'blogs':
-          url = `${getallblogpostsUser}/${currentUser.username}`;
-          break;
-        default:
-          url = `${getallpostsUser}/${currentUser.username}`;
-      }
-      axios.get(url, { withCredentials: true })
-      .then((res) => {
-        console.log(res)
-        setposts(res.data.done)
-        underlineManager(data)
-      })
-      .catch((err) => {
-        console.log(err)
-      })
-    
-    } 
+  const totalPosts = currentUser
+    ? (currentUser.PostsCount || 0) + (currentUser.ImagePostCount || 0) + (currentUser.VideoPostsCount || 0)
+    : 0
 
   return (
-    <div className="bg-[#0f172a] flex flex-col lg:flex-row md:flex-col h-screen overflow-hidden">
-        <LeftBar/>
-        <div className='h-full w-full lg:h-screen md:h-full md:max-w-full lg:w-8/12 flex lg:flex-col overflow-x-scroll items-center'>
-            <div className='w-full mt-3 md:mt-2'>
-              <SearchBar/>
-            </div>
-            <div className='text-slate-200 mt-8 flex mr-auto ml-[114px] gap-4'>
-               <div className={`${exploreUnderline} font-semibold cursor-context-menu`} onClick={()=> filterPosts('explore')}>Your Posts</div>  
-               <div className={`${imagesUnderline} cursor-context-menu`} onClick={()=> filterPosts('images')}>Images</div> 
-               <div className={`${videosUnderline} cursor-context-menu`} onClick={()=> filterPosts('videos')}>Videos</div> 
-               <div className={`${blogsUnderline} cursor-context-menu`} onClick={()=> filterPosts('blogs')}>Blogs</div>
-            </div>
-            <div className='w-[840px] grid grid-cols-2 grid-rows-18 mt-4 gap-y-6 gap-x-3'>
-                  {
-                    posts && <>
-                    {
-                    posts.map((index, i) => {
-                      if(index.type == "image") {    
-                        return (
-                          <div className='h-full col-span-1 row-span-6'>
-                          <PostImage author={index.author[0].username}  title={index.title} images={index.images} time={index.createdAt} editTime={index.updatedAt} views={index.views} avatar={index.author[0].avatar || avatar}/>
-                          </div>                        
-                          )
-                      }
-                      else if(index.type == "video") {          
-                        return (
-                          <div className='h-full w-1/2 col-span-1 row-span-6'>
-                          <Videos author={index.author[0].username} description={index.description} video={index.video} time={index.createdAt} editTime={index.updatedAt} views={index.views} avatar={index.author[0].avatar || avatar}/>
-                          </div>
-                        )
-                      }
-                      else if(index.type == "blogpost"){
-                            // Check if the author array is defined and not empty
-                        return (
-                          <div className='h-full w-1/2 col-span-1 row-span-6'>
-                          <Post author={index.author[0].username} title={index.title} description={index.description} image={index.image} time={index.createdAt} editTime={index.updatedAt} views={index.views} avatar={index.author[0].avatar || avatar}/>
-                          </div>
-                        )
-                      }
-                    })
-                  }
-                    </>
-                  }
+    <div className="flex h-screen bg-[#090e1a] overflow-hidden">
+      <LeftBar/>
+
+      <main className="flex-1 flex flex-col min-w-0 overflow-y-auto pb-20 lg:pb-0">
+        <SearchBar/>
+
+        <div className="max-w-3xl mx-auto w-full px-4 py-6">
+          {/* Profile Hero */}
+          <div className="bg-[#111827] border border-[#1f2e47] rounded-2xl overflow-hidden mb-6">
+            {/* Cover */}
+            <div className="h-32 bg-gradient-to-r from-indigo-900/60 via-purple-900/40 to-[#111827] relative">
+              <div className="absolute inset-0 bg-gradient-to-t from-[#111827] to-transparent"></div>
             </div>
 
+            {/* Avatar + Info */}
+            <div className="px-6 pb-6 -mt-12 relative">
+              <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+                <div className="flex items-end gap-4">
+                  <img
+                    src={currentUser?.avatar || avatar}
+                    alt={currentUser?.fullname}
+                    className="h-24 w-24 rounded-2xl object-cover ring-4 ring-[#090e1a] bg-[#1a2540]"
+                  />
+                  <div className="pb-1">
+                    <h1 className="text-xl font-bold text-white">{currentUser?.fullname || '—'}</h1>
+                    <p className="text-sm text-slate-400">@{currentUser?.username || '—'}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 pb-1">
+                  <Link to="/settings">
+                    <button className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-xl transition-all">
+                      <i className="fa-solid fa-pen-to-square text-xs"></i>
+                      Edit Profile
+                    </button>
+                  </Link>
+                </div>
+              </div>
+
+              {/* Stats */}
+              <div className="flex items-center gap-6 mt-4">
+                <div className="text-center">
+                  <p className="text-lg font-bold text-white">{totalPosts}</p>
+                  <p className="text-xs text-slate-400">Posts</p>
+                </div>
+                <div className="w-px h-8 bg-[#1f2e47]"></div>
+                <div className="text-center">
+                  <p className="text-lg font-bold text-white">{Math.max(0, (currentUser?.followersCount || 1) - 1)}</p>
+                  <p className="text-xs text-slate-400">Connections</p>
+                </div>
+                <div className="w-px h-8 bg-[#1f2e47]"></div>
+                <div className="flex-1">
+                  <p className="text-sm text-slate-300 line-clamp-2">{currentUser?.about || 'No bio yet'}</p>
+                </div>
+              </div>
+
+              {/* Friends grid */}
+              {currentUser?.followerslist?.length > 0 && (
+                <div className="mt-4">
+                  <Link to="/h/follow" className="text-xs font-semibold text-indigo-400 hover:text-indigo-300 mb-2 block">
+                    Connections ({Math.max(0, (currentUser.followersCount || 1) - 1)}) →
+                  </Link>
+                  <div className="flex gap-2 flex-wrap">
+                    {currentUser.followerslist.slice(0, 8).map((user, i) => (
+                      <img key={i} src={user?.avatar || avatar} alt="" className="h-9 w-9 rounded-lg object-cover ring-1 ring-[#2a3d5c]"/>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
-        <div className='h-screen w-[26vw] bg-slate-800 fixed flex flex-col rounded-tl-[34px] rounded-bl-[30px] right-0'>
-        <PANDN avatar={avatar}/>
-        <div className='h-[650px] w-[23vw] flex flex-col items-center ml-[21px] mr-0 mt-[7px] mb-0 rounded-[11.2px]'>
-                <img className='h-[119px] w-[119px] mt-[9.8px] mb-0 mx-0 rounded-[11.2px]' src={currentUser && currentUser.avatar || avatar}/>
-                <p className='text-[22px] font-bold text-[white] mt-[7px] mb-0 mx-0'>{currentUser&& <>{currentUser.fullname}</>}</p>
-                <p className='text-base font-semibold text-[#8f92a1] mt-[4.2px] mb-0 mx-0'>{currentUser&& <>{currentUser.username}</>}</p>
-                <div className='h-[42px] text-sm font-semibold text-[#8f92a1] flex flex-row gap-7 m-0 p-0'>
-                    <p className='text-base mt-[11.2px] mb-0 mx-0'><b className='text-white'>{currentUser&& currentUser.PostsCount+currentUser.ImagePostCount+currentUser.VideoPostsCount}</b> Posts</p>
-                    <p className='text-base mt-[11.2px] mb-0 mx-0'><b className='text-white'>{currentUser&& Math.max(0, currentUser.followersCount - 1)}</b> Friends</p>
-                </div>
-                <div className='text-sm text-[#8f92a1] flex flex-row gap-[35px] items-center mt-[2.8px] mb-0 mx-0'>
-                    <Link to='/settings' style={linkStyle}><button className='bg-[#53d768] text-[white] text-base h-[42px] font-semibold mt-[4.2px] mb-0 mx-0 px-[21px] py-0 rounded-[21px] border-none'>Edit Profile</button></Link>
-                    <i class="fa-solid fa-ellipsis-vertical text-lg rounded text-[white] px-[11.2px] py-[5.6px] border-2 border-solid border-[#8f92a1]"></i>
-                </div>
-                <p className='text-lg font-bold text-[white] ml-0 mr-[186px] mt-3.5 mb-0'>About</p>
-                <p className='text-[13px] font-semibold w-[14vw] text-slate-200 ml-0 mr-[23.8px] mt-[4.2px] mb-0'>
-             {  
-              currentUser? currentUser.about : <>You have not added any bios</>
-             }
-                </p>
-                <Link to="/h/follow" style={linkStyle}><p className='text-[19px] font-bold text-[white] ml-0 mr-[12vw] my-3.5'>Friends</p></Link>
-                <div className='grid grid-cols-[49px_49px_49px_49px_49px] gap-y-[9.8px] mt-0 mb-3.5 mx-0'>
-                  {
-                    currentUser && currentUser.followerslist.map((index, i) => {
-                        return (
-                            index? <img key={i} src={index.avatar || avatar} className='h-[42px] w-[42px] rounded-[7px]'/>
-                            :
-                            <img src={avatar} className='h-[42px] w-[42px] rounded-[7px]'/>
-                        )
-                      
-                    })
-                  }
-                </div>
 
+          {/* Filter Tabs */}
+          <div className="flex items-center gap-1 p-1 bg-[#111827] border border-[#1f2e47] rounded-xl mb-4">
+            {FILTERS.map(f => (
+              <button
+                key={f.key}
+                onClick={() => filterPosts(f.key)}
+                className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all duration-200
+                  ${activeFilter === f.key ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white hover:bg-[#1a2540]'}`}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Posts Grid */}
+          {posts ? (
+            <div className="space-y-4">
+              {posts.map((post, i) => {
+                const author = post.author?.[0]
+                if (!author) return null
+                const common = {
+                  key: post._id, postId: post._id, type: post.type,
+                  author: author.username, avatar: author.avatar || avatar,
+                  time: post.createdAt, views: post.views,
+                  changeToggleBlogPost: () => {}, changeToggleImagePost: () => {}, changeToggleVideoPost: () => {},
+                }
+                if (post.type === 'image')    return <PostImage {...common} title={post.title} images={post.images}/>
+                if (post.type === 'video')    return <Videos {...common} description={post.description} video={post.video}/>
+                if (post.type === 'blogpost') return <Post {...common} title={post.title} description={post.description} image={post.image}/>
+                return null
+              })}
             </div>
-</div>
-    </div>   
+          ) : (
+            <div className="flex flex-col items-center justify-center py-20 text-slate-500">
+              <i className="fa-regular fa-rectangle-list text-5xl mb-4 text-slate-600"></i>
+              <p className="text-base font-medium">No posts yet</p>
+            </div>
+          )}
+        </div>
+      </main>
+    </div>
   )
 }

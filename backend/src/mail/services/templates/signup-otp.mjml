@@ -1,0 +1,14 @@
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-text font-size="20px" font-weight="bold">Verify Your Email</mj-text>
+        <mj-text>Hello {{name}},</mj-text>
+        <mj-text>Thank you for signing up! Please use the OTP below to complete your registration.</mj-text>
+        <mj-text font-size="32px" font-weight="bold" align="center" padding="20px" color="#4CAF50">{{otp}}</mj-text>
+        <mj-text>This code will expire in 10 minutes.</mj:text>
+        <mj-text>If you didn't sign up, you can safely ignore this email.</mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

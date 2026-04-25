@@ -1,0 +1,201 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enum for Blog Status
+enum BlogStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+// Enum for Category Status
+enum CategoryStatus {
+  ACTIVE
+  INACTIVE
+}
+
+model Role {
+  id          String       @id @default(uuid())
+  name        String       @unique
+  isPermanent Boolean      @default(false) @map("is_permanent")
+  users       User[]       @relation("RoleToUser")
+  permissions Permission[] @relation("PermissionToRole")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("role")
+}
+
+model Permission {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  description String?
+  isPermanent Boolean @default(true) @map("is_permanent")
+  roles       Role[]  @relation("PermissionToRole")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("permission")
+}
+
+model User {
+  id          String    @id @default(uuid())
+  name        String
+  email       String    @unique
+  password    String
+  image       Json? // Stores { original: {...}, thumbnail: {...} }
+  phone       String?
+  dateOfBirth DateTime? @map("date_of_birth")
+
+  roleId String @map("role_id")
+  role   Role   @relation("RoleToUser", fields: [roleId], references: [id])
+
+  isActive  Boolean @default(true) @map("is_active")
+  isDeleted Boolean @default(false) @map("is_deleted")
+
+  resetPasswordToken   String?   @map("reset_password_token")
+  resetPasswordExpires DateTime? @map("reset_password_expires")
+  resetOtpCode         String?   @map("reset_otp_code")
+  resetOtpExpires      DateTime? @map("reset_otp_expires")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relationships
+  blogs        Blog[]        @relation("UserBlogs")
+  blogComments BlogComment[] @relation("UserComments")
+  blogLikes    BlogLike[]    @relation("UserLikes")
+  blogViews    BlogView[]    @relation("UserViews")
+
+  @@index([roleId])
+  @@map("user")
+}
+
+model BlogCategory {
+  id          String         @id @default(uuid())
+  name        String         @unique
+  description String?
+  status      CategoryStatus @default(ACTIVE)
+  isDeleted   Boolean        @default(false) @map("is_deleted")
+
+  parentCategoryId String?        @map("parent_category_id")
+  parentCategory   BlogCategory?  @relation("CategoryHierarchy", fields: [parentCategoryId], references: [id])
+  childCategories  BlogCategory[] @relation("CategoryHierarchy")
+
+  image          Json? // Array of images with original/thumbnail
+  icon           String?
+  showInMenu     Boolean @default(true) @map("show_in_menu")
+  isHomepageShow Boolean @default(false) @map("is_homepage_show")
+  isHomepageCat  Boolean @default(false) @map("is_homepage_cat")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  blogs BlogCategoryMapping[]
+
+  @@index([parentCategoryId])
+  @@map("blog_category")
+}
+
+model Blog {
+  id          String     @id @default(uuid())
+  title       String
+  description String
+  status      BlogStatus @default(DRAFT)
+  images      Json? // Array of images with original/thumbnail
+  variants    Json? // Mixed field equivalent
+
+  authorId String @map("author_id")
+  author   User   @relation("UserBlogs", fields: [authorId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  categories BlogCategoryMapping[]
+  comments   BlogComment[]
+  likes      BlogLike[]
+  views      BlogView[]
+
+  @@index([status])
+  @@index([authorId])
+  @@map("blog")
+}
+
+// Explicit mapping for Many-to-Many between Blog and Category
+model BlogCategoryMapping {
+  blogId     String @map("blog_id")
+  categoryId String @map("category_id")
+
+  blog     Blog         @relation(fields: [blogId], references: [id], onDelete: Cascade)
+  category BlogCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@id([blogId, categoryId])
+  @@map("blog_category_mapping")
+}
+
+model BlogComment {
+  id     String @id @default(uuid())
+  blogId String @map("blog_id")
+  blog   Blog   @relation(fields: [blogId], references: [id], onDelete: Cascade)
+
+  parentCommentId String?       @map("parent_comment_id")
+  parentComment   BlogComment?  @relation("CommentHierarchy", fields: [parentCommentId], references: [id])
+  replies         BlogComment[] @relation("CommentHierarchy")
+
+  content       String
+  commentedById String @map("commented_by_id")
+  commentedBy   User   @relation("UserComments", fields: [commentedById], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([blogId])
+  @@index([parentCommentId])
+  @@map("blog_comment")
+}
+
+model BlogLike {
+  id     String @id @default(uuid())
+  blogId String @map("blog_id")
+  blog   Blog   @relation(fields: [blogId], references: [id], onDelete: Cascade)
+
+  userId String @map("user_id")
+  user   User   @relation("UserLikes", fields: [userId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([blogId, userId]) // Prevent multiple likes from same user
+  @@map("blog_like")
+}
+
+model BlogView {
+  id     String @id @default(uuid())
+  blogId String @map("blog_id")
+  blog   Blog   @relation(fields: [blogId], references: [id], onDelete: Cascade)
+
+  userId String? @map("user_id")
+  user   User?   @relation("UserViews", fields: [userId], references: [id])
+
+  ipAddress String  @map("ip_address")
+  userAgent String? @map("user_agent")
+  location  Json? // { city, region, country, postal, loc }
+  org       String?
+  timezone  String?
+  visitorId String? @map("visitor_id")
+
+  viewedAt DateTime @default(now()) @map("viewed_at")
+
+  @@index([blogId, visitorId])
+  @@index([blogId, userId])
+  @@map("blog_view")
+}

@@ -1,0 +1,44 @@
+0 verbose cli C:\Program Files\nodejs\node.exe C:\Program Files\nodejs\node_modules\npm\bin\npm-cli.js
+1 info using npm@11.6.2
+2 info using node@v24.12.0
+3 silly config load:file:C:\Program Files\nodejs\node_modules\npm\npmrc
+4 silly config load:file:E:\00 Interview\others\resume_projects\inseeks\.npmrc
+5 silly config load:file:C:\Users\LEGION\.npmrc
+6 silly config load:file:C:\Users\LEGION\AppData\Roaming\npm\etc\npmrc
+7 verbose title npm view express-one-in-all version
+8 verbose argv "view" "express-one-in-all" "version" "--cache" ".npm-cache"
+9 verbose logfile logs-max:10 dir:E:\00 Interview\others\resume_projects\inseeks\.npm-cache\_logs\2026-04-25T18_16_47_767Z-
+10 verbose logfile E:\00 Interview\others\resume_projects\inseeks\.npm-cache\_logs\2026-04-25T18_16_47_767Z-debug-0.log
+11 silly logfile done cleaning log files
+12 http fetch GET 200 https://registry.npmjs.org/npm 671ms
+13 http fetch GET 404 https://registry.npmjs.org/express-one-in-all 700ms (cache skip)
+14 verbose stack HttpErrorGeneral: 404 Not Found - GET https://registry.npmjs.org/express-one-in-all - Not found
+14 verbose stack     at C:\Program Files\nodejs\node_modules\npm\node_modules\npm-registry-fetch\lib\check-response.js:103:15
+14 verbose stack     at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+14 verbose stack     at async RegistryFetcher.packument (C:\Program Files\nodejs\node_modules\npm\node_modules\pacote\lib\registry.js:90:19)
+14 verbose stack     at async #getData (C:\Program Files\nodejs\node_modules\npm\lib\commands\view.js:135:20)
+14 verbose stack     at async #viewPackage (C:\Program Files\nodejs\node_modules\npm\lib\commands\view.js:112:28)
+14 verbose stack     at async View.exec (C:\Program Files\nodejs\node_modules\npm\lib\commands\view.js:70:5)
+14 verbose stack     at async Npm.exec (C:\Program Files\nodejs\node_modules\npm\lib\npm.js:208:9)
+14 verbose stack     at async module.exports (C:\Program Files\nodejs\node_modules\npm\lib\cli\entry.js:67:5)
+15 verbose statusCode 404
+16 verbose pkgid express-one-in-all@*
+17 error code E404
+18 error 404 Not Found - GET https://registry.npmjs.org/express-one-in-all - Not found
+19 error 404
+20 error 404  The requested resource 'express-one-in-all@*' could not be found or you do not have permission to access it.
+21 error 404
+22 error 404 Note that you can also install from a
+23 error 404 tarball, folder, http url, or git url.
+24 verbose cwd E:\00 Interview\others\resume_projects\inseeks
+25 verbose os Windows_NT 10.0.26200
+26 verbose node v24.12.0
+27 verbose npm  v11.6.2
+28 notice
+28 notice New minor version of npm available! 11.6.2 -> 11.13.0
+28 notice Changelog: https://github.com/npm/cli/releases/tag/v11.13.0
+28 notice To update run: npm install -g npm@11.13.0
+28 notice  { force: true, Symbol(proc-log.meta): true }
+29 verbose exit 1
+30 verbose code 1
+31 error A complete log of this run can be found in: E:\00 Interview\others\resume_projects\inseeks\.npm-cache\_logs\2026-04-25T18_16_47_767Z-debug-0.log

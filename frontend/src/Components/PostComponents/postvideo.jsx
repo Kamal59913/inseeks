@@ -1,137 +1,104 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import axios from 'axios';
+import { useModalData } from '../../store/hooks';
 
 export default function PostVideos(props) {
-
-  const [likebuttontoggle, setlikebuttontoggle] = useState(false)
+  const modal = useModalData()
   const [likedata, setlikedata] = useState(null);
-
-  /*to handle like toggle on front-end*/
-  const [likecount, setlikecount ] = useState(null)
+  const [likecount, setlikecount] = useState(null)
   const [isliked, setIsLiked] = useState(null)
+  const [likebuttontoggle, setlikebuttontoggle] = useState(false)
 
-  /*get like details*/
-const getlikedetails = "http://localhost:8000/api/v1/like/getlike"
+  const getlikedetails = `${process.env.REACT_APP_API_URL}/like/getlike`
+  const likepost = `${process.env.REACT_APP_API_URL}/like/toggle/like`
 
-/*url to like a post*/
-const likepost = "http://localhost:8000/api/v1/like/toggle/like"
-
-const LikeAPost = async (data) => {
-  axios.post(likepost, data, {
-    withCredentials: true
-  })
-  .then((res)=> {
-    console.log("reached", res)
-  })
-  .catch((err)=> {
-    console.log(err)
-  })
-}
-
-const getLikes = () => {
-  const data = {
-    PostId: props.postId,
-    type: props.type
+  const LikeAPost = async (data) => {
+    axios.post(likepost, data, { withCredentials: true })
+      .then(res => console.log("liked", res)).catch(err => console.log(err))
   }
-  axios.post(getlikedetails, data, { withCredentials: true })
-  .then((res)=> {
-  setlikedata(res.data.data)
-  setlikecount(res.data.data.length)
-  if (res.data.data[0]) {
-    setIsLiked(res.data.data[0].isLiked);
-  }  })
-.catch((err)=> {
-  console.log(err)
-})
-}
 
-useEffect(() => {
-  getLikes()
-}, [likebuttontoggle])
-
-
-/*To handle the like*/
-const onLikeClick = () => {
-  const newLikeStatus = !isliked; // Toggle the like status
-  setIsLiked(newLikeStatus); // Update the like status immediately
-
-  // Update the like count based on the new like status
-  const newLikeCount = newLikeStatus ? likecount + 1 : likecount - 1;
-  setlikecount(newLikeCount);
-
-  
-  const data = {
-      PostId: props.postId,
-      type: props.type
+  const getLikes = () => {
+    const data = { PostId: props.postId, type: props.type }
+    axios.post(getlikedetails, data, { withCredentials: true })
+      .then(res => {
+        setlikedata(res.data.data)
+        setlikecount(res.data.data.length)
+        if (res.data.data[0]) setIsLiked(res.data.data[0].isLiked)
+      }).catch(err => console.log(err))
   }
-  LikeAPost(data)
-}
 
+  useEffect(() => { getLikes() }, [likebuttontoggle])
 
-  const linkStyle = {
-    textDecoration: "none", // Remove underline
-    color: "inherit", // Inherit color from parent
-  };
-  console.log()
-
-  const sendData = () => {
-    props.changeToggleVideoPost(props)
+  const onLikeClick = () => {
+    const newLikeStatus = !isliked
+    setIsLiked(newLikeStatus)
+    setlikecount(newLikeStatus ? likecount + 1 : likecount - 1)
+    LikeAPost({ PostId: props.postId, type: props.type })
   }
+
+  const sendData = () =>
+    modal.open('view-video-post', {
+      temp: props,
+    })
+
   return (
-    <div className="bg-[#131d35] ml-[26px] lg:ml-[22px] p-1 w-[400px] rounded-sm text-slate-400">
-    <div className="flex items-center m-2">
-                      <div className="h-10 w-10 flex-shrink-0">
-                        <img
-                          className="h-10 w-10 rounded-full object-cover ml-2"
-                          src={props.avatar}
-                          alt=""
-                        />
-                      </div>
-                      <div className="ml-4">
-                      <Link to={`/user/${props.author}`} style={linkStyle}> <div className="text-sm font-semibold text-black-800 cursor-context-menu">{props.author}</div> </Link>
-                        <div className="text-sm text-black-700">5 mins Ago</div>
-                      </div>
-                      <div className='ml-[212px] mb-2'><i class="fa-solid fa-ellipsis-vertical"></i></div>
+    <div className="bg-[#111827] border border-[#1f2e47] rounded-2xl overflow-hidden hover:border-[#2a3d5c] transition-all duration-200 w-full animate-fade-in">
+      {/* Header */}
+      <div className="flex items-center gap-3 p-4">
+        <Link to={`/user/${props.author}`}>
+          <img className="h-10 w-10 rounded-full object-cover ring-2 ring-[#2a3d5c] hover:ring-indigo-500 transition-all" src={props.avatar} alt={props.author}/>
+        </Link>
+        <div className="flex-1 min-w-0">
+          <Link to={`/user/${props.author}`} className="text-sm font-semibold text-slate-200 hover:text-indigo-400 transition-colors">{props.author}</Link>
+          <p className="text-xs text-slate-500 mt-0.5">{new Date(props.time).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
+        </div>
+        <button className="text-slate-500 hover:text-slate-300 p-1.5 rounded-lg hover:bg-[#1a2540] transition-all">
+          <i className="fa-solid fa-ellipsis-vertical text-sm"></i>
+        </button>
+      </div>
+
+      {/* Description */}
+      {props.description && (
+        <p className="px-4 pb-3 text-sm text-slate-400 line-clamp-2">{props.description}</p>
+      )}
+
+      {/* Video */}
+      {props.video && (
+        <div className="px-4 pb-3">
+          <video
+            src={props.video}
+            controls
+            className="w-full h-52 rounded-xl object-cover bg-black"
+          />
+        </div>
+      )}
+
+      {/* Actions */}
+      <div className="flex items-center justify-between px-4 py-3 border-t border-[#1f2e47]">
+        <div className="flex items-center gap-1">
+          <button
+            onClick={onLikeClick}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200
+              ${isliked ? 'text-red-400 bg-red-500/10' : 'text-slate-400 hover:text-red-400 hover:bg-red-500/10'}`}
+          >
+            <i className={`${isliked ? 'fa-solid' : 'fa-regular'} fa-heart text-base`}></i>
+            {likecount !== null && <span>{likecount}</span>}
+          </button>
+          <button
+            onClick={sendData}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-slate-400 hover:text-indigo-400 hover:bg-indigo-500/10 transition-all duration-200"
+          >
+            <i className="fa-regular fa-comment text-base"></i>
+          </button>
+        </div>
+        <div className="flex items-center gap-3 text-xs text-slate-500">
+          {props.views !== undefined && <span className="flex items-center gap-1"><i className="fa-regular fa-eye"></i>{props.views}</span>}
+          <button className="flex items-center gap-1.5 text-slate-400 hover:text-indigo-400 hover:bg-indigo-500/10 px-3 py-1.5 rounded-lg transition-all duration-200">
+            <i className="fa-regular fa-share-from-square text-base"></i>
+          </button>
+        </div>
+      </div>
     </div>
-    <p className="text-sm text-black-600 ml-4 text-slate-200 mb-0">
-    {props.description}
-  </p>
-<video
- src={props.video}
- alt="Laptop"
- className="my-4 ml-7 h-[200px] w-[330px] rounded-md object-cover"
- controls // Add the controls attribute here
-/>
-<div className="pl-5 pb-2">
-
-{likedata&& 
-  <>
-  {likecount}  
-  <i 
-    type="button"
-    className={`${isliked ? 'fa-solid' : 'fa-regular'} fa-heart px-2.5 py-1 text-[14px] text-white shadow-sm hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black`}
-    onClick={onLikeClick}
-  >
-  </i>
-    </>
-    }
-  
-  <i
-    type="button"
-    className="fa-regular fa-comment px-2.5 py-1 text-[14px] font-semibold text-white shadow-sm hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
-    onClick={sendData}
-  >
-  </i>
-  <i className='fa-regular fa-eye ml-10 text-slate-200'>
-  </i>
-  <i
-    type="button"
-    className="ml-4 fa-regular fa-share px-2.5 py-1 text-[14px] font-semibold text-white shadow-sm hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
-  >
-  </i>
-
-</div>
-</div>   
-    )
+  )
 }

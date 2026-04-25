@@ -5,133 +5,128 @@ import DataContext from '../../Context/myContext'
 import axios from 'axios'
 
 export default function MyFriends() {
+  const togglefollow = `${process.env.REACT_APP_API_URL}/follow/user/connecttoggle`
 
-  /*url to follow a user*/
-  const togglefollow = "http://localhost:8000/api/v1/follow//user/connecttoggle"  
+  const [activeTab, setActiveTab] = useState('discover')
+  const [friendRequestToggle, setfriendRequestToggle] = useState({})
+  const [disconnectToggle, setdisconnectToggle] = useState({})
+  const { data, fetchData, avatar, datanotfollowed, fetchDataNotFollowed } = useContext(DataContext)
 
-  const [datatoggle, setdatatoggle] = useState(true);
-  const [friendRequestToggle, setfriendRequestToggle] = useState({});
-  const [diconnectRequestToggle, setdisconnectfriendRequestToggle] = useState({});
-  const [friendsCount, setfriendsCount] = useState(0);
-  /*toggle for useeffect dependency array*/
-  const [dependencyToggle, setToggle] = useState(false);
-
-  const {data, fetchData, avatar, datanotfollowed, fetchDataNotFollowed} = useContext(DataContext)
-
-  useEffect(() => {
-      fetchData()
-      fetchDataNotFollowed()
-  }, [data, datanotfollowed])
-
-  useEffect(() => {
-    if (data && data.length > 0) {
-      setfriendsCount(data.length);
-    }
-}, [data]); // Update friends count when data changes
-
+  useEffect(() => { fetchData(); fetchDataNotFollowed() }, [])
 
   const connectionRequest = (id) => {
-  /*intially set false to each element*/
-  setfriendRequestToggle(prevState => ({
-    ...prevState,
-    [id]: !prevState[id] // If the state is undefined, set it to false
-  }));
-  
-  let toggle;
-  if(friendRequestToggle[id]){
-    toggle = 'connect';
-  } else {
-    toggle = 'connected'
-  }
-  const userdetails = {
-    userId : id,
-    toggle: toggle
-  }
-
-  axios.post(togglefollow, userdetails, { withCredentials: true })
-  .then((res)=> {
-    console.log("Toggle follow request is successfull", res)
-    // fetchDataNotFollowed()
-  })
-  .catch((err) => {
-    console.log("There is some problem occurred in the follow toggle")
-  })
+    setfriendRequestToggle(prev => ({ ...prev, [id]: !prev[id] }))
+    const toggle = friendRequestToggle[id] ? 'connect' : 'connected'
+    axios.post(togglefollow, { userId: id, toggle }, { withCredentials: true }).catch(() => {})
   }
 
   const disconnectionRequest = (id) => {
-    /*intially set false to each element*/
-    setdisconnectfriendRequestToggle(prevState => ({
-      ...prevState,
-      [id]: !prevState[id] // If the state is undefined, set it to false
-    }));
-    
-    let toggle;
-    if(diconnectRequestToggle[id]){
-      toggle = 'connect';
-    } else {
-      toggle = 'disconnected'
-    }
-    const userdetails = {
-      userId : id,
-      toggle: toggle
-    }
-  
-    console.log(userdetails.toggle)
-    axios.post(togglefollow, userdetails, { withCredentials: true })
-    .then((res)=> {
-      console.log("Toggle follow request is successfull", res)
-      // fetchData()
-    })
-    .catch((err) => {
-      console.log("There is some problem occurred in the follow toggle")
-    })
-    }
+    setdisconnectToggle(prev => ({ ...prev, [id]: !prev[id] }))
+    const toggle = disconnectToggle[id] ? 'connect' : 'disconnected'
+    axios.post(togglefollow, { userId: id, toggle }, { withCredentials: true }).catch(() => {})
+  }
+
+  const UserCard = ({ user, isConnected, onAction }) => (
+    <div className="bg-[#111827] border border-[#1f2e47] rounded-2xl p-5 flex flex-col items-center text-center hover:border-[#2a3d5c] transition-all duration-200 group">
+      <div className="relative mb-3">
+        <img
+          src={user.avatar || avatar}
+          alt={user.username}
+          className="h-16 w-16 rounded-full object-cover ring-2 ring-[#2a3d5c] group-hover:ring-indigo-500 transition-all"
+        />
+        <div className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full bg-emerald-400 border-2 border-[#111827]"></div>
+      </div>
+      <p className="text-sm font-bold text-slate-200 mb-0.5">{user.fullname || user.username}</p>
+      <p className="text-xs text-slate-500 mb-3">@{user.username}</p>
+      <button
+        onClick={() => onAction(user._id)}
+        className={`w-full py-2 rounded-xl text-xs font-semibold transition-all duration-200
+          ${isConnected
+            ? 'bg-[#1a2540] border border-[#2a3d5c] text-slate-300 hover:border-red-500/50 hover:text-red-400'
+            : 'bg-indigo-600 hover:bg-indigo-500 text-white'}`}
+      >
+        {isConnected ? 'Disconnect' : 'Connect'}
+      </button>
+    </div>
+  )
+
+  const discover  = datanotfollowed || []
+  const connected = data || []
+
   return (
-    <div className='flex flex-col lg:flex-row md:flex-col h-screen overflow-hidden'>
-        <LeftBar/>
-        <div className='h-full w-full lg:h-screen md:h-full md:max-w-full lg:w-full bg-slate-600 flex lg:flex-col overflow-x-scroll items-center'>
-        <div className='w-full mt-3 md:mt-2'>
-              <SearchBar/>
-            </div>                
-            <div className='text-slate-200 mt-8 flex mr-auto ml-[189px] gap-4'>
-                    <p className={datatoggle ? 'underline' : ''} onClick={()=> setdatatoggle(true)}>People to follow</p>
-                    <p className={!datatoggle ? 'underline' : ''} onClick={()=> setdatatoggle(false)}>Connected {friendsCount}</p>
-                </div>    
-                    <div className='grid grid-cols-4 gap-x-20 gap-y-6 items-center justify-center mt-4'>
-                        {
-                            datatoggle? <>{
-                              datanotfollowed && datanotfollowed.map((index, i) => {
-                                return (
-                                    <div className='h-[22vh] w-[26vh] bg-[white] flex flex-col justify-center items-center rounded-[1vh]'>
-                                    <img className='h-[8vh] w-[8vh] rounded-[2vh]' src={index.avatar || avatar}/>
-                                    <p className='text-base font-semibold mt-[0.4vh] mb-0 mx-0'>{index.fullname}</p>
-                                    <p className='text-[13px] font-medium text-[#8f92a1] -mt-0.5 mb-0 mx-0'>{index.username}</p>
-                                    <button className='bg-[#53d768] text-[11px] font-semibold text-[white] h-[3vh] w-[11.8vh] mt-[1vh] mb-0 mx-0 rounded-[0.4vh] border-none' 
-                                    onClick={() => connectionRequest(index._id)}>
-                                        { friendRequestToggle[index._id] ? 'Connected' : 'Connect'}
-                                      </button>
-                                </div>  
-                                )
-                            })} </>
-                            :
-                            <>{
-                            data&& data.map((index, i) => {
-                              return (
-                                  <div className='h-[22vh] w-[26vh] bg-[white] flex flex-col justify-center items-center rounded-[1vh]'>
-                                  <img className='h-[8vh] w-[8vh] rounded-[2vh]' src={index.avatar || avatar}/>
-                                  <p className='text-base font-semibold mt-[0.4vh] mb-0 mx-0'>{index.fullname}</p>
-                                  <p className='text-[13px] font-medium text-[#8f92a1] -mt-0.5 mb-0 mx-0'>{index.username}</p>
-                                  <button className='bg-[#53d768] text-[11px] font-semibold text-[white] h-[3vh] w-[11.8vh] mt-[1vh] mb-0 mx-0 rounded-[0.4vh] border-none'
-                                  onClick={() => disconnectionRequest(index._id)}>
-                                        { friendRequestToggle[index._id] ? 'Connect' : 'Connected'}
-                                  </button>
-                              </div>  
-                              )
-                          })  
-                            } </>
-                          } 
-                    </div>    
+    <div className="flex h-screen bg-[#090e1a] overflow-hidden">
+      <LeftBar/>
+      <main className="flex-1 flex flex-col min-w-0 overflow-y-auto pb-20 lg:pb-0">
+        <SearchBar/>
+
+        <div className="max-w-5xl mx-auto w-full px-4 py-6">
+          {/* Header */}
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold text-white">Network</h1>
+            <p className="text-sm text-slate-400 mt-1">Discover people and manage your connections</p>
+          </div>
+
+          {/* Tabs */}
+          <div className="flex items-center gap-1 p-1 bg-[#111827] border border-[#1f2e47] rounded-xl mb-6 w-fit">
+            <button
+              onClick={() => setActiveTab('discover')}
+              className={`px-5 py-2 rounded-lg text-sm font-medium transition-all duration-200
+                ${activeTab === 'discover' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white hover:bg-[#1a2540]'}`}
+            >
+              Discover
+            </button>
+            <button
+              onClick={() => setActiveTab('connected')}
+              className={`px-5 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2
+                ${activeTab === 'connected' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white hover:bg-[#1a2540]'}`}
+            >
+              Connected
+              {connected.length > 0 && (
+                <span className="text-xs bg-indigo-500/30 px-1.5 py-0.5 rounded-full">{connected.length}</span>
+              )}
+            </button>
+          </div>
+
+          {/* Grid */}
+          {activeTab === 'discover' ? (
+            discover.length > 0 ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                {discover.map(user => (
+                  <UserCard
+                    key={user._id}
+                    user={user}
+                    isConnected={friendRequestToggle[user._id]}
+                    onAction={connectionRequest}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-20 text-slate-500">
+                <i className="fa-regular fa-user text-5xl mb-4 text-slate-600"></i>
+                <p>No new people to discover</p>
+              </div>
+            )
+          ) : (
+            connected.length > 0 ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                {connected.map(user => (
+                  <UserCard
+                    key={user._id}
+                    user={user}
+                    isConnected={!disconnectToggle[user._id]}
+                    onAction={disconnectionRequest}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-20 text-slate-500">
+                <i className="fa-regular fa-user-group text-5xl mb-4 text-slate-600"></i>
+                <p>No connections yet</p>
+              </div>
+            )
+          )}
         </div>
-    </div>   
+      </main>
+    </div>
   )
 }

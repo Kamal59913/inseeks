@@ -13,22 +13,15 @@ import ImagePost from './Components/Pages/imagepost'
 import Environments from './Components/Pages/environments'
 import EnvSpecificHomePage from './Components/Pages/envSpecificHomePage'
 import Messages from './Components/messages'
+import ModalContainer from './Components/Modal/ModalContainer';
 
-import "./styles/color.css";
-import "./styles/font.css";
-import "./styles/index.css";
-import "./styles/tailwind.css";
-
-import './Global.scss';
-import './events.css'
-import './singlestory.css'
-import './homepage.css'
 import { UserListProvider } from './Context/myContext';
 
 function App() {
   return (   
     <UserListProvider>
     <BrowserRouter>
+       <ModalContainer />
        <Routes>
         <Route path='/' element={<LoginPage/>}></Route>
         <Route path='/h' element={<HOME/>}></Route>

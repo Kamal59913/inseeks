@@ -1,0 +1,155 @@
+<mjml>
+  <mj-head>
+    <mj-title>New Visitor Alert</mj-title>
+    <mj-preview>Someone visited your portfolio from {{country}} using {{deviceType}}</mj-preview>
+    <mj-attributes>
+      <mj-text font-family="'Segoe UI', Tahoma, Geneva, Verdana, sans-serif" line-height="1.6" />
+      <mj-section padding="20px" />
+    </mj-attributes>
+    <mj-style>
+      .highlight {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .device-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+      .mobile { background-color: #fef3c7; color: #92400e; }
+      .tablet { background-color: #dbeafe; color: #1d4ed8; }
+      .desktop { background-color: #d1fae5; color: #065f46; }
+    </mj-style>
+  </mj-head>
+  
+  <mj-body background-color="#f0fdf4">
+    <!-- Header Section -->
+    <mj-section background-color="#059669" padding="40px 20px">
+      <mj-column>
+        <mj-text align="center" color="#ffffff" font-size="28px" font-weight="bold">
+          👁️ Visitor Alert
+        </mj-text>
+        <mj-text align="center" color="#a7f3d0" font-size="16px">
+          Someone just visited your portfolio website
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Main Content Section -->
+    <mj-section background-color="#ffffff" padding="40px">
+      <mj-column>
+        <mj-text font-size="18px" font-weight="600" color="#065f46" padding-bottom="20px">
+          📊 Visitor Analytics:
+        </mj-text>
+        
+        <!-- Visitor Information -->
+        <mj-table>
+          <tr style="border-bottom: 1px solid #d1fae5;">
+            <td style="padding: 12px 0; font-weight: 600; color: #047857; width: 140px;">Device:</td>
+            <td style="padding: 12px 0; color: #065f46;">
+              <span class="device-badge {{deviceType}}">{{deviceType}}</span>
+            </td>
+          </tr>
+          <tr style="border-bottom: 1px solid #d1fae5;">
+            <td style="padding: 12px 0; font-weight: 600; color: #047857; width: 140px;">Location:</td>
+            <td style="padding: 12px 0; color: #065f46;">
+              🌍 {{#if city}}{{city}}, {{/if}}{{#if region}}{{region}}, {{/if}}{{country}}
+            </td>
+          </tr>
+          <tr style="border-bottom: 1px solid #d1fae5;">
+            <td style="padding: 12px 0; font-weight: 600; color: #047857; width: 140px;">Page Visited:</td>
+            <td style="padding: 12px 0;">
+              <a href="{{url}}" style="color: #059669; text-decoration: none; word-break: break-all;">{{url}}</a>
+            </td>
+          </tr>
+          <tr style="border-bottom: 1px solid #d1fae5;">
+            <td style="padding: 12px 0; font-weight: 600; color: #047857; width: 140px;">Referrer:</td>
+            <td style="padding: 12px 0; color: #065f46;">
+              {{#if referrer}}{{referrer}}{{else}}Direct Visit{{/if}}
+            </td>
+          </tr>
+          <tr style="border-bottom: 1px solid #d1fae5;">
+            <td style="padding: 12px 0; font-weight: 600; color: #047857; width: 140px;">Screen Size:</td>
+            <td style="padding: 12px 0; color: #065f46;">{{screenResolution}}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #d1fae5;">
+            <td style="padding: 12px 0; font-weight: 600; color: #047857; width: 140px;">Language:</td>
+            <td style="padding: 12px 0; color: #065f46;">{{language}}</td>
+          </tr>
+          <tr>
+            <td style="padding: 12px 0; font-weight: 600; color: #047857; width: 140px;">Timezone:</td>
+            <td style="padding: 12px 0; color: #065f46;">{{timezone}}</td>
+          </tr>
+        </mj-table>
+      </mj-column>
+    </mj-section>
+
+    <!-- Stats Section -->
+    <mj-section background-color="#f0fdf4" padding="30px">
+      <mj-column>
+        <mj-text align="center" font-size="16px" color="#047857" padding-bottom="20px">
+          📈 Visit Summary
+        </mj-text>
+        
+        <mj-table>
+          <tr>
+            <td style="text-align: center; padding: 20px; background-color: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+              <div style="font-size: 24px; font-weight: 700; color: #059669; margin-bottom: 5px;">{{timestamp}}</div>
+              <div style="font-size: 14px; color: #6b7280;">Visit Time</div>
+            </td>
+          </tr>
+        </mj-table>
+      </mj-column>
+    </mj-section>
+
+    <!-- Technical Details Section -->
+    <mj-section background-color="#ffffff" padding="30px" border="1px solid #d1fae5" border-radius="8px">
+      <mj-column>
+        <mj-text align="center" font-size="14px" color="#6b7280" padding-bottom="15px">
+          🔧 Technical Details
+        </mj-text>
+        
+        <mj-table>
+          <tr style="border-bottom: 1px solid #f3f4f6;">
+            <td style="padding: 8px 0; font-weight: 500; color: #6b7280; width: 100px;">IP:</td>
+            <td style="padding: 8px 0; color: #374151; font-family: monospace; font-size: 13px;">{{ip}}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #f3f4f6;">
+            <td style="padding: 8px 0; font-weight: 500; color: #6b7280; width: 100px;">Browser:</td>
+            <td style="padding: 8px 0; color: #374151; font-size: 13px;">{{userAgent}}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; font-weight: 500; color: #6b7280; width: 100px;">Viewport:</td>
+            <td style="padding: 8px 0; color: #374151; font-family: monospace; font-size: 13px;">{{viewportSize}}</td>
+          </tr>
+        </mj-table>
+      </mj-column>
+    </mj-section>
+
+    <!-- Action Section -->
+    <mj-section background-color="#ecfdf5" padding="25px" border-left="4px solid #10b981">
+      <mj-column>
+        <mj-text font-size="14px" color="#065f46" align="center">
+          💡 <strong>Engagement Tip:</strong> This visitor might be a potential client. Consider updating your portfolio based on popular pages!
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Footer Section -->
+    <mj-section background-color="#065f46" padding="30px">
+      <mj-column>
+        <mj-text align="center" color="#a7f3d0" font-size="14px">
+          Portfolio Analytics - Visitor Tracking System
+        </mj-text>
+        <mj-text align="center" color="#6b7280" font-size="12px" padding-top="10px">
+          © {{currentYear}} Your Portfolio Analytics. All rights reserved.
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

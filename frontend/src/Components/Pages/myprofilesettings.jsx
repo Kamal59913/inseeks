@@ -1,194 +1,145 @@
 import { useEffect, useState } from 'react';
-import PANDN from '../Utilities/notifcationandprofile'
 import LeftBar from '../Utilities/LeftBar';
-import ReplaceImage from '../CreatePost/replaceprofileimage'
-import DeleteImage from '../CreatePost/deleteimage';
 import axios from 'axios';
+import { FormField, FormTextarea } from '../Common/FormFields';
+import { useAppForm } from '../../hooks/useAppForm';
+import { profileSettingsSchema } from '../../utils/formSchemas';
+import { preprocessTrimmedFormData } from '../../utils/formValidation';
+import { useModalData } from '../../store/hooks';
 
-function MyProfileSettings() {  
-  /*url to update profile*/
-  const updateurl = "http://localhost:8000/api/v1/users/update-account"
+const SETTINGS_NAV = [
+  { key: 'account', icon: 'fa-circle-user', label: 'My Account' },
+  { key: 'notif', icon: 'fa-bell', label: 'Notifications' },
+  { key: 'security', icon: 'fa-lock', label: 'Security & Privacy' },
+  { key: 'billing', icon: 'fa-credit-card', label: 'Billing' },
+  { key: 'help', icon: 'fa-circle-question', label: 'Help & Support' },
+]
 
-  /*url to get the current user*/
-  const currentuser = "http://localhost:8000/api/v1/users/current-user"
+function MyProfileSettings() {
+  const modal = useModalData()
+  const updateurl = `${process.env.REACT_APP_API_URL}/users/update-account`
+  const currentuser = `${process.env.REACT_APP_API_URL}/users/current-user`
+  const fallback = 'https://res.cloudinary.com/dogyotgp5/image/upload/v1713078910/avatar-dummy-social-app_fx9x9f.png'
 
-
-  const [togglechangeprofilepic, setTogglechangeprofilepic] = useState(false)
-  const [toggledeleteprofilepic, setToggledeleteprofilepic] = useState(false)
-
-  /*hooks to store form*/
-  const [fullname, setfullname] = useState('');
-  const [username, setUsername] = useState('');
-  const [avatar, setAvatar] = useState('https://res.cloudinary.com/dogyotgp5/image/upload/v1713078910/avatar-dummy-social-app_fx9x9f.png');
-  const [profilepicture, setProfilepicturetoggle] = useState(false);
-  const [email, setEmail] = useState('');
-  const [about, setAbout] = useState('');
-  const [currentUser, setCurrentUser] = useState();
+  const [profilepicture, setProfilepicturetoggle] = useState(false)
+  const [currentUser, setCurrentUser] = useState()
   const [buttonname, setButtonname] = useState('Save Changes')
-
-/*to get the current user*/
-useEffect(() => {
-  axios.get(currentuser, {
-    withCredentials: true
+  const [activeNav, setActiveNav] = useState('account')
+  const { control, handleSubmit, reset } = useAppForm({
+    schema: profileSettingsSchema,
+    defaultValues: {
+      fullname: '',
+      username: '',
+      email: '',
+      about: '',
+    },
   })
-  .then((res)=>{
-    console.log(res.data.data)
-    setCurrentUser(res.data.data)
-  })
-}, [username, profilepicture])
 
+  useEffect(() => {
+    axios.get(currentuser, { withCredentials: true })
+      .then((res) => {
+        const nextUser = res.data.data
+        setCurrentUser(nextUser)
+        reset({
+          fullname: nextUser?.fullname || '',
+          username: nextUser?.username || '',
+          email: nextUser?.email || '',
+          about: nextUser?.about || '',
+        })
+      })
+  }, [profilepicture, reset])
 
-  const togglePic = () => {
-    togglechangeprofilepic? 
-    setTogglechangeprofilepic(false)
-    :
-    setTogglechangeprofilepic(true)
+  const toggleForProfileImageFetch = () => setProfilepicturetoggle((value) => !value)
+
+  const handlesubmit = (values) => {
+    setButtonname('Saving...')
+    axios.patch(updateurl, preprocessTrimmedFormData(values), { withCredentials: true })
+      .then(() => {
+        reset()
+        toggleForProfileImageFetch()
+        setButtonname('Saved! ✓')
+        setTimeout(() => setButtonname('Save Changes'), 2000)
+      })
+      .catch(() => setButtonname('Save Changes'))
   }
 
-  const toggleDeletePic = () => {
-    toggledeleteprofilepic? 
-    setToggledeleteprofilepic(false)
-    :
-    setToggledeleteprofilepic(true)
-  }
-
-  const toggleForProfileImageFetch = () => {
-    profilepicture? setProfilepicturetoggle(false): setProfilepicturetoggle(true)
-    console.log("here is the toggle", profilepicture);
-  }
-
-  const handlesubmit = (e) => {
-    e.preventDefault();
-    console.log("clicked")
-    const data = {
-      fullname: fullname,
-      username: username,
-      email: email,
-      about: about
-    }
-    axios.patch(updateurl, data, {
-      withCredentials: true
-    })
-    .then((res)=> {
-      console.log(res)
-      setAbout('');
-      setEmail('');
-      setUsername('');
-      setfullname('');
-      setButtonname('Saved !!');
-      setTimeout(() => {
-        setButtonname('Save Changes')
-      }, 2000);
-    })
-    .catch((err)=> {
-      console.log(err)
-    })
-  }
-  console.log("this is the avatar",avatar)
-
-  return (   
-    <>
-    {togglechangeprofilepic && <ReplaceImage togglePic={togglePic} toggleForProfileImageFetch={toggleForProfileImageFetch}/>}
-    {toggledeleteprofilepic && <DeleteImage toggleDeletePic={toggleDeletePic} toggleForProfileImageFetch={toggleForProfileImageFetch}/>}
-    <div className="bg-[#0f172a] flex flex-col lg:flex-row md:flex-col h-screen overflow-hidden">
+  return (
+    <div className="flex h-screen bg-[#090e1a] overflow-hidden">
       <LeftBar/>
-      <div className='h-full w-full lg:h-screen md:h-full md:max-w-full lg:w-8/12 flex lg:flex-col overflow-x-scroll items-center pl-8'>
-        <div className='@apply h-[70px] w-[59.2vw] text-[black] mt-[7px]'>
-          <p className='@apply text-slate-200 text-xl font-bold mt-7 ml-2'>Accounts Information</p>
-        </div>
-        <div className='flex h-[133px] text-[white] gap-2'>
-        
-            <img className='h-[105px] w-[105px] mt-[7px] rounded-[28px]' src={currentUser&& currentUser.avatar || avatar}/>
-     
-      
-          <div className=' h-28 w-[50vw] flex flex-col ml-3.5 mt-[7px]'>
-            <div className='text-xl h-7 w-[700px] text-[$maincolor-light] font-bold mt-3.5'> {currentUser&& <>{currentUser.username}</>}</div>
-            <div className='h-14 w-[600px] flex flex-row gap-3.5 mt-[7px]'>
-              <button className='px-4 h-10 bg-slate-500 cursor-pointer text-[white] font-semibold rounded-[42px]' onClick={togglePic}> Replace Image</button>
-              <button className='px-4 h-10 cursor-pointer font-medium rounded-[7px] border-[3px] border-solid border-[grey]' onClick={toggleDeletePic}> Delete Image <i class="fa-regular fa-trash-can"></i></button>
+
+      <main className="flex-1 flex min-w-0 overflow-y-auto pb-20 lg:pb-0">
+        <aside className="hidden lg:flex flex-col shrink-0 w-56 h-screen border-r border-[#1f2e47] py-8 px-3 gap-1 sticky top-0">
+          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider px-3 mb-3">Settings</p>
+          {SETTINGS_NAV.map((item) => (
+            <button
+              key={item.key}
+              onClick={() => setActiveNav(item.key)}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 text-left
+                ${activeNav === item.key ? 'text-indigo-400 bg-indigo-500/10' : 'text-slate-400 hover:text-white hover:bg-[#1a2540]'}`}
+            >
+              <i className={`fa-solid ${item.icon} w-4 text-center`}></i>
+              {item.label}
+            </button>
+          ))}
+        </aside>
+
+        <div className="flex-1 px-4 lg:px-8 py-8 max-w-2xl">
+          <h1 className="text-2xl font-bold text-white mb-8">Account Settings</h1>
+
+          <div className="bg-[#111827] border border-[#1f2e47] rounded-2xl p-6 mb-6">
+            <h2 className="text-sm font-semibold text-slate-300 mb-4">Profile Photo</h2>
+            <div className="flex items-center gap-5">
+              <img
+                src={currentUser?.avatar || fallback}
+                alt="avatar"
+                className="h-20 w-20 rounded-2xl object-cover ring-2 ring-[#2a3d5c]"
+              />
+              <div className="flex flex-col gap-2">
+                <button
+                  type="button"
+                  onClick={() => modal.open('replace-avatar', { onComplete: toggleForProfileImageFetch })}
+                  className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-all"
+                >
+                  <i className="fa-solid fa-arrow-up-from-bracket text-xs"></i>
+                  Replace Photo
+                </button>
+                <button
+                  type="button"
+                  onClick={() => modal.open('delete-avatar', { onComplete: toggleForProfileImageFetch })}
+                  className="flex items-center gap-2 bg-transparent border border-red-500/30 hover:border-red-500/60 hover:bg-red-500/10 text-red-400 text-sm font-semibold px-4 py-2 rounded-xl transition-all"
+                >
+                  <i className="fa-regular fa-trash-can text-xs"></i>
+                  Remove Photo
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-       <div className='h-[240px] w-[60vw] flex flex-col ml-3.5 mr-0 my-0'>
-        <div className='flex gap-4'>
-            <div className='text-md font-semibold text-slate-200 underline'>Basic Information</div>
-            <div className='text-md font-semibold text-slate-200'>Change Password</div>
-          </div>
-          <form onSubmit={handlesubmit} method='POST'>
-              <div className='h-[70px] w-[420px] mt-4'>
-              <label for="title" className='text-slate-200'>FULLNAME</label> <br/>
-                  <input type="text"
-                  name="Occupation"
-                  className='h-[37.8px] w-[20vw] text-slate-200 font-medium border-b bg-transparent'
-                  value={fullname}
-                  onChange={(e)=>setfullname(e.target.value)}
-                  /><br/>
-              </div>
-              <div className='h-[84px] w-[420px]'>
-              <label for="title" className='text-slate-200'>USERNAME</label> <br/>
-                  <input type="text"
-                  name="Occupation"
-                  className='h-[37.8px] w-[20vw] text-slate-200 font-medium border-b bg-transparent'
-                  value={username}
-                  onChange={(e)=> setUsername(e.target.value)}
-                  /><br/>
-              </div>
-              <div className='h-[70px] w-[420px] mt-4'>
-              <label for="title" className='text-slate-200'>EMAIL</label> <br/>
-                  <input type="text"
-                  name="Occupation"
-                  className='h-[37.8px] w-[20vw] text-slate-200 font-medium border-b bg-transparent'
-                  value={email}
-                  onChange={(e)=> setEmail(e.target.value)}
-                  /><br/>
-              </div>
-              <div className='h-[84px] w-[420px]'>
-              <label for="title" className='text-slate-200'>ABOUT</label> <br/>
-                  <textarea
-                  name="Occupation"
-                  className='h-[37.8px] w-[20vw] text-slate-200 font-medium border-b bg-transparent'
-                  value={about}
-                  onChange={(e)=>setAbout(e.target.value)}
-                  /><br/>
-              </div>
-          <div className='divider'></div>
-          <button type='submit' className='mr-auto mt-2 text-lg h-14 min-w-[210px] bg-slate-200 text-slate-600 font-semibold rounded-[70px] border-none'> {buttonname} </button>
-          </form>
-          </div>
 
-      </div>
-      
-      <div className='hidden shrink-0 h-full lg:h-screen md:h-full md:w-full lg:w-3/12 bg-slate-800 lg:flex lg:flex-col pl-8'>
-            <PANDN/>
-             <p className='text-[white] text-[22px] font-semibold ml-[22.4px] mr-0 mt-[21px] mb-0'>Settings</p>
-             <div className='text-[white] flex flex-row gap-[9.8px] ml-[22.4px] mr-0 mt-7 mb-0'>
-             <i className="fa-regular fa-user m-0 p-[9.8px] rounded-[6.3px] border-[1.8px] border-solid border-[grey]"></i>
-             <p className='text-sm font-bold mt-[8.4px] mb-0 mx-0'> My Account </p>
-             </div>
-             <div className='text-[white] flex flex-row gap-[9.8px] ml-[22.4px] mr-0 mt-7 mb-0'>
-             <i className="fa-regular fa-bell m-0 p-[9.8px] rounded-[6.3px] border-[1.8px] border-solid border-[grey]"></i>
-             <p className='text-sm font-bold mt-[8.4px] mb-0 mx-'> Notifications </p>
-             </div>
-             <div className='text-[white] flex flex-row gap-[9.8px] ml-[22.4px] mr-0 mt-7 mb-0'>
-             <i class="fa-regular fa-clock m-0 p-[9.8px] rounded-[6.3px] border-[1.8px] border-solid border-[grey]"></i>
-             <p className='text-sm font-bold mt-[8.4px] mb-0 mx-'> Activity History </p>
-             </div>
-             <div className='text-[white] flex flex-row gap-[9.8px] ml-[22.4px] mr-0 mt-7 mb-0'>
-             <i class="fa-solid fa-rupee-sign m-0 p-[9.8px] rounded-[6.3px] border-[1.8px] border-solid border-[grey]"></i>
-             <p className='text-sm font-bold mt-[8.4px] mb-0 mx-'> Billing and Payment </p>
-             </div>
-             <div className='text-[white] flex flex-row gap-[9.8px] ml-[22.4px] mr-0 mt-7 mb-0'>
-             <i class="fa-solid fa-lock m-0 p-[9.8px] rounded-[6.3px] border-[1.8px] border-solid border-[grey]"></i>
-             <p className='text-sm font-bold mt-[8.4px] mb-0 mx-'> Security & Privacy </p>
-             </div>
-             <div className='text-[white] flex flex-row gap-[9.8px] ml-[22.4px] mr-0 mt-7 mb-0'>
-             <i class="fa-brands fa-hire-a-helper m-0 p-[9.8px] rounded-[6.3px] border-[1.8px] border-solid border-[grey]"></i>
-             <p className='text-sm font-bold mt-[8.4px] mb-0 mx-'> Help </p>
-             </div>
+          <div className="bg-[#111827] border border-[#1f2e47] rounded-2xl p-6">
+            <h2 className="text-sm font-semibold text-slate-300 mb-5">Basic Information</h2>
+            <form onSubmit={handleSubmit(handlesubmit)} className="space-y-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <FormField control={control} name="fullname" label="Full Name" placeholder="Full name" maxLength={80}/>
+                <FormField control={control} name="username" label="Username" placeholder="username" maxLength={40}/>
+              </div>
+              <FormField control={control} name="email" label="Email" type="email" placeholder="email@example.com" maxLength={150}/>
+              <FormTextarea control={control} name="about" label="About" rows={3} placeholder="Tell us about yourself..." maxLength={280}/>
+
+              <div className="flex items-center justify-end pt-2">
+                <button
+                  type="submit"
+                  className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-6 py-2.5 rounded-xl transition-all duration-200 min-w-[150px] justify-center"
+                >
+                  {buttonname === 'Saved! ✓' && <i className="fa-solid fa-check text-xs"></i>}
+                  {buttonname}
+                </button>
+              </div>
+            </form>
           </div>
-      </div>
-      </>
-  );
+        </div>
+      </main>
+    </div>
+  )
 }
 
 export default MyProfileSettings;

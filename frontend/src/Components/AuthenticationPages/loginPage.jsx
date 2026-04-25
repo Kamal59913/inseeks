@@ -1,162 +1,193 @@
 import React, { useState } from 'react'
-import { useNavigate } from "react-router-dom";
-import SignUpPage from '../AuthenticationPages/signUpPage' 
-import { ArrowRight } from 'lucide-react'
-import  axios  from 'axios';
+import { useNavigate } from "react-router-dom"
+import SignUpPage from '../AuthenticationPages/signUpPage'
+import axios from 'axios'
+import { FormField } from '../Common/FormFields'
+import { PasswordField } from '../Common/PasswordField'
+import { useAppForm } from '../../hooks/useAppForm'
+import { loginSchema } from '../../utils/formSchemas'
+import { preprocessTrimmedFormData } from '../../utils/formValidation'
 
 export default function LoginPage() {
+  const loginUrl = `${process.env.REACT_APP_API_URL}/users/login`
+  const navigate  = useNavigate()
+  const [toggle, setToggle] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
-  let indexof;
-  const loginUrl = "http://localhost:8000/api/v1/users/login"
-  const [toggle, setToggle] = useState(false);
+  const { control, handleSubmit } = useAppForm({
+    schema: loginSchema,
+    defaultValues: {
+      identifier: '',
+      password: '',
+    },
+  })
 
-  /*Initializing useNavigate*/
-  const navigate = useNavigate();
-  /*hooks for input fields*/
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [temp, setTemp] = useState('');
-  const [password, setPassword] = useState('');
+  const handleLogin = (values) => {
+    setLoading(true)
+    setError('')
+    const { identifier, password } = preprocessTrimmedFormData(values)
+    const normalizedIdentifier = identifier.toLowerCase()
 
-  const setUsernameOrEmail = (theUserNameorPass) => {
-
-    //whether email or username, converting it to lower-case
-    let usernameoremail = theUserNameorPass.toLowerCase();
-    setTemp(usernameoremail)
-    indexof = usernameoremail.indexOf("@")
-    if((indexof) === -1) {
-      setUsername(usernameoremail)
-    } else {
-      setEmail(usernameoremail)
-    }
-  }
-
-  const LogInData = {
-    username: username,
-    email: email,
-    password: password
-  }
-
-
-  const handleLogin = (e) => {
-    e.preventDefault()
-    console.log("working")
-    axios.post(loginUrl,LogInData, {
-      withCredentials: true
-    })
-      .then((res) => {
-        if(res.data.statusCode === 200 && res.data.success === true)
-          {
-            navigate("/h")
-          }
+    axios.post(loginUrl, {
+      username: normalizedIdentifier.includes('@') ? '' : normalizedIdentifier,
+      email: normalizedIdentifier.includes('@') ? normalizedIdentifier : '',
+      password,
+    }, { withCredentials: true })
+      .then(res => {
+        if (res.data.statusCode === 200 && res.data.success) navigate('/h')
+        else setError('Invalid credentials. Please try again.')
       })
-      .catch((err) => {
-        console.log(err)
-      })
+      .catch(() => setError('Login failed. Check your credentials.'))
+      .finally(() => setLoading(false))
   }
 
-  const TogglePage = () => {
-    if(!toggle) {
-      setToggle(true)
-    } else {
-      setToggle(false)
-    }
-  }
+  if (toggle) return <SignUpPage togglepage={() => setToggle(false)}/>
+
   return (
-    <>
-    {toggle? <SignUpPage togglepage = {TogglePage}/> : 
-        <section className=''>
-        <div className="grid grid-cols-1 lg:grid-cols-2 bg-slate-900 h-screen">
-          <div className="relative flex lg:items-center px-4 pb-10 pt-60 sm:px-6 sm:pb-16 md:justify-center lg:px-8 lg:pb-24">
-            <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent"></div>
-            <div className="relative">
-              <div className="w-full max-w-xl xl:mx-auto xl:w-full xl:max-w-xl">
-                <h3 className="text-4xl font-bold text-slate-200">
-                  Get insight into this new Social
-                </h3>
-              </div>
-  
-  
+    <div className="min-h-screen bg-[#090e1a] flex">
+      {/* Left Hero Panel */}
+      <div className="hidden lg:flex flex-col justify-between w-1/2 relative overflow-hidden p-12">
+        {/* Gradient BG */}
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/80 via-[#0f172a] to-[#090e1a]"></div>
+        {/* Decorative blobs */}
+        <div className="absolute top-1/4 -left-20 h-80 w-80 rounded-full bg-indigo-600/20 blur-3xl"></div>
+        <div className="absolute bottom-1/4 right-10 h-60 w-60 rounded-full bg-purple-600/15 blur-3xl"></div>
+
+        <div className="relative z-10">
+          <div className="flex items-center gap-2.5">
+            <div className="h-9 w-9 rounded-xl bg-indigo-600 flex items-center justify-center">
+              <i className="fa-solid fa-seedling text-white text-sm"></i>
             </div>
-          </div>
-          <div className="flex flex-col items-center justify-center px-4 sm:px-6 sm:py-16 lg:px-8 lg:py-0 ">
-            <div className="lg:mt-4 xl:mx-auto xl:w-96 xl:max-w-sm 2xl:max-w-md pt-16 px-4 border-2 border-slate-600 rounded-md ">
-              <h2 className="text-3xl font-bold leading-tight text-slate-200 sm:text-4xl">Log in</h2>  
-              <form action="#" onSubmit={handleLogin} className="mt-8">
-                <div className="space-y-6">
-                  <div>
-                    <label htmlFor="" className="text-base font-medium text-slate-200">
-                      {' '}
-                      Email address or Username{' '}
-                    </label>
-                    <div className="mt-2">
-                      <input
-                        className="flex text-slate-200 h-10 w-full rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
-                        type="text"
-                        placeholder="Email or username "
-                        value={temp}
-                        onChange={(e) => setUsernameOrEmail(e.target.value)}
-                      ></input>
-                    </div>
-                  </div>
-                  <div>
-                    <div className="flex items-center justify-between">
-                      <label htmlFor="" className="text-base font-medium text-slate-200">
-                        {' '}
-                        Password{' '}
-                      </label>
-                      <a
-                        href="#"
-                        title=""
-                        className="text-sm font-semibold text-slate-200 hover:underline"
-                      >
-                        {' '}
-                        Forgot password?{' '}
-                      </a>
-                    </div>
-                    <div className="mt-2">
-                      <input
-                        className="flex text-slate-200 h-10 w-full rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
-                        type="password"
-                        placeholder="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                      ></input>
-                    </div>
-                  </div>
-                  <div>
-                    <button
-                      type="submit"
-                      className="inline-flex w-full items-center justify-center rounded-md bg-slate-600 px-3.5 py-2.5 font-semibold leading-7 text-white hover:bg-black/80"
-                    >
-                      Get started <ArrowRight className="ml-2" size={16} />
-                    </button>
-                    
-                  </div>
-                  <div className='h-20 w-full flex space-x-10 justify-center'>
-                      <i className='fa-brands fa-google text-slate-100 text-3xl'></i>
-                      <i className='fa-brands fa-facebook text-slate-100 text-3xl'></i>
-                      <i className='fa-brands fa-twitter text-slate-100 text-3xl'></i>
-                  </div>
-                </div>
-              </form>
-              <div>
-                <p className="text-sm text-gray-200 pb-10">
-                Don&apos;t have an account?{' '}
-                <p
-                  className="inline-flex font-semibold text-slate-400 transition-all duration-200 hover:underline"
-                  onClick={TogglePage}
-                >
-                  Create a free account
-                </p>
-              </p> 
-              </div>
-            </div>
+            <span className="text-white font-bold text-xl tracking-tight">Inseeks</span>
           </div>
         </div>
-      </section>
-    }
 
-    </>
+        <div className="relative z-10 space-y-6">
+          <div className="inline-flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/20 rounded-full px-4 py-1.5">
+            <div className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></div>
+            <span className="text-indigo-300 text-sm font-medium">Join thousands of creators</span>
+          </div>
+          <h1 className="text-5xl font-bold text-white leading-tight">
+            Connect. Create.<br/>
+            <span className="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">Inspire.</span>
+          </h1>
+          <p className="text-slate-400 text-lg max-w-md leading-relaxed">
+            A next-generation social platform for professionals, creators, and communities to share ideas and grow together.
+          </p>
+
+          <div className="flex items-center gap-4 pt-2">
+            {[
+              { num: '10K+', label: 'Users' },
+              { num: '500+', label: 'Communities' },
+              { num: '50K+', label: 'Posts' },
+            ].map(s => (
+              <div key={s.label} className="text-center">
+                <p className="text-2xl font-bold text-white">{s.num}</p>
+                <p className="text-xs text-slate-400">{s.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="relative z-10 text-xs text-slate-600">© 2024 Inseeks. All rights reserved.</div>
+      </div>
+
+      {/* Right Form Panel */}
+      <div className="flex-1 flex items-center justify-center px-6 py-12">
+        <div className="w-full max-w-md space-y-8 animate-fade-in">
+          {/* Mobile logo */}
+          <div className="flex items-center gap-2.5 lg:hidden">
+            <div className="h-9 w-9 rounded-xl bg-indigo-600 flex items-center justify-center">
+              <i className="fa-solid fa-seedling text-white text-sm"></i>
+            </div>
+            <span className="text-white font-bold text-xl">Inseeks</span>
+          </div>
+
+          <div>
+            <h2 className="text-3xl font-bold text-white">Welcome back</h2>
+            <p className="text-slate-400 mt-2 text-sm">Sign in to continue your journey</p>
+          </div>
+
+          {error && (
+            <div className="flex items-center gap-3 bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-3">
+              <i className="fa-solid fa-circle-exclamation text-red-400 text-sm"></i>
+              <p className="text-red-400 text-sm">{error}</p>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit(handleLogin)} className="space-y-5">
+            <FormField
+              control={control}
+              name="identifier"
+              label="Email or Username"
+              placeholder="you@example.com or username"
+              maxLength={150}
+              disabled={loading}
+            />
+
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Password</label>
+                <a href="#" className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors">Forgot password?</a>
+              </div>
+              <PasswordField
+                control={control}
+                name="password"
+                label="Password"
+                placeholder="Enter your password"
+                maxLength={64}
+                disabled={loading}
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-800 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2"
+            >
+              {loading ? (
+                <><i className="fa-solid fa-circle-notch fa-spin"></i> Signing in…</>
+              ) : (
+                <><span>Sign In</span><i className="fa-solid fa-arrow-right text-sm"></i></>
+              )}
+            </button>
+          </form>
+
+          {/* Social login */}
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-[#1f2e47]"></div>
+            </div>
+            <div className="relative flex justify-center text-xs">
+              <span className="bg-[#090e1a] px-4 text-slate-500">or continue with</span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-3">
+            {[
+              { icon: 'fa-google', label: 'Google' },
+              { icon: 'fa-github', label: 'GitHub' },
+              { icon: 'fa-twitter', label: 'Twitter' },
+            ].map(s => (
+              <button
+                key={s.label}
+                className="flex items-center justify-center gap-2 bg-[#111827] border border-[#2a3d5c] hover:border-[#3d4f6b] text-slate-300 py-2.5 rounded-xl text-sm font-medium transition-all"
+              >
+                <i className={`fa-brands ${s.icon}`}></i>
+                <span className="hidden sm:inline text-xs">{s.label}</span>
+              </button>
+            ))}
+          </div>
+
+          <p className="text-center text-sm text-slate-400">
+            Don't have an account?{' '}
+            <button type="button" onClick={() => setToggle(true)} className="text-indigo-400 hover:text-indigo-300 font-semibold transition-colors">
+              Create a free account
+            </button>
+          </p>
+        </div>
+      </div>
+    </div>
   )
 }

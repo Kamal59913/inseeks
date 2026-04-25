@@ -1,0 +1,22 @@
+<mjml>
+  <mj-body background-color="#ffffff">
+    <mj-section background-color="#f0f0f0" padding="20px">
+      <mj-column>
+        <mj-text font-size="22px" font-weight="bold" color="#333333">Hello {{name}},</mj-text>
+        <mj-text font-size="16px" color="#555555">
+          Welcome to our platform! We're excited to have you on board. 🎉
+        </mj-text>
+        <mj-button href="{{ctaUrl}}" background-color="#007BFF" color="white">
+          {{ctaText}}
+        </mj-button>
+      </mj-column>
+    </mj-section>
+    <mj-section>
+      <mj-column>
+        <mj-text font-size="12px" color="#999999">
+          If you didn’t sign up, you can ignore this email.
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

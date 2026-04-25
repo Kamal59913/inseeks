@@ -1,0 +1,22 @@
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-text font-size="20px" font-weight="bold"
+          >Welcome to Our Platform!</mj-text
+        >
+        <mj-text>Hello {{name}},</mj-text>
+        <mj-text
+          >Thank you for signing up. Please click the button below to complete
+          your registration.</mj-text
+        >
+        <mj-button href="{{ctaUrl}}" background-color="#4CAF50"
+          >Complete Signup</mj-button
+        >
+        <mj-text
+          >If you didn't sign up, you can safely ignore this email.</mj-text
+        >
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

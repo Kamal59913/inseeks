@@ -1,33 +1,35 @@
-import React, { useState } from 'react'
-import LeftBar from '../Utilities/LeftBar'
+import React from 'react'
 import RIGHTCOMMENTBAR from '../Utilities/RightSideCommentBar'
+import { useModalData } from '../../store/hooks'
+import AppModal from '../Modal/AppModal'
 
-export default function VideoPost(props) {
-    const [avatar, setAvatar] = useState('https://res.cloudinary.com/dogyotgp5/image/upload/v1713078910/avatar-dummy-social-app_fx9x9f.png');
+export default function VideoPost({ modalId, data }) {
+  const modal = useModalData()
+  const fallback = 'https://res.cloudinary.com/dogyotgp5/image/upload/v1713078910/avatar-dummy-social-app_fx9x9f.png'
+  const temp = data?.temp
 
   return (
-    <div className='absolute w-full flex flex-col lg:flex-row md:flex-col h-screen overflow-hidden bg-opacity-20 justify-center items-center z-10 bg-slate-100'>
-        {/* <LeftBar/> */}
-        <div className='w-[600px] h-[650px] flex flex-col overflow-y-scroll overflow-x-hidden bg-slate-600 items-center ml-8'>
-        <div className="flex mt-14 w-[500px] relative">
-                      <div className="h-10 w-10 flex-shrink-0">
-                        <img
-                          className="h-10 w-10 rounded-full object-cover"
-                          src={props.temp.avatar || avatar}
-                          alt=""
-                        />
-                      </div>
-                      <div className="ml-4">  
-                      <div className="text-sm font-semibold text-black-800 cursor-context-menu">{props.temp.author}</div>
-                        <div className="text-sm text-black-700">5 mins Ago</div>
-                      </div>
-                      <div className='absolute mr-40 mb-3 ml-[494px]'><i class="fa-solid fa-ellipsis-vertical"></i></div>
-                    </div>
-                <video className='h-[360px] w-[500px] mt-6' src={props.temp.video || avatar} controls/>
-                <p className='font-semibold mt-6 max-w-[500px] text-lg'> {props.temp.description} </p>
+    <AppModal onClose={() => modal.closeById(modalId)} contentClassName="max-w-5xl w-[92vw] h-[90vh] overflow-hidden rounded-2xl border border-[#2a3d5c] bg-[#111827]" outsideClick={true}>
+      <div className="flex h-full">
+        <div className="flex-1 bg-[#111827] flex flex-col overflow-y-auto">
+          <div className="flex items-center gap-3 px-6 py-4 border-b border-[#1f2e47] sticky top-0 bg-[#111827] z-10">
+            <img src={temp.avatar || fallback} alt={temp.author} className="h-10 w-10 rounded-full object-cover ring-2 ring-[#2a3d5c]"/>
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-slate-200">{temp.author}</p>
+              <p className="text-xs text-slate-500">
+                {temp.time ? new Date(temp.time).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : 'Just now'}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex-1 flex flex-col px-6 py-5 space-y-4">
+            {temp.video && <video src={temp.video} controls autoPlay className="w-full rounded-xl bg-black max-h-[50vh] object-contain"/>}
+            {temp.description && <p className="text-sm text-slate-400 leading-relaxed">{temp.description}</p>}
+          </div>
         </div>
-        <RIGHTCOMMENTBAR currentUser = {props.temp.currentUser} currentPostId = {props.temp.postId}/>
-        <i className='fa-regular fa-x h-20 w-20 text-2xl font-bold text-slate-400 mb-[560px] ml-5' onClick={props.changeToggleVideoPost}></i>
-    </div>   
+
+        <RIGHTCOMMENTBAR currentUser={temp.currentUser} currentPostId={temp.postId}/>
+      </div>
+    </AppModal>
   )
 }

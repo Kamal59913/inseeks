@@ -1,72 +1,92 @@
-import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
 import SearchBar from '../Utilities/SearchBar';
 import LeftBar from '../Utilities/LeftBar';
-import { CreateEnv } from '../CreatePost/createEnv';
 import EnvCard from '../envComponents/envCard';
 import axios from 'axios'
+import { useModalData } from '../../store/hooks';
 
-export default function Events() {
+export default function Environments() {
+  const modal = useModalData()
   const [holdEnvData, setholdEnvData] = useState()
-  /*Url to retrieve environments*/
-  let getEnvs = "http://localhost:8000/api/v1/env/getEnvs"
+  const [search, setSearch] = useState('')
+  const getEnvs = `${process.env.REACT_APP_API_URL}/env/getEnvs`
 
-  const [toggleCreateEnv, settoggleCreateEnv] = useState(false);
+  const refreshEnvs = () => {
+    axios.get(getEnvs, { withCredentials: true })
+      .then((res) => setholdEnvData(res.data.data))
+      .catch(() => {})
+  }
 
   useEffect(() => {
-    axios.get(getEnvs, {
-      withCredentials: true
-    })
-    .then((res) => {
-      setholdEnvData(res.data.data)
-    })
-    .catch((err) => {
-      console.log(err)
-    })
-  }, [toggleCreateEnv])
-  
-  console.log(holdEnvData,'holdEnvData')
-  const navigate = useNavigate()
-  const goToEvent = () => {
-    navigate('/')
-  }
+    refreshEnvs()
+  }, [])
 
-  const toggleCreate = () => {
-    toggleCreateEnv? settoggleCreateEnv(false) : settoggleCreateEnv(true)
-    console.log(toggleCreate, "clicked")
-  }
+  const filtered = holdEnvData?.filter((e) =>
+    e.name?.toLowerCase().includes(search.toLowerCase()) ||
+    e.description?.toLowerCase().includes(search.toLowerCase()),
+  )
+
   return (
-    <>
-    {toggleCreateEnv && <CreateEnv toggleCreate = {toggleCreate}/>}
-    <div className='bg-[#0f172a] flex flex-col lg:flex-row md:flex-col h-screen overflow-hidden'>
-        <LeftBar/>
-        <div className='h-full w-full lg:h-screen md:h-full md:max-w-full lg:w-full flex lg:flex-col overflow-x-scroll'>
-        <div className='w-full mt-3 md:mt-2'>
-              <SearchBar/>
+    <div className="flex h-screen bg-[#090e1a] overflow-hidden">
+      <LeftBar/>
+      <main className="flex-1 flex flex-col min-w-0 overflow-y-auto pb-20 lg:pb-0">
+        <SearchBar/>
+
+        <div className="max-w-6xl mx-auto w-full px-4 py-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+            <div>
+              <h1 className="text-2xl font-bold text-white">Environments</h1>
+              <p className="text-sm text-slate-400 mt-1">Join communities that match your interests</p>
             </div>
-              <p className='ml-14 mt-4 text-slate-100 text-xl'>Environments</p>
-                <div className='text-slate-100 ml-14 flex text-sm gap-4'>
-                <p className> Anytime</p>
-                <p className> Today</p>
-                <p className> Tomorrow</p>
-                <p className> This Week</p>
-                <p className> This Month</p>
-                <p className> Select</p>
-                <p className = ""
-                   onClick={toggleCreate}
-                > Create One </p>
-                </div>
-                <div className='grid grid-cols-3 gap-y-10 gap-x-40 ml-14 mt-3 w-[1000px]'>
-                { holdEnvData &&
-                  holdEnvData.map((index, i)=> {
-                    return (
-                    <EnvCard title={index.name} description={index.description} avatar = {index.envAvatar} isJoined = {index.isJoined}/>
-                  )
-                  })
-                }
-                </div>
+            <button
+              onClick={() => modal.open('create-env', { onCreated: refreshEnvs })}
+              className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-all duration-200 shrink-0"
+            >
+              <i className="fa-solid fa-plus text-xs"></i>
+              Create Environment
+            </button>
+          </div>
+
+          <div className="flex items-center gap-3 mb-6">
+            <div className="flex-1 flex items-center gap-3 bg-[#111827] border border-[#1f2e47] rounded-xl px-4 py-2.5 focus-within:border-indigo-500 transition-all">
+              <i className="fa-solid fa-magnifying-glass text-slate-500 text-sm"></i>
+              <input
+                type="text"
+                placeholder="Search environments..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="flex-1 bg-transparent text-slate-200 text-sm placeholder-slate-500 border-none focus:outline-none"
+              />
+            </div>
+          </div>
+
+          {filtered?.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {filtered.map((env, i) => (
+                <EnvCard
+                  key={i}
+                  title={env.name}
+                  description={env.description}
+                  avatar={env.envAvatar}
+                  isJoined={env.isJoined}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-20 text-slate-500">
+              <i className="fa-solid fa-seedling text-5xl mb-4 text-slate-600"></i>
+              <p className="text-base font-medium">No environments found</p>
+              <p className="text-sm mt-1">Create one to get started!</p>
+              <button
+                onClick={() => modal.open('create-env', { onCreated: refreshEnvs })}
+                className="mt-4 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-all"
+              >
+                Create Environment
+              </button>
+            </div>
+          )}
         </div>
-    </div>  
-    </> 
+      </main>
+    </div>
   )
 }
