@@ -1,43 +1,15 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { Link } from 'react-router-dom'
-import axios from 'axios';
 import { useModalData } from '../../store/hooks';
+import PostAttachmentGallery from '../Common/PostAttachmentGallery';
+import VoteControls from '../Common/VoteControls';
+import { useVoteQuery } from '../../hooks/useVoteQuery';
+
+import ImageWithFallback from '../Common/ImageWithFallback';
 
 export default function Post(props) {
   const modal = useModalData()
-  const [likebuttontoggle, setlikebuttontoggle] = useState(false)
-  const [likedata, setlikedata] = useState(null);
-  const [likecount, setlikecount] = useState(null)
-  const [isliked, setIsLiked] = useState(null)
-
-  const getlikedetails = `${process.env.REACT_APP_API_URL}/like/getlike`
-  const likepost = `${process.env.REACT_APP_API_URL}/like/toggle/like`
-
-  const LikeAPost = async (data) => {
-    axios.post(likepost, data, { withCredentials: true })
-      .then((res) => console.log("liked", res))
-      .catch((err) => console.log(err))
-  }
-
-  const getLikes = () => {
-    const data = { PostId: props.postId, type: props.type }
-    axios.post(getlikedetails, data, { withCredentials: true })
-      .then((res) => {
-        setlikedata(res.data.data)
-        setlikecount(res.data.data.length)
-        if (res.data.data[0]) setIsLiked(res.data.data[0].isLiked)
-      })
-      .catch((err) => console.log(err))
-  }
-
-  useEffect(() => { getLikes() }, [likebuttontoggle])
-
-  const onLikeClick = () => {
-    const newLikeStatus = !isliked
-    setIsLiked(newLikeStatus)
-    setlikecount(newLikeStatus ? likecount + 1 : likecount - 1)
-    LikeAPost({ PostId: props.postId, type: props.type })
-  }
+  const { summary, vote, isVoting } = useVoteQuery(props.type, props.postId)
 
   const sendData = () => {
     modal.open('view-blog-post', {
@@ -46,11 +18,11 @@ export default function Post(props) {
   }
 
   return (
-    <div className="bg-[#111827] border border-[#1f2e47] rounded-2xl overflow-hidden hover:border-[#2a3d5c] transition-all duration-200 w-full animate-fade-in">
-      {/* Header */}
+ <div className="bg-[#111827] rounded-2xl overflow-hidden transition-all duration-200 w-full animate-fade-in">
       <div className="flex items-center gap-3 p-4">
         <Link to={`/user/${props.author}`}>
-          <img
+          <ImageWithFallback
+            variant="avatar"
             className="h-10 w-10 rounded-full object-cover ring-2 ring-[#2a3d5c] hover:ring-indigo-500 transition-all"
             src={props.avatar}
             alt={props.author}
@@ -60,27 +32,25 @@ export default function Post(props) {
           <Link to={`/user/${props.author}`} className="text-sm font-semibold text-slate-200 hover:text-indigo-400 transition-colors">
             {props.author}
           </Link>
-          <p className="text-xs text-slate-500 mt-0.5">
-            {new Date(props.time).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-          </p>
+          <div className="mt-0.5 flex items-center gap-2 text-xs text-slate-500">
+            {props.community ? (
+              <Link
+                to={`/env-home-page/${props.community}`}
+                className="truncate font-medium text-slate-400 hover:text-indigo-400 transition-colors"
+              >
+                / {props.community}
+              </Link>
+            ) : null}
+            <span>{new Date(props.time).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+          </div>
         </div>
         <button className="text-slate-500 hover:text-slate-300 p-1.5 rounded-lg hover:bg-[#1a2540] transition-all">
           <i className="fa-solid fa-ellipsis-vertical text-sm"></i>
         </button>
       </div>
 
-      {/* Image */}
-      {props.image && (
-        <div className="px-4 pb-3">
-          <img
-            src={props.image}
-            alt={props.title}
-            className="w-full h-52 rounded-xl object-cover"
-          />
-        </div>
-      )}
+      <PostAttachmentGallery attachments={props.attachments} legacyImage={props.image} />
 
-      {/* Content */}
       <div className="px-4 pb-3">
         {props.title && <h3 className="text-base font-semibold text-slate-100 mb-1">{props.title}</h3>}
         {props.description && (
@@ -88,23 +58,18 @@ export default function Post(props) {
         )}
       </div>
 
-      {/* Actions */}
-      <div className="flex items-center justify-between px-4 py-3 border-t border-[#1f2e47]">
+ <div className="flex items-center justify-between px-4 py-3 ">
         <div className="flex items-center gap-1">
-          <button
-            onClick={onLikeClick}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200
-              ${isliked ? 'text-red-400 bg-red-500/10' : 'text-slate-400 hover:text-red-400 hover:bg-red-500/10'}`}
-          >
-            <i className={`${isliked ? 'fa-solid' : 'fa-regular'} fa-heart text-base`}></i>
-            {likecount !== null && <span>{likecount}</span>}
-          </button>
+          <VoteControls summary={summary} onVote={vote} disabled={isVoting} />
 
           <button
             onClick={sendData}
+            title="Real time discussions"
+            aria-label="Real time discussions"
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-slate-400 hover:text-indigo-400 hover:bg-indigo-500/10 transition-all duration-200"
           >
-            <i className="fa-regular fa-comment text-base"></i>
+            <i className="fa-regular fa-comments text-base"></i>
+            <span>{props.conversationCount || 0}</span>
           </button>
         </div>
 

@@ -1,0 +1,10 @@
+import React from 'react';
+
+export default function BackButton() {
+  return (
+    <div className="back">
+      <i className="fa-solid fa-less-than less-than"></i>
+      <span className="textt"> Back </span>
+    </div>
+  );
+}

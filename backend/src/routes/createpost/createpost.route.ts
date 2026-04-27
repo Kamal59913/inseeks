@@ -17,7 +17,10 @@ import { auth } from "../../middleware/auth/auth.middleware";
 const router = Router()
 
 router.route("/generalpost").post(auth, 
-    upload.single("image"),
+    upload.fields([
+        { name: "attachments", maxCount: 8 },
+        { name: "image", maxCount: 1 }
+    ]),
     createPost)
 router.route("/videopost").post(auth, 
     upload.single("video"),

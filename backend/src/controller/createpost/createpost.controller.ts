@@ -8,31 +8,143 @@ import { uploadOnCloudinary } from "../../utils/cloudinary.js";
 import { ApiResponse } from "../../utils/response/ApiResponse";
 import { User } from "../../model/user.model.js";
 import mongoose from "mongoose";
+import fs from "fs";
+import path from "path";
 
-const createPost = asyncHandler(async (req, res) => {
-    const {title, description, envname} = req.body;
-    const imagePath = req.file?.path;
+const PUBLIC_DOCS_DIR = path.resolve(process.cwd(), "src/public/uploads/documents");
+const COMMENT_COLLECTION = "commentposts";
 
-    let image;
-    if(imagePath) {
-        image = await uploadOnCloudinary(imagePath)
-        if(!image.url) {
-            throw new ApiError(400, "Error while uploading on avatar")
+const ensureDirectory = (directoryPath) => {
+    if (!fs.existsSync(directoryPath)) {
+        fs.mkdirSync(directoryPath, { recursive: true });
+    }
+};
+
+const buildPublicFileUrl = (req, relativePath) => {
+    const forwardedProto = req.headers["x-forwarded-proto"];
+    const protocol = forwardedProto ? String(forwardedProto).split(",")[0] : req.protocol;
+    const normalizedPath = relativePath.replace(/\\/g, "/").replace(/^\/+/, "");
+
+    return `${protocol}://${req.get("host")}/${normalizedPath}`;
+};
+
+const persistDocumentLocally = (req, file) => {
+    ensureDirectory(PUBLIC_DOCS_DIR);
+
+    const extension = path.extname(file.originalname || file.filename || "");
+    const baseName = path.basename(file.originalname || file.filename || "document", extension);
+    const safeBaseName = baseName.replace(/[^a-zA-Z0-9-_]/g, "_");
+    const finalFileName = `${Date.now()}-${safeBaseName}${extension || ""}`;
+    const finalPath = path.join(PUBLIC_DOCS_DIR, finalFileName);
+
+    fs.renameSync(file.path, finalPath);
+
+    return {
+        url: buildPublicFileUrl(req, path.join("uploads", "documents", finalFileName)),
+        resourceType: "raw",
+        mimeType: file.mimetype,
+        originalName: file.originalname,
+        bytes: file.size
+    };
+};
+
+const discussionLookupStages = [
+    {
+        $lookup: {
+            from: COMMENT_COLLECTION,
+            let: {
+                postIdString: { $toString: "$_id" }
+            },
+            pipeline: [
+                {
+                    $match: {
+                        $expr: {
+                            $eq: ["$PostId", "$$postIdString"]
+                        }
+                    }
+                }
+            ],
+            as: "discussionEntries"
+        }
+    },
+    {
+        $addFields: {
+            conversationCount: {
+                $size: "$discussionEntries"
+            }
+        }
+    },
+    {
+        $project: {
+            discussionEntries: 0
         }
     }
+];
 
-    if(title === "") {
+const createPost = asyncHandler(async (req, res) => {
+    const { title = "", description = "", envname } = req.body;
+    const filesMap = Array.isArray(req.files) ? {} : (req.files || {});
+    const uploadedFiles = [
+        ...(filesMap.attachments || []),
+        ...(filesMap.image || [])
+    ];
+
+    if(description.trim() === "") {
+        throw new ApiError(400, "Adding a description is required")
+    }
+
+    if(title.trim() === "") {
         throw new ApiError(400, "Adding a title is required")
     }
 
-    const postData = {
-        title,
-        description,
-        PostAuthor: req.user._id,
-        community: envname
+    if(String(envname || "").trim() === "") {
+        throw new ApiError(400, "Selecting a space is required")
     }
-    if(image) {
-        postData.image = image.url;
+
+    const attachments = [];
+
+    for (const file of uploadedFiles) {
+        const mimeType = file.mimetype?.toLowerCase() || "";
+        const isDocument = mimeType === "application/pdf" || mimeType.startsWith("application/");
+
+        if (isDocument) {
+            attachments.push(persistDocumentLocally(req, file));
+            continue;
+        }
+
+        const uploadedAsset = await uploadOnCloudinary(file.path);
+
+        if(!uploadedAsset?.url && !uploadedAsset?.secure_url) {
+            throw new ApiError(400, "Error while uploading an attachment")
+        }
+
+        attachments.push({
+            url: uploadedAsset.secure_url || uploadedAsset.url,
+            resourceType: uploadedAsset.resource_type || file.mimetype?.split("/")[0],
+            mimeType: file.mimetype,
+            originalName: file.originalname,
+            bytes: uploadedAsset.bytes || file.size
+        });
+    }
+
+    const firstImageAttachment = attachments.find((attachment) => {
+        const mimeType = attachment.mimeType?.toLowerCase() || "";
+        const url = attachment.url?.toLowerCase() || "";
+
+        if (mimeType === "application/pdf" || url.endsWith(".pdf")) {
+            return false;
+        }
+
+        return mimeType.startsWith("image/") || attachment.resourceType === "image";
+    });
+
+    const postData = {
+        title: title.trim(),
+        description: description.trim(),
+        PostAuthor: req.user._id,
+        community: envname,
+        attachments,
+        image: firstImageAttachment?.url
     }
 
     const post = await BlogPost.create(postData)
@@ -89,6 +201,10 @@ const createVideoPost = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Adding a description is required")
     }
 
+    if(String(envname || "").trim() === "") {
+        throw new ApiError(400, "Selecting a space is required")
+    }
+
     const post = await VideoPost.create({       
             description,
             PostAuthor: req.user._id,
@@ -138,6 +254,10 @@ const createImagePost = asyncHandler(async (req, res) => {
     console.log(files)
     if(title === "") {
         throw new ApiError(400, "Adding a title is required")
+    }
+
+    if(String(envname || "").trim() === "") {
+        throw new ApiError(400, "Selecting a space is required")
     }
 
     let imagePath;
@@ -240,7 +360,8 @@ const homePagePostsDisplay = asyncHandler(async (req, res) => {
                     $size: "$likes"
                 }
             }
-        }
+        },
+        ...discussionLookupStages
     ]);
 
     const imagePosts = await ImagePost.aggregate([
@@ -282,7 +403,8 @@ const homePagePostsDisplay = asyncHandler(async (req, res) => {
                     $size: "$likes"
                 }
             }
-        }
+        },
+        ...discussionLookupStages
     ]);
     const videoPosts = await VideoPost.aggregate([
         {
@@ -323,7 +445,8 @@ const homePagePostsDisplay = asyncHandler(async (req, res) => {
                     $size: "$likes"
                 }
             }
-        }
+        },
+        ...discussionLookupStages
     ]);
     //combining the posts
     const allPosts = [...blogPosts, ...imagePosts, ...videoPosts];
@@ -354,7 +477,8 @@ const videosDisplay = asyncHandler(async (req, res) => {
                     }
                 ]
             }
-        }
+        },
+        ...discussionLookupStages
     ]);
     //combining the posts
     const allPosts = [...videoPosts];
@@ -386,7 +510,8 @@ const blogsDisplay = asyncHandler(async (req, res) => {
                     }
                 ]
             }
-        }
+        },
+        ...discussionLookupStages
     ]);
 
     //combining the posts
@@ -417,7 +542,8 @@ const imagesDisplay = asyncHandler(async (req, res) => {
                     }
                 ]
             }
-        }
+        },
+        ...discussionLookupStages
     ]);
 
     //combining the posts
@@ -460,7 +586,8 @@ const getUsersPosts = asyncHandler(async (req, res) => {
                     }
                 ]
             }
-        }
+        },
+        ...discussionLookupStages
     ]);
 
     const imagePosts = await ImagePost.aggregate([
@@ -485,7 +612,8 @@ const getUsersPosts = asyncHandler(async (req, res) => {
                     }
                 ]
             }
-        }
+        },
+        ...discussionLookupStages
     ]);
     const videoPosts = await VideoPost.aggregate([
         {
@@ -509,7 +637,8 @@ const getUsersPosts = asyncHandler(async (req, res) => {
                     }
                 ]
             }
-        }
+        },
+        ...discussionLookupStages
     ]);
     //combining the posts
     const allPosts = [...blogPosts, ...imagePosts, ...videoPosts];
@@ -550,7 +679,8 @@ const getUserimagesDisplay = asyncHandler(async (req, res) => {
                     }
                 ]
             }
-        }
+        },
+        ...discussionLookupStages
     ]);
 
     //combining the posts
@@ -590,7 +720,8 @@ const getUserVideosDisplay = asyncHandler(async (req, res) => {
                     }
                 ]
             }
-        }
+        },
+        ...discussionLookupStages
     ]);
     //combining the posts
     const allPosts = [...videoPosts];
@@ -632,7 +763,8 @@ const getUserblogsDisplay = asyncHandler(async (req, res) => {
                     }
                 ]
             }
-        }
+        },
+        ...discussionLookupStages
     ]);
 
     //combining the posts

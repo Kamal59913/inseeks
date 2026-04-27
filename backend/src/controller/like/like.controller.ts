@@ -1,104 +1,116 @@
 // @ts-nocheck
+import mongoose from "mongoose";
 import { asyncHandler } from "../../utils/response/asyncHandler";
 import { ApiResponse } from "../../utils/response/ApiResponse";
+import { ApiError } from "../../utils/response/ApiError";
 import { Likes } from "../../model/likes.model.js";
-import mongoose from "mongoose";
+import { getIO } from "../../socket/socketconnect";
+import { CommentPost } from "../../model/comment.model.js";
+import { User } from "../../model/user.model.js";
 
-const LikePost = asyncHandler(async (req,res) => {
-     const {PostId, type} = req.body
+const SUPPORTED_TYPES = ["image", "video", "blogpost", "comment"];
+const SUPPORTED_VOTES = ["upvote", "downvote"];
 
-     let find;
+const getVoteSummary = async (targetField, targetId, userId) => {
+  const targetObjectId = new mongoose.Types.ObjectId(targetId);
 
-     let likedPost;
+  const [upvotesCount, downvotesCount, existingVote] = await Promise.all([
+    Likes.countDocuments({ [targetField]: targetObjectId, voteType: "upvote" }),
+    Likes.countDocuments({ [targetField]: targetObjectId, voteType: "downvote" }),
+    Likes.findOne({ [targetField]: targetObjectId, likedBy: userId }).lean(),
+  ]);
 
-     // Check if the like already exists
-     if (type === 'image' || type === 'video' || type === 'blogpost') {
-         likedPost = await Likes.findOne({
-             [type]: PostId,
-             likedBy: req.user._id
-         });
-     }
-
-     if(likedPost) {
-          await Likes.findByIdAndDelete(likedPost._id)
-     }
-
-     if (!likedPost) {
-          {
-               if(type == 'image') {
-                    find = await Likes.create({
-                         image : PostId,
-                         likedBy: req.user._id,
-                    })
-               }
-               else if(type == 'video') {
-                    find = await Likes.create({
-                         video : PostId,
-                         likedBy: req.user._id,
-                    })
-               }         
-               else if(type == 'blogpost') {
-                    find = await Likes.create({
-                         blogpost : PostId,
-                         likedBy: req.user._id,
-                    })
-               }
-     
-          }
-
-     } 
-
-     return res
-     .status(200)
-     .json(
-          new ApiResponse(200, find, "Successfully liked the post")
-     )
-})
-
-const GetPostLike = asyncHandler(async (req,res) => {
-
-     const {PostId, type} = req.body
-
-     let matchField;
-     
-     if (type === 'image') matchField = 'image';
-     else if (type === 'video') matchField = '$video';
-     else if (type === 'blogpost') matchField = '$blogpost';
-     else matchField = null; // Handle other types if needed
- 
-     
-     const likedetails = await Likes.aggregate([
-          /*pipeline 1 to match specific genre of post*/
-          {
-               $match: {
-                    [type]: new mongoose.Types.ObjectId(PostId)
-               }
-          },
-
-          /*pipeline 2 to check if the post is liked by the current user*/
-          {
-               $addFields: {
-                    isLiked: {
-                         $cond: {
-                              if: {$eq: [req.user?._id, "$likedBy"]},
-                              then: true,
-                              else: false
-                         }
-                    },                          
-               }
-          },
-     ])
-     
-     return res
-     .status(200)
-     .json(
-          new ApiResponse(200, likedetails, "Successfully retrieved like details")
-     )
-})
-
-
-
-export {
-    LikePost,
-    GetPostLike
+  return {
+    upvotesCount,
+    downvotesCount,
+    score: upvotesCount - downvotesCount,
+    userVote: existingVote?.voteType || null,
+  };
 };
+
+const LikePost = asyncHandler(async (req, res) => {
+  const { PostId, CommentId, type, voteType } = req.body;
+  const targetField = type;
+  const targetId = CommentId || PostId;
+
+  if (!SUPPORTED_TYPES.includes(targetField)) {
+    throw new ApiError(400, "Invalid vote target type");
+  }
+
+  if (!targetId) {
+    throw new ApiError(400, "Target id is required");
+  }
+
+  if (!SUPPORTED_VOTES.includes(voteType)) {
+    throw new ApiError(400, "voteType must be upvote or downvote");
+  }
+
+  const existingVote = await Likes.findOne({
+    [targetField]: targetId,
+    likedBy: req.user._id,
+  });
+
+  if (existingVote) {
+    if (existingVote.voteType === voteType) {
+      await Likes.findByIdAndDelete(existingVote._id);
+    } else {
+      existingVote.voteType = voteType;
+      await existingVote.save();
+    }
+  } else {
+    await Likes.create({
+      [targetField]: targetId,
+      likedBy: req.user._id,
+      voteType,
+    });
+  }
+
+  const summary = await getVoteSummary(targetField, targetId, req.user._id);
+
+  if (targetField === "comment") {
+    const [comment, actor] = await Promise.all([
+      CommentPost.findById(targetId).lean(),
+      User.findById(req.user._id).select("username avatar").lean(),
+    ]);
+
+    if (comment?.PostId) {
+      const io = getIO();
+      io?.to(`discussion:${comment.PostId}`).emit("discussion:vote-updated", {
+        postId: comment.PostId,
+        commentId: String(targetId),
+        summary,
+        actor: {
+          username: actor?.username || "Anonymous",
+          avatar: actor?.avatar,
+        },
+        voteType,
+      });
+    }
+  }
+
+  return res.status(200).json(
+    new ApiResponse(200, summary, "Vote updated successfully"),
+  );
+});
+
+const GetPostLike = asyncHandler(async (req, res) => {
+  const { PostId, CommentId, type } = req.body;
+  const targetField = type;
+  const targetId = CommentId || PostId;
+
+  if (!SUPPORTED_TYPES.includes(targetField)) {
+    throw new ApiError(400, "Invalid vote target type");
+  }
+
+  if (!targetId) {
+    throw new ApiError(400, "Target id is required");
+  }
+
+  const summary = await getVoteSummary(targetField, targetId, req.user._id);
+
+  return res.status(200).json(
+    new ApiResponse(200, summary, "Vote details fetched successfully"),
+  );
+});
+
+export { LikePost, GetPostLike };

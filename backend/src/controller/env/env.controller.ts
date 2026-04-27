@@ -69,24 +69,30 @@ const getEnvs = asyncHandler(async (req, res) => {
 )})
 
 const joinCommunity = asyncHandler(async (req, res) => {
-     const {title} = req.body;
+     const {title, shouldJoin} = req.body;
       
      let JoinStatus;
      let newJoin;
      const existingJoin = await Joins.findOne({
-          community: title
+          community: title,
+          JoinedBy: req.user?._id
      })
      
-     if(!existingJoin) {
-          /*Pipeline 1 is to check matched or not*/
+     if(shouldJoin === true) {
+          if(!existingJoin) {
+               newJoin = await Joins.create({
+                    community: title,
+                    JoinedBy: req.user?._id
+               })
+          } else {
+               newJoin = existingJoin
+          }
           JoinStatus = true
-          newJoin = await Joins.create({
-               community: title,
-               JoinedBy: req.user?._id
-          })
      } else {
+          if(existingJoin) {
+               await existingJoin.deleteOne();
+          }
           JoinStatus = false
-          await existingJoin.deleteOne();
      }
      
      return res

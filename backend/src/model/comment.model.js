@@ -13,8 +13,28 @@ const commentPostSchema = new Schema(
         },
         content: {
             type: String,
-            required: true
+            default: ""
         },
+        attachments: [
+            {
+                url: {
+                    type: String,
+                    required: true,
+                },
+                resourceType: {
+                    type: String,
+                },
+                mimeType: {
+                    type: String,
+                },
+                originalName: {
+                    type: String,
+                },
+                bytes: {
+                    type: Number,
+                }
+            }
+        ],
         type: {
             type: String,
             default: "video"

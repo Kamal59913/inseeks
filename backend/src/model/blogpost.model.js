@@ -13,6 +13,26 @@ const blogPostSchema = new Schema(
         image: {
             type: String,
         },
+        attachments: [
+            {
+                url: {
+                    type: String,
+                    required: true,
+                },
+                resourceType: {
+                    type: String,
+                },
+                mimeType: {
+                    type: String,
+                },
+                originalName: {
+                    type: String,
+                },
+                bytes: {
+                    type: Number,
+                }
+            }
+        ],
         type: {
             type: String,
             default: "blogpost"
