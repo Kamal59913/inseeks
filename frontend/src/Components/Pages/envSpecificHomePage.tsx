@@ -67,36 +67,38 @@ export default function EnvHomepage() {
       <main className="flex-1 flex flex-col min-w-0 overflow-y-auto pb-20 lg:pb-0">
         <SearchBar />
 
- <div className="mx-4 mt-4 bg-gradient-to-r from-indigo-900/60 via-purple-900/30 to-[#111827] rounded-2xl p-6">
-          <div className="flex items-center gap-4">
-            <div className="h-14 w-14 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center">
-              <i className="fa-solid fa-seedling text-indigo-400 text-xl"></i>
+        <div className="max-w-2xl mx-auto w-full px-4 pt-4">
+          <div className="bg-gradient-to-r from-indigo-900/60 via-purple-900/30 to-[#111827] rounded-2xl p-6">
+            <div className="flex items-center gap-4">
+              <div className="h-14 w-14 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center">
+                <i className="fa-solid fa-seedling text-indigo-400 text-xl"></i>
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-white capitalize">{envname}</h1>
+                <p className="text-sm text-slate-400 mt-0.5">Space feed</p>
+              </div>
+              {envname ? (
+                <SpaceJoinButton
+                  title={envname}
+                  initialIsJoined={!!currentEnvironment?.isJoined}
+                  className="ml-auto text-sm font-semibold px-4 py-2 rounded-xl transition-all duration-200"
+                  joinedClassName="bg-[#1a2540] text-slate-300 hover:text-red-400"
+                  unjoinedClassName="bg-indigo-600 hover:bg-indigo-500 text-white"
+                />
+              ) : null}
+              <Link
+                to="/environments"
+                className="flex items-center gap-2 text-sm text-slate-400 hover:text-indigo-400 transition-colors"
+              >
+                <i className="fa-solid fa-arrow-left text-xs"></i>
+                All Spaces
+              </Link>
             </div>
-            <div>
-              <h1 className="text-xl font-bold text-white capitalize">{envname}</h1>
-              <p className="text-sm text-slate-400 mt-0.5">Space feed</p>
-            </div>
-            {envname ? (
-              <SpaceJoinButton
-                title={envname}
-                initialIsJoined={!!currentEnvironment?.isJoined}
-                className="ml-auto text-sm font-semibold px-4 py-2 rounded-xl transition-all duration-200"
-                joinedClassName="bg-[#1a2540] text-slate-300 hover:text-red-400"
-                unjoinedClassName="bg-indigo-600 hover:bg-indigo-500 text-white"
-              />
-            ) : null}
-            <Link
-              to="/environments"
-              className="flex items-center gap-2 text-sm text-slate-400 hover:text-indigo-400 transition-colors"
-            >
-              <i className="fa-solid fa-arrow-left text-xs"></i>
-              All Spaces
-            </Link>
           </div>
         </div>
 
-        <div className="max-w-2xl mx-auto w-full py-6 space-y-4">
- <div className="flex items-center gap-1 p-1 bg-[#111827] rounded-xl">
+        <div className="max-w-2xl mx-auto w-full py-6 px-4 space-y-4">
+          <div className="flex items-center gap-1 p-1 bg-[#111827] rounded-xl">
             {FILTERS.map((f) => (
               <button
                 key={f.key}

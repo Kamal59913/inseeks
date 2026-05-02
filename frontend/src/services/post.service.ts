@@ -48,10 +48,6 @@ export const postService = {
     formData.append('title', title);
     formData.append('description', description);
     attachments.forEach((attachment) => formData.append('attachments', attachment));
-    const firstImage = attachments.find((attachment) => attachment.type?.startsWith('image/'));
-    if (firstImage) {
-      formData.append('image', firstImage);
-    }
     formData.append('envname', envname);
     return apiClient.post('/createpost/generalpost', formData, {
       headers: {
@@ -65,10 +61,6 @@ export const postService = {
     formData.append('title', title);
     formData.append('description', description);
     attachments.forEach((attachment) => formData.append('attachments', attachment));
-    const firstImage = attachments.find((attachment) => attachment.type?.startsWith('image/'));
-    if (firstImage) {
-      formData.append('image', firstImage);
-    }
     formData.append('envname', envname);
     return apiClient.post('/createpost/generalpost', formData, {
       headers: {

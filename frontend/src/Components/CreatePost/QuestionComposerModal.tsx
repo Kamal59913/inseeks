@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useController } from "react-hook-form";
 import PulseLoader from "react-spinners/PulseLoader";
 import AppModal from "../Modal/AppModal";
@@ -43,6 +43,7 @@ export default function QuestionComposerModal({
   const [submitError, setSubmitError] = useState<string | null>(null);
   const payload = data || {};
   const [spaceMenuOpen, setSpaceMenuOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const {
     data: spaces,
     fetchNextPage: fetchNextSpaces,
@@ -100,7 +101,15 @@ export default function QuestionComposerModal({
 
   const addFiles = (files: FileList | null) => {
     if (!files?.length) return;
-    attachmentsField.onChange([...attachments, ...Array.from(files)]);
+    const nextFiles = Array.from(files);
+    const uniqueFiles = nextFiles.filter(
+      (file) =>
+        !attachments.some((a) => a.name === file.name && a.size === file.size),
+    );
+
+    if (uniqueFiles.length > 0) {
+      attachmentsField.onChange([...attachments, ...uniqueFiles]);
+    }
   };
 
   const removeAttachment = (indexToRemove: number) => {
@@ -278,20 +287,25 @@ export default function QuestionComposerModal({
                   Add optional files to support your question.
                 </p>
               </div>
-              <label className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition-all hover:bg-indigo-500">
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition-all hover:bg-indigo-500"
+              >
                 <i className="fa-solid fa-paperclip text-xs"></i>
                 Attach files
-                <input
-                  type="file"
-                  className="hidden"
-                  multiple
-                  disabled={isSubmitting}
-                  onChange={(event) => {
-                    addFiles(event.target.files);
-                    event.target.value = "";
-                  }}
-                />
-              </label>
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                className="hidden"
+                multiple
+                disabled={isSubmitting}
+                onChange={(event) => {
+                  addFiles(event.target.files);
+                  event.target.value = "";
+                }}
+              />
             </div>
 
             <p className="mt-3 text-xs text-slate-500">

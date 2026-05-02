@@ -142,8 +142,14 @@ export default function ImagePostComposerModal({
     }
 
     setSubmitError(null);
-    const updatedImages = [...images, ...nextFiles];
-    setImages(updatedImages);
+    const uniqueFiles = nextFiles.filter(
+      (file) => !images.some((img) => img.name === file.name && img.size === file.size)
+    );
+    
+    if (uniqueFiles.length > 0) {
+      const updatedImages = [...images, ...uniqueFiles];
+      setImages(updatedImages);
+    }
 
     if (!images.length) {
       setSelectedIndex(0);
