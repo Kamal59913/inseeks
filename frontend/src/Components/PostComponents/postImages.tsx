@@ -69,7 +69,7 @@ export default function PostImages(props: any) {
           postType={props.type || "image"}
           authorUsername={props.author}
           currentUsername={currentUser?.username}
-          postData={{ title: props.title, description: "" }}
+          postData={{ title: props.title, description: "", community: props.community }}
         />
       </div>
 

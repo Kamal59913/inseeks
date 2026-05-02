@@ -61,7 +61,7 @@ export default function Post(props: any) {
           postType={props.type || 'blogpost'}
           authorUsername={props.author}
           currentUsername={currentUser?.username}
-          postData={{ title: props.title, description: props.description }}
+          postData={{ title: props.title, description: props.description, community: props.community }}
         />
       </div>
 

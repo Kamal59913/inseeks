@@ -94,6 +94,6 @@ export const postService = {
 
   deletePost: (postId: string) => apiClient.delete(`/createpost/${postId}`),
 
-  updatePost: (postId: string, data: { title?: string; description?: string }) =>
+  updatePost: (postId: string, data: { title?: string; description?: string; envname?: string }) =>
     apiClient.patch(`/createpost/${postId}`, data),
 };

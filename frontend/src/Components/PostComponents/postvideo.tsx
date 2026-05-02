@@ -57,7 +57,7 @@ export default function PostVideos(props: any) {
           postType={props.type || 'video'}
           authorUsername={props.author}
           currentUsername={currentUser?.username}
-          postData={{ title: '', description: props.description }}
+          postData={{ title: '', description: props.description, community: props.community }}
         />
       </div>
 

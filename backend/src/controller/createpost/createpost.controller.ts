@@ -880,7 +880,7 @@ const deletePost = asyncHandler(async (req, res) => {
 
 const updatePost = asyncHandler(async (req, res) => {
     const { postId } = req.params;
-    const { title, description } = req.body;
+    const { title, description, envname } = req.body;
     const result = await findPostAcrossCollections(postId);
     if (!result) throw new ApiError(404, "Post not found");
 
@@ -891,6 +891,7 @@ const updatePost = asyncHandler(async (req, res) => {
 
     if (title !== undefined) post.title = title;
     if (description !== undefined) post.description = description;
+    if (envname !== undefined) post.community = envname;
     await post.save();
 
     return res.status(200).json(new ApiResponse(200, post, "Post updated successfully"));
