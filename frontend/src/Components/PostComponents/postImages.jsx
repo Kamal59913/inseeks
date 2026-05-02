@@ -6,9 +6,12 @@ import VoteControls from '../Common/VoteControls';
 import { useVoteQuery } from '../../hooks/useVoteQuery';
 import Button from '../Common/Button';
 import { copyToClipboard } from '../../utils/clipboardUtils';
+import PostOptionsMenu from './PostOptionsMenu';
+import { useCurrentUserQuery } from '../../hooks/useCurrentUserQuery';
 
 export default function PostImages(props) {
   const modal = useModalData()
+  const { data: currentUser } = useCurrentUserQuery()
   const { summary, vote, isVoting } = useVoteQuery(props.type, props.postId, {
     upvotesCount: props.upvotesCount || 0,
     downvotesCount: props.downvotesCount || 0,
@@ -51,9 +54,13 @@ export default function PostImages(props) {
             <span>{new Date(props.time).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
           </div>
         </div>
-        <Button variant="ghost" size="icon" borderRadius="rounded-lg">
-          <i className="fa-solid fa-ellipsis-vertical text-sm"></i>
-        </Button>
+        <PostOptionsMenu
+          postId={props.postId}
+          postType={props.type || 'image'}
+          authorUsername={props.author}
+          currentUsername={currentUser?.username}
+          postData={{ title: props.title, description: '' }}
+        />
       </div>
 
       {props.title && <p className="px-4 pb-2 text-base font-semibold text-slate-100">{props.title}</p>}

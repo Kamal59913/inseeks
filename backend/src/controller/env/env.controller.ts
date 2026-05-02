@@ -401,6 +401,39 @@ const getEnvPosts = asyncHandler(async (req, res) => {
      .json({"done":allPosts.slice(offset, offset + limit),"pagination":buildPagination(allPosts.length, limit, offset)})
  })
  
+const deleteEnv = asyncHandler(async (req, res) => {
+     const { envname } = req.params;
+     const env = await Env.findOne({ name: envname });
+     if (!env) throw new ApiError(404, "Space not found");
+     if (String(env.CreatedBy) !== String(req.user?._id)) {
+          throw new ApiError(403, "You are not authorized to delete this space");
+     }
+     await env.deleteOne();
+     await Joins.deleteMany({ community: envname });
+     return res.status(200).json(new ApiResponse(200, null, "Space deleted successfully"));
+});
+
+const updateEnv = asyncHandler(async (req, res) => {
+     const { envname } = req.params;
+     const { EnvDescription } = req.body;
+     const env = await Env.findOne({ name: envname });
+     if (!env) throw new ApiError(404, "Space not found");
+     if (String(env.CreatedBy) !== String(req.user?._id)) {
+          throw new ApiError(403, "You are not authorized to edit this space");
+     }
+
+     if (EnvDescription !== undefined) env.description = EnvDescription;
+
+     const imagePath = req.file?.path;
+     if (imagePath) {
+          const image = await uploadOnCloudinary(imagePath);
+          if (!image?.url) throw new ApiError(409, "Error uploading cover image");
+          env.envAvatar = image.url;
+     }
+
+     await env.save();
+     return res.status(200).json(new ApiResponse(200, env, "Space updated successfully"));
+});
 
 export {
      CreateEnv,
@@ -409,5 +442,7 @@ export {
      getEnvPosts,
      getEnvBlogPosts,
      getEnvImagePosts,
-     getEnvVideoPosts
+     getEnvVideoPosts,
+     deleteEnv,
+     updateEnv
 };

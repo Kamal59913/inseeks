@@ -99,4 +99,9 @@ export const postService = {
     apiClient.post(`/view/${postId}`, { postType }),
 
   getPostById: (postId: string) => apiClient.get(`/createpost/getpost/${postId}`),
+
+  deletePost: (postId: string) => apiClient.delete(`/createpost/${postId}`),
+
+  updatePost: (postId: string, data: { title?: string; description?: string }) =>
+    apiClient.patch(`/createpost/${postId}`, data),
 };

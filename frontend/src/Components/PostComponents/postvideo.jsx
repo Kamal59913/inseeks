@@ -6,9 +6,12 @@ import { useVoteQuery } from '../../hooks/useVoteQuery';
 import Button from '../Common/Button';
 import ImageWithFallback from '../Common/ImageWithFallback';
 import { copyToClipboard } from '../../utils/clipboardUtils';
+import PostOptionsMenu from './PostOptionsMenu';
+import { useCurrentUserQuery } from '../../hooks/useCurrentUserQuery';
 
 export default function PostVideos(props) {
   const modal = useModalData()
+  const { data: currentUser } = useCurrentUserQuery()
   const { summary, vote, isVoting } = useVoteQuery(props.type, props.postId, {
     upvotesCount: props.upvotesCount || 0,
     downvotesCount: props.downvotesCount || 0,
@@ -49,9 +52,13 @@ export default function PostVideos(props) {
             <span>{new Date(props.time).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
           </div>
         </div>
-        <Button variant="ghost" size="icon" borderRadius="rounded-lg">
-          <i className="fa-solid fa-ellipsis-vertical text-sm"></i>
-        </Button>
+        <PostOptionsMenu
+          postId={props.postId}
+          postType={props.type || 'video'}
+          authorUsername={props.author}
+          currentUsername={currentUser?.username}
+          postData={{ title: '', description: props.description }}
+        />
       </div>
 
       {props.description && (

@@ -29,4 +29,10 @@ export const envService = {
     apiClient.get(`/env/getposts/env/images/${envname}`, { params: { limit, offset } }),
   getEnvironmentVideoPosts: (envname: string, limit = 5, offset = 0) =>
     apiClient.get(`/env/getposts/env/videos/${envname}`, { params: { limit, offset } }),
+
+  deleteEnvironment: (envname: string) =>
+    apiClient.delete(`/env/${envname}`),
+
+  updateEnvironment: (envname: string, data: { EnvDescription?: string }) =>
+    apiClient.patch(`/env/${envname}`, data),
 };

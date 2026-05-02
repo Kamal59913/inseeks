@@ -25,6 +25,8 @@ export interface ModalDataMap {
   'view-image-post': ViewPostData;
   'view-video-post': ViewPostData;
   'log-out': { title: string; action: () => void };
+  'confirm-delete': { title: string; description?: string; confirmLabel?: string; onConfirm: () => void | Promise<void> };
+  'edit-post': { postId: string; postType: string; postData: any };
 }
 
 export type ModalName = keyof ModalDataMap;

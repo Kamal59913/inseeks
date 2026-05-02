@@ -72,7 +72,8 @@ export default function QuestionComposerModal({
 
   const attachments = (attachmentsField.value || []) as File[];
   const selectedSpace =
-    spaces?.items?.find((space: any) => space.name === spaceField.value) || null;
+    spaces?.items?.find((space: any) => space.name === spaceField.value) ||
+    null;
   const selectedSpaceLabel = selectedSpace?.name || spaceField.value || "";
 
   const previews = useMemo(
@@ -173,12 +174,14 @@ export default function QuestionComposerModal({
                 <button
                   type="button"
                   onClick={() => setSpaceMenuOpen((previous) => !previous)}
-                    className={`flex w-full items-center justify-between rounded-xl bg-[#111827] px-4 py-3 text-left text-sm transition-all duration-200 focus:outline-none ${
-                    spaceState.error ? "border border-red-500/70" : "border border-transparent"
+                  className={`flex w-full items-center justify-between rounded-xl field-subtle px-4 py-3 text-left text-sm transition-all duration-200 focus:outline-none ${
+                    spaceState.error ? "border border-red-500/70" : ""
                   }`}
                 >
                   <div className="min-w-0">
-                    <p className={`${selectedSpaceLabel ? "text-slate-100" : "text-slate-500"} truncate`}>
+                    <p
+                      className={`${selectedSpaceLabel ? "text-slate-100" : "text-slate-500"} truncate`}
+                    >
                       {selectedSpaceLabel || "Select a space"}
                     </p>
                     {selectedSpace?.description ? (
@@ -199,28 +202,30 @@ export default function QuestionComposerModal({
                 </button>
 
                 {spaceMenuOpen ? (
-                  <div className="absolute z-20 mt-2 max-h-64 w-full overflow-y-auto rounded-2xl border border-[#1f2e47] bg-[#0f172a] p-2 shadow-2xl">
+                  <div className="absolute z-20 mt-2 max-h-64 w-full overflow-y-auto rounded-2xl field-subtle p-2 shadow-2xl">
                     {spaces?.items?.length ? (
                       <>
                         {spaces.items.map((space: any) => (
-                        <button
-                          key={space._id}
-                          type="button"
-                          onClick={() => {
-                            spaceField.onChange(space.name);
-                            setSpaceMenuOpen(false);
-                          }}
-                          className={`w-full rounded-xl px-3 py-3 text-left transition-all hover:bg-[#16213a] ${
-                            spaceField.value === space.name ? "bg-[#16213a]" : ""
-                          }`}
-                        >
-                          <p className="truncate text-sm font-semibold text-slate-100">
-                            {space.name}
-                          </p>
-                          <p className="mt-1 line-clamp-2 text-xs text-slate-400">
-                            {space.description}
-                          </p>
-                        </button>
+                          <button
+                            key={space._id}
+                            type="button"
+                            onClick={() => {
+                              spaceField.onChange(space.name);
+                              setSpaceMenuOpen(false);
+                            }}
+                            className={`w-full rounded-xl px-3 py-3 text-left transition-all hover:bg-[#16213a] ${
+                              spaceField.value === space.name
+                                ? "bg-[#16213a]"
+                                : ""
+                            }`}
+                          >
+                            <p className="truncate text-sm font-semibold text-slate-100">
+                              {space.name}
+                            </p>
+                            <p className="mt-1 line-clamp-2 text-xs text-slate-400">
+                              {space.description}
+                            </p>
+                          </button>
                         ))}
                         <InfiniteLoader
                           onLoadMore={fetchNextSpaces}
@@ -238,7 +243,9 @@ export default function QuestionComposerModal({
                 ) : null}
               </div>
               {spaceState.error ? (
-                <p className="text-xs text-red-400">{spaceState.error.message}</p>
+                <p className="text-xs text-red-400">
+                  {spaceState.error.message}
+                </p>
               ) : null}
             </div>
 

@@ -126,6 +126,7 @@ export default function Environments() {
                   description={env.description}
                   avatar={env.envAvatar}
                   isJoined={env.isJoined}
+                  creatorId={env.CreatedBy}
                 />
                 ))}
               </div>

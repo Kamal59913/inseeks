@@ -10,7 +10,9 @@ import { createPost,
          getUserimagesDisplay,
          getUserVideosDisplay,
          getUserblogsDisplay,
-         getPostById
+         getPostById,
+         deletePost,
+         updatePost
         } from "../../controller/createpost/createpost.controller";
 import { upload } from "../../middleware/upload/upload.middleware";
 import { auth } from "../../middleware/auth/auth.middleware";
@@ -42,5 +44,9 @@ router.route("/getuserposts/blogs/:username").get(auth, getUserblogsDisplay)
 
 /* single post fetch */
 router.route("/getpost/:postId").get(auth, getPostById)
+
+/* post edit / delete */
+router.route("/:postId").delete(auth, deletePost)
+router.route("/:postId").patch(auth, updatePost)
 
 export default router;

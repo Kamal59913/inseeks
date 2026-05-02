@@ -853,6 +853,49 @@ const getPostById = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Post not found");
 });
 
+const findPostAcrossCollections = async (postId) => {
+    const objectId = new mongoose.Types.ObjectId(postId);
+    let post = await BlogPost.findById(objectId);
+    if (post) return { post, model: BlogPost, type: 'blogpost' };
+    post = await ImagePost.findById(objectId);
+    if (post) return { post, model: ImagePost, type: 'image' };
+    post = await VideoPost.findById(objectId);
+    if (post) return { post, model: VideoPost, type: 'video' };
+    return null;
+};
+
+const deletePost = asyncHandler(async (req, res) => {
+    const { postId } = req.params;
+    const result = await findPostAcrossCollections(postId);
+    if (!result) throw new ApiError(404, "Post not found");
+
+    const { post } = result;
+    if (String(post.PostAuthor) !== String(req.user?._id)) {
+        throw new ApiError(403, "You are not authorized to delete this post");
+    }
+
+    await post.deleteOne();
+    return res.status(200).json(new ApiResponse(200, null, "Post deleted successfully"));
+});
+
+const updatePost = asyncHandler(async (req, res) => {
+    const { postId } = req.params;
+    const { title, description } = req.body;
+    const result = await findPostAcrossCollections(postId);
+    if (!result) throw new ApiError(404, "Post not found");
+
+    const { post } = result;
+    if (String(post.PostAuthor) !== String(req.user?._id)) {
+        throw new ApiError(403, "You are not authorized to edit this post");
+    }
+
+    if (title !== undefined) post.title = title;
+    if (description !== undefined) post.description = description;
+    await post.save();
+
+    return res.status(200).json(new ApiResponse(200, post, "Post updated successfully"));
+});
+
 export {
     createPost,
     createVideoPost,
@@ -865,5 +908,7 @@ export {
     getUserimagesDisplay,
     getUserVideosDisplay,
     getUserblogsDisplay,
-    getPostById
+    getPostById,
+    deletePost,
+    updatePost
 }

@@ -2,16 +2,64 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import ImageWithFallback from '../Common/ImageWithFallback';
 import SpaceJoinButton from '../Common/SpaceJoinButton';
+import ContextMenu, { ContextMenuItem } from '../Common/ContextMenu';
+import Button from '../Common/Button';
+import { useCurrentUserQuery } from '../../hooks/useCurrentUserQuery';
+import { useModalData } from '../../store/hooks';
+import { useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from '../../hooks/queryKeys';
+import { envService } from '../../services/env.service';
+import { copyToClipboard } from '../../utils/clipboardUtils';
 
 interface EnvCardProps {
   title: string;
   description: string;
   avatar?: string;
   isJoined: boolean;
+  creatorId?: string;
 }
 
-export default function EnvCard({ title, description, avatar, isJoined }: EnvCardProps) {
+export default function EnvCard({ title, description, avatar, isJoined, creatorId }: EnvCardProps) {
   const navigate = useNavigate();
+  const { data: currentUser } = useCurrentUserQuery();
+  const modal = useModalData();
+  const queryClient = useQueryClient();
+
+  const isOwner = currentUser && creatorId && currentUser._id === creatorId;
+
+  const handleShare = () => {
+    copyToClipboard(`${window.location.origin}/env-home-page/${title}`);
+  };
+
+  const handleEdit = () => {
+    // Add logic for editing space if needed, perhaps through a generic edit modal
+  };
+
+  const handleDelete = () => {
+    modal.open('confirm-delete' as any, {
+      title: 'Delete Space',
+      description: `Are you sure you want to delete ${title}? This will remove all posts inside it.`,
+      confirmLabel: 'Delete',
+      onConfirm: async () => {
+        try {
+          await envService.deleteEnvironment(title);
+          queryClient.invalidateQueries({ queryKey: queryKeys.environments });
+        } catch (err) {
+          console.error('Failed to delete space:', err);
+        }
+      },
+    });
+  };
+
+  const menuItems: ContextMenuItem[] = [
+    { label: 'Share', icon: 'fa-share-from-square', onClick: handleShare },
+  ];
+
+  if (isOwner) {
+    menuItems.push(
+      { label: 'Delete', icon: 'fa-trash-can', onClick: handleDelete, variant: 'danger' }
+    );
+  }
 
   return (
     <div
@@ -39,7 +87,19 @@ export default function EnvCard({ title, description, avatar, isJoined }: EnvCar
 
       {/* Info */}
       <div className="p-4">
-        <h3 className="text-sm font-bold text-slate-100 mb-1">{title}</h3>
+        <div className="flex items-start justify-between gap-2 mb-1">
+          <h3 className="text-sm font-bold text-slate-100">{title}</h3>
+          <div onClick={(e) => e.stopPropagation()}>
+            <ContextMenu
+              items={menuItems}
+              trigger={
+                <Button variant="ghost" size="icon" borderRadius="rounded-lg" className="h-6 w-6">
+                  <i className="fa-solid fa-ellipsis-vertical text-xs"></i>
+                </Button>
+              }
+            />
+          </div>
+        </div>
         <p className="text-xs text-slate-400 line-clamp-2 mb-4">{description}</p>
 
         {/* Member avatars */}
