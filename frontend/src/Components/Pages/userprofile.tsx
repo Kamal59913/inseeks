@@ -11,6 +11,7 @@ import PageLoader from "../Common/PageLoader";
 import ImageWithFallback from "../Common/ImageWithFallback";
 import ConnectionButton from "../Common/ConnectionButton";
 import InfiniteLoader from "../Common/InfiniteLoader";
+import { APP_CONFIG } from "../../config/app.config";
 
 const FILTERS = [
   { key: "explore", label: "All Posts" },
@@ -158,7 +159,7 @@ export default function UserProfile() {
 
               {(posts?.items || []).length > 0 ? (
                 <>
-                  <div className="space-y-4">
+                  <div className={APP_CONFIG.USE_TWO_COLUMN_FEED ? "columns-1 lg:columns-2 gap-4" : "space-y-4"}>
                     {(posts?.items || []).map((post: any) => {
                     const author = post.author?.[0];
                     if (!author) return null;
@@ -180,10 +181,21 @@ export default function UserProfile() {
                       time: post.createdAt,
                       views: post.views,
                     };
-                    if (post.type === "image") return <PostImage {...common} title={post.title} images={post.images} />;
-                    if (post.type === "video") return <Videos {...common} description={post.description} video={post.video} />;
-                    if (post.type === "blogpost") return <Post {...common} title={post.title} description={post.description} image={post.image} attachments={post.attachments} />;
-                    return null;
+                    
+                    let PostComponent = null;
+                    if (post.type === "image") PostComponent = <PostImage {...common} title={post.title} images={post.images} />;
+                    else if (post.type === "video") PostComponent = <Videos {...common} description={post.description} video={post.video} />;
+                    else if (post.type === "blogpost") PostComponent = <Post {...common} title={post.title} description={post.description} image={post.image} attachments={post.attachments} />;
+                    
+                    if (!PostComponent) return null;
+                    
+                    return APP_CONFIG.USE_TWO_COLUMN_FEED ? (
+                      <div key={post._id} className="break-inside-avoid mb-4">
+                        {PostComponent}
+                      </div>
+                    ) : (
+                      PostComponent
+                    );
                     })}
                   </div>
                   <InfiniteLoader

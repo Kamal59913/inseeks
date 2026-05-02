@@ -16,6 +16,7 @@ import { useEnvironmentQuery } from "../../hooks/useEnvironmentQuery";
 import SpaceJoinButton from "../Common/SpaceJoinButton";
 import InfiniteLoader from "../Common/InfiniteLoader";
 import { prependInfiniteItems } from "../../hooks/infiniteQueryUtils";
+import { APP_CONFIG } from "../../config/app.config";
 
 const FILTERS = [
   { key: 'explore', label: 'All', icon: 'fa-border-all' },
@@ -61,7 +62,7 @@ export default function EnvHomepage() {
 
   return (
     <div className="flex h-screen bg-[#090e1a] overflow-hidden">
-      <LeftBar logout={logout} />
+      <LeftBar />
 
       <main className="flex-1 flex flex-col min-w-0 overflow-y-auto pb-20 lg:pb-0">
         <SearchBar />
@@ -112,7 +113,6 @@ export default function EnvHomepage() {
               </button>
             ))}
           </div>
-
           {isEnvironmentPageLoading ? (
             <PageLoader />
           ) : (
@@ -124,7 +124,7 @@ export default function EnvHomepage() {
 
               {(posts?.items || []).length > 0 ? (
                 <>
-                  <div className="space-y-4">
+                  <div className={APP_CONFIG.USE_TWO_COLUMN_FEED ? "columns-1 lg:columns-2 gap-4" : "space-y-4"}>
                     {(posts?.items || []).map((post: any) => {
                     const author = post.author?.[0];
                     if (!author) return null;
@@ -147,10 +147,21 @@ export default function EnvHomepage() {
                       views: post.views,
                       currentUser,
                     };
-                    if (post.type === 'image') return <PostImage {...common} title={post.title} images={post.images} />;
-                    if (post.type === 'video') return <Videos {...common} description={post.description} video={post.video} />;
-                    if (post.type === 'blogpost') return <Post {...common} title={post.title} description={post.description} image={post.image} attachments={post.attachments} />;
-                    return null;
+                    
+                    let PostComponent = null;
+                    if (post.type === 'image') PostComponent = <PostImage {...common} title={post.title} images={post.images} />;
+                    else if (post.type === 'video') PostComponent = <Videos {...common} description={post.description} video={post.video} />;
+                    else if (post.type === 'blogpost') PostComponent = <Post {...common} title={post.title} description={post.description} image={post.image} attachments={post.attachments} />;
+                    
+                    if (!PostComponent) return null;
+                    
+                    return APP_CONFIG.USE_TWO_COLUMN_FEED ? (
+                      <div key={post._id} className="break-inside-avoid mb-4">
+                        {PostComponent}
+                      </div>
+                    ) : (
+                      PostComponent
+                    );
                     })}
                   </div>
                   <InfiniteLoader

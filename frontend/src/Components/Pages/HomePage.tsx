@@ -18,6 +18,7 @@ import { useEnvironmentQuery } from "../../hooks/useEnvironmentQuery";
 import { queryKeys } from "../../hooks/queryKeys";
 import PageLoader from "../Common/PageLoader";
 import ImageWithFallback from "../Common/ImageWithFallback";
+import { APP_CONFIG } from "../../config/app.config";
 import ConnectionButton from "../Common/ConnectionButton";
 import SpaceJoinButton from "../Common/SpaceJoinButton";
 import InfiniteLoader from "../Common/InfiniteLoader";
@@ -121,7 +122,7 @@ export default function Homepage() {
 
               {(posts?.items || []).length > 0 ? (
                 <>
-                  <div className="space-y-4">
+                  <div className={APP_CONFIG.USE_TWO_COLUMN_FEED ? "columns-1 lg:columns-2 gap-4" : "space-y-4"}>
                     {(posts?.items || []).map((post: any) => {
                     const author = post.author?.[0];
                     if (!author) return null;
@@ -148,28 +149,26 @@ export default function Homepage() {
                       currentUser,
                     };
 
+                    let PostComponent = null;
+
                     if (post.type === "image") {
-                      return (
+                      PostComponent = (
                         <PostImage
                           {...common}
                           title={post.title}
                           images={post.images}
                         />
                       );
-                    }
-
-                    if (post.type === "video") {
-                      return (
+                    } else if (post.type === "video") {
+                      PostComponent = (
                         <Videos
                           {...common}
                           description={post.description}
                           video={post.video}
                         />
                       );
-                    }
-
-                    if (post.type === "blogpost") {
-                      return (
+                    } else if (post.type === "blogpost") {
+                      PostComponent = (
                         <Post
                           {...common}
                           title={post.title}
@@ -180,7 +179,15 @@ export default function Homepage() {
                       );
                     }
 
-                    return null;
+                    if (!PostComponent) return null;
+
+                    return APP_CONFIG.USE_TWO_COLUMN_FEED ? (
+                      <div key={post._id} className="break-inside-avoid mb-4">
+                        {PostComponent}
+                      </div>
+                    ) : (
+                      PostComponent
+                    );
                     })}
                   </div>
                   <InfiniteLoader
