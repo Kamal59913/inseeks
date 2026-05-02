@@ -35,9 +35,46 @@ const defaultSummary: VoteSummary = {
   userVote: null,
 };
 
-export const useVoteQuery = (type: VoteTargetType, id: string) => {
+const updateVoteSummaryAcrossPosts = (
+  queryClient: ReturnType<typeof useQueryClient>,
+  id: string,
+  summary: VoteSummary,
+) => {
+  queryClient.setQueriesData({ queryKey: ['posts'] }, (previous: any) => {
+    if (!previous?.pages) return previous;
+
+    return {
+      ...previous,
+      pages: previous.pages.map((page: any) => ({
+        ...page,
+        items: (page.items || []).map((post: any) =>
+          post?._id === id
+            ? {
+                ...post,
+                ...summary,
+              }
+            : post,
+        ),
+      })),
+    };
+  });
+};
+
+export const useVoteQuery = (
+  type: VoteTargetType,
+  id: string,
+  initialSummary?: Partial<VoteSummary>,
+) => {
   const queryClient = useQueryClient();
   const queryKey = queryKeys.vote(type, id);
+  const fallbackSummary = {
+    ...defaultSummary,
+    ...initialSummary,
+    score:
+      typeof initialSummary?.score === 'number'
+        ? initialSummary.score
+        : (initialSummary?.upvotesCount || 0) - (initialSummary?.downvotesCount || 0),
+  };
 
   const query = useQuery({
     queryKey,
@@ -48,7 +85,8 @@ export const useVoteQuery = (type: VoteTargetType, id: string) => {
       });
       return response.data.data as VoteSummary;
     },
-    enabled: !!id,
+    enabled: !!id && type === 'comment',
+    initialData: fallbackSummary,
   });
 
   const mutation = useMutation({
@@ -60,20 +98,32 @@ export const useVoteQuery = (type: VoteTargetType, id: string) => {
       }),
     onMutate: async (voteType) => {
       await queryClient.cancelQueries({ queryKey });
-      const previous = queryClient.getQueryData<VoteSummary>(queryKey) || defaultSummary;
-      queryClient.setQueryData(queryKey, applyVoteTransition(previous, voteType));
+      const previous = queryClient.getQueryData<VoteSummary>(queryKey) || fallbackSummary;
+      const optimistic = applyVoteTransition(previous, voteType);
+      queryClient.setQueryData(queryKey, optimistic);
+      if (type !== 'comment') {
+        updateVoteSummaryAcrossPosts(queryClient, id, optimistic);
+      }
       return { previous };
     },
     onError: (_error, _voteType, context) => {
-      queryClient.setQueryData(queryKey, context?.previous || defaultSummary);
+      const restored = context?.previous || fallbackSummary;
+      queryClient.setQueryData(queryKey, restored);
+      if (type !== 'comment') {
+        updateVoteSummaryAcrossPosts(queryClient, id, restored);
+      }
     },
     onSuccess: (response) => {
-      queryClient.setQueryData(queryKey, response.data.data as VoteSummary);
+      const nextSummary = response.data.data as VoteSummary;
+      queryClient.setQueryData(queryKey, nextSummary);
+      if (type !== 'comment') {
+        updateVoteSummaryAcrossPosts(queryClient, id, nextSummary);
+      }
     },
   });
 
   return {
-    summary: query.data || defaultSummary,
+    summary: query.data || fallbackSummary,
     isLoading: query.isLoading,
     vote: mutation.mutate,
     isVoting: mutation.isPending,

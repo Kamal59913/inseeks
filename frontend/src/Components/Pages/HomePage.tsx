@@ -19,6 +19,8 @@ import PageLoader from "../Common/PageLoader";
 import ImageWithFallback from "../Common/ImageWithFallback";
 import ConnectionButton from "../Common/ConnectionButton";
 import SpaceJoinButton from "../Common/SpaceJoinButton";
+import InfiniteLoader from "../Common/InfiniteLoader";
+import { prependInfiniteItems } from "../../hooks/infiniteQueryUtils";
 
 interface FilterType {
   key: "explore" | "images" | "videos" | "blogs";
@@ -43,10 +45,31 @@ export default function Homepage() {
     "https://res.cloudinary.com/dogyotgp5/image/upload/v1713078910/avatar-dummy-social-app_fx9x9f.png",
   );
 
-  const { data: currentUser } = useCurrentUserQuery();
-  const { data: posts } = useHomePostsQuery(activeFilter);
-  const { data: userList } = useSuggestedUsersQuery();
-  const { data: spaces } = useEnvironmentQuery();
+  const { data: currentUser, isLoading: isCurrentUserLoading } = useCurrentUserQuery();
+  const {
+    data: posts,
+    isLoading: isPostsLoading,
+    fetchNextPage: fetchNextPosts,
+    hasNextPage: hasNextPosts,
+    isFetchingNextPage: isFetchingNextPosts,
+  } = useHomePostsQuery(activeFilter);
+  const {
+    data: userList,
+    isLoading: isUserListLoading,
+    fetchNextPage: fetchNextUsers,
+    hasNextPage: hasNextUsers,
+    isFetchingNextPage: isFetchingNextUsers,
+  } = useSuggestedUsersQuery(6);
+  const {
+    data: spaces,
+    isLoading: isSpacesLoading,
+    fetchNextPage: fetchNextSpaces,
+    hasNextPage: hasNextSpaces,
+    isFetchingNextPage: isFetchingNextSpaces,
+  } = useEnvironmentQuery(7);
+
+  const isHomeLoading =
+    isCurrentUserLoading || isPostsLoading || isUserListLoading || isSpacesLoading;
 
   const logout = () => {
     navigate("/");
@@ -56,7 +79,8 @@ export default function Homepage() {
   const updatepost = (newposts: any) => {
     queryClient.setQueryData(
       queryKeys.homePosts(activeFilter),
-      (previous: any[] = []) => [...newposts, ...previous],
+      (previous: any) =>
+        prependInfiniteItems(previous, Array.isArray(newposts) ? newposts : [newposts]),
     );
   };
 
@@ -85,15 +109,16 @@ export default function Homepage() {
             ))}
           </div>
 
-          {!posts || !currentUser || !userList || !spaces ? (
+          {isHomeLoading ? (
             <PageLoader />
           ) : (
             <>
               <SharePost avatar={currentUser?.avatar || avatar} modalData={{ updatepost }} />
 
-              {posts.length > 0 ? (
-                <div className="space-y-4">
-                  {posts.map((post) => {
+              {(posts?.items || []).length > 0 ? (
+                <>
+                  <div className="space-y-4">
+                    {(posts?.items || []).map((post: any) => {
                     const author = post.author?.[0];
                     if (!author) return null;
 
@@ -102,6 +127,13 @@ export default function Homepage() {
                       postId: post._id,
                       type: post.type,
                       community: post.community,
+                      upvotesCount: post.upvotesCount || 0,
+                      downvotesCount: post.downvotesCount || 0,
+                      userVote: post.userVote || null,
+                      score:
+                        typeof post.score === "number"
+                          ? post.score
+                          : (post.upvotesCount || 0) - (post.downvotesCount || 0),
                       conversationCount: post.conversationCount || 0,
                       _id: author._id,
                       author: author.username,
@@ -145,8 +177,15 @@ export default function Homepage() {
                     }
 
                     return null;
-                  })}
-                </div>
+                    })}
+                  </div>
+                  <InfiniteLoader
+                    onLoadMore={fetchNextPosts}
+                    hasMore={hasNextPosts}
+                    isLoading={isFetchingNextPosts}
+                    label="Loading more posts..."
+                  />
+                </>
               ) : (
                 <div className="flex flex-col items-center justify-center py-20 text-slate-500">
                   <i className="fa-regular fa-compass text-5xl mb-4 text-slate-600"></i>
@@ -180,8 +219,14 @@ export default function Homepage() {
         </div>
 
         <div className="flex-1 overflow-y-auto space-y-2 pr-1">
-          {sidebarTab === "people"
-            ? userList?.map((user: any) => (
+          {isHomeLoading ? (
+            <div className="flex h-full items-center justify-center">
+              <PageLoader />
+            </div>
+          ) : sidebarTab === "people" ? (
+            <>
+              <div className="space-y-2">
+                {(userList?.items || []).map((user: any) => (
                 <div
                   key={user._id}
                   className="flex items-center gap-3 p-3 rounded-xl hover:bg-[#111827] transition-all group"
@@ -210,8 +255,19 @@ export default function Homepage() {
                     disconnectedClassName="bg-indigo-600 hover:bg-indigo-500 text-white"
                   />
                 </div>
-              ))
-            : spaces?.map((space: any) => (
+                ))}
+              </div>
+              <InfiniteLoader
+                onLoadMore={fetchNextUsers}
+                hasMore={hasNextUsers}
+                isLoading={isFetchingNextUsers}
+                label="Loading more people..."
+              />
+            </>
+          ) : (
+            <>
+              <div className="space-y-2">
+                {(spaces?.items || []).map((space: any) => (
                 <div
                   key={space._id}
                   onClick={() => navigate(`/env-home-page/${space.name}`)}
@@ -242,7 +298,16 @@ export default function Homepage() {
                     unjoinedLabel="Join"
                   />
                 </div>
-              ))}
+                ))}
+              </div>
+              <InfiniteLoader
+                onLoadMore={fetchNextSpaces}
+                hasMore={hasNextSpaces}
+                isLoading={isFetchingNextSpaces}
+                label="Loading more spaces..."
+              />
+            </>
+          )}
         </div>
 
         <Link

@@ -10,6 +10,7 @@ import { useModalData } from "../../store/hooks";
 import { postService } from "../../services/post.service";
 import ImageWithFallback from "../Common/ImageWithFallback";
 import { useEnvironmentQuery } from "../../hooks/useEnvironmentQuery";
+import InfiniteLoader from "../Common/InfiniteLoader";
 
 interface QuestionComposerModalProps {
   modalId: string;
@@ -42,7 +43,12 @@ export default function QuestionComposerModal({
   const [submitError, setSubmitError] = useState<string | null>(null);
   const payload = data || {};
   const [spaceMenuOpen, setSpaceMenuOpen] = useState(false);
-  const { data: spaces } = useEnvironmentQuery();
+  const {
+    data: spaces,
+    fetchNextPage: fetchNextSpaces,
+    hasNextPage: hasNextSpaces,
+    isFetchingNextPage: isFetchingNextSpaces,
+  } = useEnvironmentQuery();
 
   const { control, handleSubmit, reset } = useAppForm({
     schema: postQuestionSchema,
@@ -66,7 +72,7 @@ export default function QuestionComposerModal({
 
   const attachments = (attachmentsField.value || []) as File[];
   const selectedSpace =
-    spaces?.find((space: any) => space.name === spaceField.value) || null;
+    spaces?.items?.find((space: any) => space.name === spaceField.value) || null;
   const selectedSpaceLabel = selectedSpace?.name || spaceField.value || "";
 
   const previews = useMemo(
@@ -194,8 +200,9 @@ export default function QuestionComposerModal({
 
                 {spaceMenuOpen ? (
                   <div className="absolute z-20 mt-2 max-h-64 w-full overflow-y-auto rounded-2xl border border-[#1f2e47] bg-[#0f172a] p-2 shadow-2xl">
-                    {spaces?.length ? (
-                      spaces.map((space: any) => (
+                    {spaces?.items?.length ? (
+                      <>
+                        {spaces.items.map((space: any) => (
                         <button
                           key={space._id}
                           type="button"
@@ -214,7 +221,14 @@ export default function QuestionComposerModal({
                             {space.description}
                           </p>
                         </button>
-                      ))
+                        ))}
+                        <InfiniteLoader
+                          onLoadMore={fetchNextSpaces}
+                          hasMore={hasNextSpaces}
+                          isLoading={isFetchingNextSpaces}
+                          label="Loading more spaces..."
+                        />
+                      </>
                     ) : (
                       <div className="px-3 py-4 text-sm text-slate-500">
                         No spaces available yet.

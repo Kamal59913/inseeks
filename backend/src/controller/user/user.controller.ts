@@ -6,6 +6,8 @@ import { uploadOnCloudinary } from "../../utils/cloudinary.js";
 import { ApiResponse } from "../../utils/response/ApiResponse";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
+import crypto from "crypto";
+import { mailTriggerService } from "../../mail/services/mail.module";
 
 const generateAccessAndRefreshTokens = async(userId) => 
 {
@@ -745,8 +747,29 @@ const getanUser = asyncHandler(async (req, res) => {
      )
 
 })
+const parsePagination = (req, fallbackLimit = 6) => {
+     const parsedLimit = Number.parseInt(req.query.limit, 10)
+     const parsedOffset = Number.parseInt(req.query.offset, 10)
+     const limit = Number.isNaN(parsedLimit) ? fallbackLimit : Math.min(Math.max(parsedLimit, 1), 20)
+     const offset = Number.isNaN(parsedOffset) ? 0 : Math.max(parsedOffset, 0)
+
+     return { limit, offset }
+}
+
+const buildPagination = (totalCount, limit, offset) => {
+     const hasMore = offset + limit < totalCount
+
+     return {
+          limit,
+          offset,
+          nextOffset: hasMore ? offset + limit : null,
+          hasMore
+     }
+}
+
 //route: getuserlist top 3
 const getUserListThree = asyncHandler(async (req, res) => {
+     const { limit, offset } = parsePagination(req, 6)
      const user = await User.aggregate([
           /*pipeline 1 checking followed or not*/
           {
@@ -785,20 +808,20 @@ const getUserListThree = asyncHandler(async (req, res) => {
                     isFollowing: false
                }
           },
-          /*pipeline 5 for users are supposed be only following*/
-          {
-               $limit: 3
-          }
      ])
      return res
      .status(200)
      .json(
-          new ApiResponse(200, user, "User channel fetched successfully")
+          new ApiResponse(200, {
+               items: user.slice(offset, offset + limit),
+               pagination: buildPagination(user.length, limit, offset)
+          }, "User channel fetched successfully")
      )
 })
 
 //route: friendlist
 const getUserList = asyncHandler(async (req, res) => {
+     const { limit, offset } = parsePagination(req, 6)
      const user = await User.aggregate([
           /*pipeline 1 checking followed or not*/
           {
@@ -842,12 +865,16 @@ const getUserList = asyncHandler(async (req, res) => {
      return res
      .status(200)
      .json(
-          new ApiResponse(200, user, "User channel fetched successfully")
+          new ApiResponse(200, {
+               items: user.slice(offset, offset + limit),
+               pagination: buildPagination(user.length, limit, offset)
+          }, "User channel fetched successfully")
      )
 })
 
 //route: not in friendlist
 const getUserListNotFriend = asyncHandler(async (req, res) => {
+     const { limit, offset } = parsePagination(req, 6)
      const user = await User.aggregate([
           /*pipeline 1 checking followed or not*/
           {
@@ -891,9 +918,104 @@ const getUserListNotFriend = asyncHandler(async (req, res) => {
      return res
      .status(200)
      .json(
-          new ApiResponse(200, user, "User channel fetched successfully")
+          new ApiResponse(200, {
+               items: user.slice(offset, offset + limit),
+               pagination: buildPagination(user.length, limit, offset)
+          }, "User channel fetched successfully")
      )
 })
+
+const forgotPassword = asyncHandler(async (req, res) => {
+    const { email } = req.body;
+
+    if (!email) {
+        throw new ApiError(400, "Email is required");
+    }
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+        throw new ApiError(404, "User with this email does not exist");
+    }
+
+    // Generate 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    user.forgotPasswordOTP = otp;
+    user.forgotPasswordExpiry = Date.now() + 600000; // 10 minutes
+
+    await user.save({ validateBeforeSave: false });
+
+    try {
+        await mailTriggerService.trigger("forgot-password-otp", {
+            to: user.email,
+            context: {
+                name: user.fullname,
+                otp: otp
+            }
+        });
+
+        return res.status(200).json(
+            new ApiResponse(200, {}, "OTP sent to your email")
+        );
+    } catch (error) {
+        user.forgotPasswordOTP = undefined;
+        user.forgotPasswordExpiry = undefined;
+        await user.save({ validateBeforeSave: false });
+        throw new ApiError(500, "Error sending email. Please try again later.");
+    }
+});
+
+const verifyOTP = asyncHandler(async (req, res) => {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+        throw new ApiError(400, "Email and OTP are required");
+    }
+
+    const user = await User.findOne({
+        email,
+        forgotPasswordOTP: otp,
+        forgotPasswordExpiry: { $gt: Date.now() }
+    });
+
+    if (!user) {
+        throw new ApiError(400, "Invalid or expired OTP");
+    }
+
+    return res.status(200).json(
+        new ApiResponse(200, {}, "OTP verified successfully")
+    );
+});
+
+const resetPassword = asyncHandler(async (req, res) => {
+    const { email, otp, newPassword } = req.body;
+
+    if (!email || !otp || !newPassword) {
+        throw new ApiError(400, "All fields are required");
+    }
+
+    const user = await User.findOne({
+        email,
+        forgotPasswordOTP: otp,
+        forgotPasswordExpiry: { $gt: Date.now() }
+    });
+
+    if (!user) {
+        throw new ApiError(400, "Invalid or expired OTP");
+    }
+
+    user.password = newPassword;
+    user.forgotPasswordOTP = undefined;
+    user.forgotPasswordExpiry = undefined;
+
+    await user.save();
+
+    return res.status(200).json(
+        new ApiResponse(200, {}, "Password reset successfully")
+    );
+});
+
 export {
      registerUser,
      loginUser,
@@ -910,5 +1032,8 @@ export {
      getanUser,
      getUserListThree,
      getUserList,
-     getUserListNotFriend
+     getUserListNotFriend,
+     forgotPassword,
+     verifyOTP,
+     resetPassword
 };

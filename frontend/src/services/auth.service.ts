@@ -43,4 +43,14 @@ export const authService = {
 
   /** GET /users/current-user */
   getCurrentUser: () => apiClient.get('/users/current-user'),
+
+  /** POST /users/forgot-password */
+  forgotPassword: (email: string) => apiClient.post('/users/forgot-password', { email }),
+
+  /** POST /users/verify-otp */
+  verifyOTP: (email: string, otp: string) => apiClient.post('/users/verify-otp', { email, otp }),
+
+  /** POST /users/reset-password */
+  resetPassword: (payload: { email: string; otp: string; newPassword: string }) =>
+    apiClient.post('/users/reset-password', payload),
 };

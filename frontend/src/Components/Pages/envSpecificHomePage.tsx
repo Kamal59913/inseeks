@@ -14,6 +14,8 @@ import { queryKeys } from "../../hooks/queryKeys";
 import PageLoader from "../Common/PageLoader";
 import { useEnvironmentQuery } from "../../hooks/useEnvironmentQuery";
 import SpaceJoinButton from "../Common/SpaceJoinButton";
+import InfiniteLoader from "../Common/InfiniteLoader";
+import { prependInfiniteItems } from "../../hooks/infiniteQueryUtils";
 
 const FILTERS = [
   { key: 'explore', label: 'All', icon: 'fa-border-all' },
@@ -30,10 +32,18 @@ export default function EnvHomepage() {
     'https://res.cloudinary.com/dogyotgp5/image/upload/v1713078910/avatar-dummy-social-app_fx9x9f.png';
   const [activeFilter, setActiveFilter] = useState<'explore' | 'images' | 'videos' | 'blogs'>('explore');
 
-  const { data: currentUser } = useCurrentUserQuery();
-  const { data: posts } = useEnvironmentPostsQuery(envname || '', activeFilter, !!envname);
-  const { data: environments } = useEnvironmentQuery();
-  const currentEnvironment = environments?.find((environment: any) => environment.name === envname);
+  const { data: currentUser, isLoading: isCurrentUserLoading } = useCurrentUserQuery();
+  const {
+    data: posts,
+    isLoading: isPostsLoading,
+    fetchNextPage: fetchNextPosts,
+    hasNextPage: hasNextPosts,
+    isFetchingNextPage: isFetchingNextPosts,
+  } = useEnvironmentPostsQuery(envname || '', activeFilter, !!envname);
+  const { data: environments, isLoading: isEnvironmentsLoading } = useEnvironmentQuery(8);
+  const currentEnvironment = environments?.items?.find((environment: any) => environment.name === envname);
+  const isEnvironmentPageLoading =
+    isCurrentUserLoading || isPostsLoading || isEnvironmentsLoading;
 
   const logout = () => {
     navigate('/');
@@ -42,10 +52,11 @@ export default function EnvHomepage() {
 
   const updatepost = (newposts: any) => {
     if (!envname) return;
-    queryClient.setQueryData(queryKeys.envPosts(envname, activeFilter), (previous: any[] = []) => [
-      ...newposts,
-      ...previous,
-    ]);
+    queryClient.setQueryData(
+      queryKeys.envPosts(envname, activeFilter),
+      (previous: any) =>
+        prependInfiniteItems(previous, Array.isArray(newposts) ? newposts : [newposts]),
+    );
   };
 
   return (
@@ -102,7 +113,7 @@ export default function EnvHomepage() {
             ))}
           </div>
 
-          {(!posts || !currentUser) ? (
+          {isEnvironmentPageLoading ? (
             <PageLoader />
           ) : (
             <>
@@ -111,9 +122,10 @@ export default function EnvHomepage() {
                 modalData={{ updatepost, envname }}
               />
 
-              {posts.length > 0 ? (
-                <div className="space-y-4">
-                  {posts.map((post: any) => {
+              {(posts?.items || []).length > 0 ? (
+                <>
+                  <div className="space-y-4">
+                    {(posts?.items || []).map((post: any) => {
                     const author = post.author?.[0];
                     if (!author) return null;
                     const common = {
@@ -121,6 +133,13 @@ export default function EnvHomepage() {
                       postId: post._id,
                       type: post.type,
                       community: post.community,
+                      upvotesCount: post.upvotesCount || 0,
+                      downvotesCount: post.downvotesCount || 0,
+                      userVote: post.userVote || null,
+                      score:
+                        typeof post.score === "number"
+                          ? post.score
+                          : (post.upvotesCount || 0) - (post.downvotesCount || 0),
                       conversationCount: post.conversationCount || 0,
                       author: author.username,
                       avatar: author.avatar || fallback,
@@ -132,8 +151,15 @@ export default function EnvHomepage() {
                     if (post.type === 'video') return <Videos {...common} description={post.description} video={post.video} />;
                     if (post.type === 'blogpost') return <Post {...common} title={post.title} description={post.description} image={post.image} attachments={post.attachments} />;
                     return null;
-                  })}
-                </div>
+                    })}
+                  </div>
+                  <InfiniteLoader
+                    onLoadMore={fetchNextPosts}
+                    hasMore={hasNextPosts}
+                    isLoading={isFetchingNextPosts}
+                    label="Loading more posts..."
+                  />
+                </>
               ) : (
                 <div className="flex flex-col items-center justify-center py-20 text-slate-500">
                   <i className="fa-regular fa-compass text-5xl mb-4 text-slate-600"></i>

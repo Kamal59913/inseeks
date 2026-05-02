@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import LeftBar from '../Utilities/LeftBar';
+import SearchBar from '../Utilities/SearchBar';
 import { FormField, FormTextarea } from '../Common/FormFields';
 import { useAppForm } from '../../hooks/useAppForm';
 import { profileSettingsSchema } from '../../utils/formSchemas';
@@ -9,17 +10,12 @@ import ImageWithFallback from '../Common/ImageWithFallback';
 import PageLoader from '../Common/PageLoader';
 import { useCurrentUserQuery, useUpdateUserMutation } from '../../hooks/useCurrentUserQuery';
 
-const SETTINGS_NAV = [
-  { key: 'account', icon: 'fa-circle-user', label: 'My Account' },
-];
-
 function MyProfileSettings() {
   const modal = useModalData();
   const fallback =
     'https://res.cloudinary.com/dogyotgp5/image/upload/v1713078910/avatar-dummy-social-app_fx9x9f.png';
 
   const [profilepicture, setProfilepicturetoggle] = useState(false);
-  const [activeNav, setActiveNav] = useState('account');
 
   const { data: currentUser, isLoading } = useCurrentUserQuery();
   const updateMutation = useUpdateUserMutation();
@@ -70,45 +66,60 @@ function MyProfileSettings() {
       <LeftBar />
 
       <main className="flex-1 flex flex-col min-w-0 overflow-y-auto pb-20 lg:pb-0">
-        <div className="max-w-2xl mx-auto w-full px-4 py-12">
-          <h1 className="text-2xl font-bold text-white mb-8">Account Settings</h1>
+        <SearchBar />
 
-          <div className="bg-[#111827] rounded-2xl p-6 mb-6">
-            <h2 className="text-sm font-semibold text-slate-300 mb-4">Profile Photo</h2>
-            <div className="flex items-center gap-5">
-              <ImageWithFallback
-                variant="avatar"
-                src={currentUser?.avatar || fallback}
-                alt="avatar"
-                className="h-20 w-20 rounded-2xl object-cover ring-2 ring-[#2a3d5c]"
-              />
-              <div className="flex flex-col gap-2">
-                <button
-                  type="button"
-                  onClick={() =>
-                    modal.open('replace-avatar', { onComplete: toggleForProfileImageFetch })
-                  }
-                  className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-all"
-                >
-                  <i className="fa-solid fa-arrow-up-from-bracket text-xs"></i>
-                  Replace Photo
-                </button>
-                <button
-                  type="button"
-                  onClick={() =>
-                    modal.open('delete-avatar', { onComplete: toggleForProfileImageFetch })
-                  }
-                  className="flex items-center gap-2 bg-transparent border border-red-500/30 hover:border-red-500/60 hover:bg-red-500/10 text-red-400 text-sm font-semibold px-4 py-2 rounded-xl transition-all"
-                >
-                  <i className="fa-regular fa-trash-can text-xs"></i>
-                  Remove Photo
-                </button>
+        <div className="max-w-3xl mx-auto w-full px-4 py-6">
+          <div className="bg-[#111827] rounded-2xl overflow-hidden mb-6">
+            {/* Header Gradient matching Profile page */}
+            <div className="h-32 bg-gradient-to-r from-indigo-900/60 via-purple-900/40 to-[#111827] relative">
+              <div className="absolute inset-0 bg-gradient-to-t from-[#111827] to-transparent"></div>
+            </div>
+
+            <div className="px-6 pb-6 -mt-12 relative">
+              <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                <div className="flex items-end gap-4">
+                  <ImageWithFallback
+                    variant="avatar"
+                    src={currentUser?.avatar || fallback}
+                    alt="avatar"
+                    className="h-24 w-24 rounded-2xl object-cover ring-4 ring-[#090e1a] bg-[#1a2540]"
+                  />
+                  <div className="pb-1">
+                    <h1 className="text-xl font-bold text-white">Edit Profile</h1>
+                    <p className="text-sm text-slate-400">@{currentUser?.username || '—'}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 pb-1">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      modal.open('replace-avatar', { onComplete: toggleForProfileImageFetch })
+                    }
+                    className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-all"
+                  >
+                    <i className="fa-solid fa-arrow-up-from-bracket text-xs"></i>
+                    Replace
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      modal.open('delete-avatar', { onComplete: toggleForProfileImageFetch })
+                    }
+                    className="flex items-center justify-center h-9 w-9 bg-transparent border border-red-500/30 hover:border-red-500/60 hover:bg-red-500/10 text-red-400 rounded-xl transition-all"
+                    title="Remove Photo"
+                  >
+                    <i className="fa-regular fa-trash-can text-xs"></i>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
 
           <div className="bg-[#111827] rounded-2xl p-6">
-            <h2 className="text-sm font-semibold text-slate-300 mb-5">Basic Information</h2>
+            <h2 className="text-sm font-semibold text-slate-300 mb-5 uppercase tracking-wider">
+              Profile Information
+            </h2>
             <form onSubmit={handleSubmit(handlesubmit)} className="space-y-5">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <FormField
@@ -138,15 +149,15 @@ function MyProfileSettings() {
                 control={control}
                 name="about"
                 label="About"
-                rows={3}
+                rows={4}
                 placeholder="Tell us about yourself..."
                 maxLength={280}
               />
 
-              <div className="flex items-center justify-end pt-2">
+              <div className="flex items-center justify-end pt-4">
                 <button
                   type="submit"
-                  className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-6 py-2.5 rounded-xl transition-all duration-200 min-w-[150px] justify-center"
+                  className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-8 py-2.5 rounded-xl transition-all duration-200 min-w-[160px] justify-center"
                 >
                   {buttonname === 'Saved! ✓' && <i className="fa-solid fa-check text-xs"></i>}
                   {buttonname}
@@ -156,27 +167,6 @@ function MyProfileSettings() {
           </div>
         </div>
       </main>
-
-      <aside className="hidden xl:flex flex-col shrink-0 w-64 h-screen border-l border-[#1f2e47] py-8 px-4 gap-1 bg-[#090e1a]">
-        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider px-3 mb-4">
-          Settings
-        </p>
-        {SETTINGS_NAV.map((item) => (
-          <button
-            key={item.key}
-            onClick={() => setActiveNav(item.key)}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 text-left
-              ${
-                activeNav === item.key
-                  ? 'text-indigo-400 bg-indigo-500/10'
-                  : 'text-slate-400 hover:text-white hover:bg-[#1a2540]'
-              }`}
-          >
-            <i className={`fa-solid ${item.icon} w-4 text-center`}></i>
-            {item.label}
-          </button>
-        ))}
-      </aside>
     </div>
   );
 }

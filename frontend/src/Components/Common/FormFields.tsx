@@ -1,146 +1,157 @@
 import React from 'react';
-import { Control } from 'react-hook-form';
-import { useController } from 'react-hook-form';
-import { getBufferedMaxLength } from '../../utils/formLimits';
+import { Controller, Control, FieldValues, Path } from 'react-hook-form';
 
-const labelClassName =
-  'text-xs font-semibold text-slate-400 uppercase tracking-wider';
+interface FormFieldProps<T extends FieldValues> extends React.InputHTMLAttributes<HTMLInputElement> {
+  label?: string;
+  error?: string;
+  icon?: string;
+  control?: Control<T>;
+  name: Path<T>;
+}
+
+interface FormTextareaProps<T extends FieldValues> extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+  label?: string;
+  error?: string;
+  control?: Control<T>;
+  name: Path<T>;
+}
+
 const baseFieldClassName =
-  'w-full bg-[#111827] border text-slate-200 placeholder-slate-500 rounded-xl px-4 py-3 text-sm transition-all duration-200 focus:outline-none';
+  'w-full field-subtle border-none text-slate-200 placeholder-slate-500 rounded-3xl px-6 py-3.5 text-sm transition-all duration-200 focus:outline-none focus:bg-[#1b2742] focus:ring-1 focus:ring-indigo-500/35';
 
 const getFieldClasses = (hasError: boolean): string =>
   `${baseFieldClassName} ${
     hasError
-      ? 'border-red-500/70 focus:border-red-400'
- : ' focus:bg-[#1a2540]'
+      ? 'bg-red-500/10 text-red-200 placeholder-red-300 ring-1 ring-red-500/50'
+      : ''
   }`;
 
-interface FormFieldProps {
-  control: Control<any>;
-  name: string;
-  label?: string;
-  placeholder?: string;
-  type?: string;
-  maxLength?: number;
-  disabled?: boolean;
-}
-
-export function FormField({
+export const FormField = <T extends FieldValues>({
+  label,
+  error,
+  icon,
+  className,
   control,
   name,
-  label,
-  placeholder,
-  type = 'text',
-  maxLength,
-  disabled = false,
-}: FormFieldProps) {
-  const { field, fieldState } = useController({ control, name });
-
-  return (
-    <div className="space-y-1.5">
-      {label ? <label className={labelClassName}>{label}</label> : null}
-      <input
-        {...field}
-        type={type}
-        disabled={disabled}
-        placeholder={placeholder}
-        maxLength={getBufferedMaxLength(maxLength)}
-        className={getFieldClasses(Boolean(fieldState.error))}
-      />
-      {fieldState.error ? (
-        <p className="text-xs text-red-400">{fieldState.error.message}</p>
-      ) : null}
-    </div>
-  );
-}
-
-interface FormTextareaProps {
-  control: Control<any>;
-  name: string;
-  label?: string;
-  placeholder?: string;
-  rows?: number;
-  maxLength?: number;
-  disabled?: boolean;
-}
-
-export function FormTextarea({
-  control,
-  name,
-  label,
-  placeholder,
-  rows = 3,
-  maxLength,
-  disabled = false,
-}: FormTextareaProps) {
-  const { field, fieldState } = useController({ control, name });
-
-  return (
-    <div className="space-y-1.5">
-      {label ? <label className={labelClassName}>{label}</label> : null}
-      <textarea
-        {...field}
-        rows={rows}
-        disabled={disabled}
-        placeholder={placeholder}
-        maxLength={getBufferedMaxLength(maxLength)}
-        className={`${getFieldClasses(Boolean(fieldState.error))} resize-none`}
-      />
-      {fieldState.error ? (
-        <p className="text-xs text-red-400">{fieldState.error.message}</p>
-      ) : null}
-    </div>
-  );
-}
-
-interface FormFileFieldProps {
-  control: Control<any>;
-  name: string;
-  label?: string;
-  accept?: string;
-  multiple?: boolean;
-  disabled?: boolean;
-  helperText?: string;
-}
-
-export function FormFileField({
-  control,
-  name,
-  label,
-  accept,
-  multiple = false,
-  disabled = false,
-  helperText,
-}: FormFileFieldProps) {
-  const { field, fieldState } = useController({ control, name });
-
-  return (
-    <div className="space-y-2">
-      {label ? <p className={labelClassName}>{label}</p> : null}
-      <label
-        className={`inline-flex items-center justify-center rounded-md px-3.5 py-2.5 font-semibold transition-all duration-200 ${
-          disabled
-            ? 'cursor-not-allowed bg-slate-700 text-slate-300'
-            : 'cursor-pointer bg-slate-600 text-white hover:bg-black/80'
-        }`}
-      >
+  ...props
+}: FormFieldProps<T>) => {
+  const renderInput = (fieldProps: any) => (
+    <div className={`flex flex-col gap-1.5 w-full ${className}`}>
+      {label && (
+        <label className="text-xs font-bold text-slate-400 ml-2 uppercase tracking-wider">
+          {label}
+        </label>
+      )}
+      <div className="relative group">
+        {icon && (
+          <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+            <i className={`fa-solid ${icon} text-slate-500 group-focus-within:text-indigo-400 transition-colors text-sm`}></i>
+          </div>
+        )}
         <input
+          {...fieldProps}
+          {...props}
+          className={`${getFieldClasses(!!error)} ${icon ? 'pl-12' : ''}`}
+        />
+      </div>
+      {error && <p className="text-[11px] font-semibold text-red-400 ml-2 mt-0.5">{error}</p>}
+    </div>
+  );
+
+  if (control) {
+    return (
+      <Controller
+        control={control}
+        name={name}
+        render={({ field }) => renderInput(field)}
+      />
+    );
+  }
+
+  return renderInput({});
+};
+
+export const FormTextarea = <T extends FieldValues>({
+  label,
+  error,
+  className,
+  control,
+  name,
+  ...props
+}: FormTextareaProps<T>) => {
+  const renderTextarea = (fieldProps: any) => (
+    <div className={`flex flex-col gap-1.5 w-full ${className}`}>
+      {label && (
+        <label className="text-xs font-bold text-slate-400 ml-2 uppercase tracking-wider">
+          {label}
+        </label>
+      )}
+      <textarea
+        {...fieldProps}
+        {...props}
+        className={`${getFieldClasses(!!error)} resize-none min-h-[120px]`}
+      />
+      {error && <p className="text-[11px] font-semibold text-red-400 ml-2 mt-0.5">{error}</p>}
+    </div>
+  );
+
+  if (control) {
+    return (
+      <Controller
+        control={control}
+        name={name}
+        render={({ field }) => renderTextarea(field)}
+      />
+    );
+  }
+
+  return renderTextarea({});
+};
+
+export const FormFileField = <T extends FieldValues>({
+  label,
+  error,
+  className,
+  control,
+  name,
+  ...props
+}: FormFieldProps<T>) => {
+  const renderFileInput = (fieldProps: any) => (
+    <div className={`flex flex-col gap-1.5 w-full ${className}`}>
+      {label && (
+        <label className="text-xs font-bold text-slate-400 ml-2 uppercase tracking-wider">
+          {label}
+        </label>
+      )}
+      <div className="relative flex items-center">
+        <input
+          {...props}
+          {...fieldProps}
           type="file"
-          accept={accept}
-          multiple={multiple}
-          disabled={disabled}
-          className="hidden"
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            const files = Array.from(event.target.files || []);
-            field.onChange(multiple ? files : files[0] || null);
+          className={`${getFieldClasses(!!error)} file:hidden cursor-pointer`}
+          value={undefined}
+          onChange={(e) => {
+            fieldProps.onChange?.(e.target.files?.[0]);
+            props.onChange?.(e);
           }}
         />
-        <i className="fa-solid fa-image"></i>
-      </label>
-      {helperText ? <p className="text-xs text-slate-500">{helperText}</p> : null}
-      {fieldState.error ? (
-        <p className="text-xs text-red-400">{fieldState.error.message}</p>
-      ) : null}
+        <div className="absolute right-6 pointer-events-none">
+          <i className="fa-solid fa-cloud-arrow-up text-indigo-400"></i>
+        </div>
+      </div>
+      {error && <p className="text-[11px] font-semibold text-red-400 ml-2 mt-0.5">{error}</p>}
     </div>
   );
-}
+
+  if (control) {
+    return (
+      <Controller
+        control={control}
+        name={name}
+        render={({ field }) => renderFileInput(field)}
+      />
+    );
+  }
+
+  return renderFileInput({});
+};

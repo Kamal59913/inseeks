@@ -34,14 +34,14 @@ export default function AppModal({
         }}
       />
       <div
- className={`relative z-10 w-full rounded-3xl bg-[#111827] shadow-2xl ${contentClassName}`}
+        className={`surface-subtle relative z-10 w-full rounded-3xl ${contentClassName}`}
         onClick={(event) => event.stopPropagation()}
       >
         {showCloseButton ? (
           <button
             type="button"
             onClick={onClose}
-            className="absolute right-3 top-3 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition-colors hover:bg-slate-200 hover:text-slate-700"
+            className="absolute right-3 top-3 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-[#17233b] text-slate-400 transition-all hover:bg-[#1d2b46] hover:text-slate-200"
             aria-label="Close modal"
           >
             <i className="fa-solid fa-xmark text-base"></i>

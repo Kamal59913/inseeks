@@ -13,6 +13,8 @@ export const followService = {
       toggle: shouldFollow ? 'connected' : 'disconnected',
     }),
 
-  getFollowedUsers: () => apiClient.get('/users/getusers'),
-  getNotFollowedUsers: () => apiClient.get('/users/getusersnotfollowed'),
+  getFollowedUsers: (limit = 6, offset = 0) =>
+    apiClient.get('/users/getusers', { params: { limit, offset } }),
+  getNotFollowedUsers: (limit = 6, offset = 0) =>
+    apiClient.get('/users/getusersnotfollowed', { params: { limit, offset } }),
 };

@@ -13,7 +13,10 @@ import { changeCurrentPassword,
     getanUser,
     getUserListThree,
     getUserList,
-    getUserListNotFriend
+    getUserListNotFriend,
+    forgotPassword,
+    verifyOTP,
+    resetPassword
 } from "../../controller/user/user.controller";
 import { upload } from "../../middleware/upload/upload.middleware";
 import { auth } from "../../middleware/auth/auth.middleware";
@@ -36,6 +39,9 @@ router.route("/register").post(
     )
 
 router.route("/login").post(loginUser)
+router.route("/forgot-password").post(forgotPassword)
+router.route("/verify-otp").post(verifyOTP)
+router.route("/reset-password").post(resetPassword)
 //secured routes
 router.route("/logout").post(auth ,logoutUser)
 router.route("/refresh-token").post(refreshAccessToken)

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Change Price icon – dense line style, price tag with pencil/edit (optimized visual weight) -->
+<svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Main price tag shape, expanded to fill more space -->
+  <path d="M7.5 7L4 11V20H13.5L20.5 13L15 7.5L7.5 7Z" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Hole/string on tag for realism -->
+  <circle cx="5.5" cy="9" r="1" stroke="currentColor" stroke-width="2.2"/>
+  <!-- Pencil overlay, larger and crossing more area -->
+  <path d="M17 5L19 7L16 10L13 13L12 17L16 16L19 13L22 10L20 8L17 5Z" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Short connector/emphasis line -->
+  <path d="M15.5 6.5L16.5 7.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+</svg>

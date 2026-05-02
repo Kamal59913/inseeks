@@ -7,7 +7,8 @@ export interface CreateEnvironmentPayload {
 }
 
 export const envService = {
-  getEnvironments: () => apiClient.get('/env/getEnvs'),
+  getEnvironments: (limit = 8, offset = 0) =>
+    apiClient.get('/env/getEnvs', { params: { limit, offset } }),
 
   createEnvironment: ({ envName, EnvDescription, envCoverImage }: CreateEnvironmentPayload) => {
     const formData = new FormData();
@@ -20,8 +21,12 @@ export const envService = {
   setEnvironmentJoin: (title: string, shouldJoin: boolean) =>
     apiClient.post('/env/create-user-join', { title, shouldJoin }),
 
-  getEnvironmentPosts: (envname: string) => apiClient.get(`/env/getposts/env/${envname}`),
-  getEnvironmentBlogPosts: (envname: string) => apiClient.get(`/env/getposts/env/blogs/${envname}`),
-  getEnvironmentImagePosts: (envname: string) => apiClient.get(`/env/getposts/env/images/${envname}`),
-  getEnvironmentVideoPosts: (envname: string) => apiClient.get(`/env/getposts/env/videos/${envname}`),
+  getEnvironmentPosts: (envname: string, limit = 5, offset = 0) =>
+    apiClient.get(`/env/getposts/env/${envname}`, { params: { limit, offset } }),
+  getEnvironmentBlogPosts: (envname: string, limit = 5, offset = 0) =>
+    apiClient.get(`/env/getposts/env/blogs/${envname}`, { params: { limit, offset } }),
+  getEnvironmentImagePosts: (envname: string, limit = 5, offset = 0) =>
+    apiClient.get(`/env/getposts/env/images/${envname}`, { params: { limit, offset } }),
+  getEnvironmentVideoPosts: (envname: string, limit = 5, offset = 0) =>
+    apiClient.get(`/env/getposts/env/videos/${envname}`, { params: { limit, offset } }),
 };

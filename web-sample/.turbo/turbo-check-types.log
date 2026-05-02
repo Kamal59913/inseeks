@@ -1,0 +1,51 @@
+[?9001h[?1004h[?25l[2J[m[2;1H> avom-web@0.1.0 check-types E:\00000_Qualhon_Informatics\2026\avom\apps\web
+> next typegen ]0;C:\WINDOWS\system32\cmd.exe[?25h
+[7;15H && tsc --noEmit[8;1H
+
+Generating rout
+[7;15Hte types...     
+✓ Types generat
+[7;15Hted successfully[8;1H
+[96mcomponents/Post[m
+[96m[7;15Ht/Post.tsx[m:[93m6[m:[93m27 [m
+[7;15H - [91merror [90mTS7031:[m
+[90m[7;15H: [mBinding elemen
+[7;15Hnt 'isOpen' impl
+[7;15Hlicitly has an '
+[7;15H'any' type.     
+
+[7m6[27m const CreateN
+[7;15HNewModal = ({ is
+[7;15HsOpen, onClose }
+[7;15H}) => {
+[7m [27m              [8;30H
+[91m             ~~[m
+[91m[7;15H~~~~~[m
+
+[96mcomponents/Post[m
+[96m[7;15Ht/Post.tsx[m:[93m6[m:[93m35 [m
+[7;15H - [91merror [90mTS7031:[m
+[90m[7;15H: [mBinding elemen
+[7;15Hnt 'onClose' imp
+[7;15Hplicitly has an 
+[7;15H 'any' type.    
+
+[7m6[27m const CreateN
+[7;15HNewModal = ({ is
+[7;15HsOpen, onClose }
+[7;15H}) => {
+[7m [27m              [8;30H
+[91m               [8;31H[m
+[91m      ~~~~~~~  [m
+
+
+Found 2 errors 
+[7;15H in the same fil
+[7;15Hle, starting at:
+[7;15H: components/Pos
+[7;15Hst/Post.tsx[90m:6   [8;1H[m
+
+[30m[41m ELIFECYCLE [m [31mCo[m
+[31m[7;15Hommand failed wi[m
+[31m[7;15Hith exit code 2.[8;1H[m
+[?9001l[?1004l

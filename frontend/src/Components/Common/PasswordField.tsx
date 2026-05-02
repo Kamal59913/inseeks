@@ -1,64 +1,66 @@
 import React, { useState } from 'react';
-import { Control, useController } from 'react-hook-form';
-import { getBufferedMaxLength } from '../../utils/formLimits';
+import { Controller, Control, FieldValues, Path } from 'react-hook-form';
+
+interface PasswordFieldProps<T extends FieldValues> extends React.InputHTMLAttributes<HTMLInputElement> {
+  label?: string;
+  error?: string;
+  control?: Control<T>;
+  name: Path<T>;
+}
 
 const inputBaseClassName =
-  'w-full bg-[#111827] border text-slate-200 placeholder-slate-500 rounded-xl px-4 py-3 pr-12 text-sm transition-all duration-200 focus:outline-none';
+  'w-full field-subtle border-none text-slate-200 placeholder-slate-500 rounded-3xl px-6 py-3.5 pr-12 text-sm transition-all duration-200 focus:outline-none focus:bg-[#1b2742] focus:ring-1 focus:ring-indigo-500/35';
 
 const inputStateClassName = (hasError: boolean): string =>
   hasError
-    ? 'border-red-500/70 focus:border-red-400'
- : ' focus:bg-[#1a2540]';
+    ? 'bg-red-500/10 text-red-200 placeholder-red-300 ring-1 ring-red-500/40'
+    : '';
 
-interface PasswordFieldProps {
-  control: Control<any>;
-  name: string;
-  label?: string;
-  placeholder?: string;
-  maxLength?: number;
-  disabled?: boolean;
-}
-
-export function PasswordField({
+export const PasswordField = <T extends FieldValues>({
+  label,
+  error,
+  className,
   control,
   name,
-  label,
-  placeholder,
-  maxLength,
-  disabled = false,
-}: PasswordFieldProps) {
-  const { field, fieldState } = useController({ control, name });
+  ...props
+}: PasswordFieldProps<T>) => {
   const [showPassword, setShowPassword] = useState(false);
 
-  return (
-    <div className="space-y-1.5">
-      {label ? (
-        <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+  const renderInput = (fieldProps: any) => (
+    <div className={`flex flex-col gap-1.5 w-full ${className}`}>
+      {label && (
+        <label className="text-xs font-bold text-slate-400 ml-2 uppercase tracking-wider">
           {label}
         </label>
-      ) : null}
-      <div className="relative">
+      )}
+      <div className="relative group">
         <input
-          {...field}
+          {...fieldProps}
+          {...props}
           type={showPassword ? 'text' : 'password'}
-          disabled={disabled}
-          placeholder={placeholder}
-          maxLength={getBufferedMaxLength(maxLength)}
-          className={`${inputBaseClassName} ${inputStateClassName(Boolean(fieldState.error))}`}
+          className={`${inputBaseClassName} ${inputStateClassName(!!error)}`}
         />
         <button
           type="button"
-          onClick={() => !disabled && setShowPassword((v) => !v)}
-          disabled={disabled}
-          className="absolute right-2 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-[#1a2540] hover:text-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
-          aria-label={showPassword ? 'Hide password' : 'Show password'}
+          onClick={() => setShowPassword(!showPassword)}
+          className="absolute inset-y-0 right-0 pr-6 flex items-center text-slate-500 hover:text-indigo-400 transition-colors"
         >
-          <i className={`fa-regular ${showPassword ? 'fa-eye-slash' : 'fa-eye'} text-base`}></i>
+          <i className={`fa-solid ${showPassword ? 'fa-eye-slash' : 'fa-eye'} text-sm`}></i>
         </button>
       </div>
-      {fieldState.error ? (
-        <p className="text-xs text-red-400">{fieldState.error.message}</p>
-      ) : null}
+      {error && <p className="text-[11px] font-semibold text-red-400 ml-2 mt-0.5">{error}</p>}
     </div>
   );
-}
+
+  if (control) {
+    return (
+      <Controller
+        control={control}
+        name={name}
+        render={({ field }) => renderInput(field)}
+      />
+    );
+  }
+
+  return renderInput({});
+};

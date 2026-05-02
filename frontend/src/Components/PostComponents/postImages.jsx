@@ -7,7 +7,15 @@ import { useVoteQuery } from '../../hooks/useVoteQuery';
 
 export default function PostImages(props) {
   const modal = useModalData()
-  const { summary, vote, isVoting } = useVoteQuery(props.type, props.postId)
+  const { summary, vote, isVoting } = useVoteQuery(props.type, props.postId, {
+    upvotesCount: props.upvotesCount || 0,
+    downvotesCount: props.downvotesCount || 0,
+    userVote: props.userVote || null,
+    score:
+      typeof props.score === 'number'
+        ? props.score
+        : (props.upvotesCount || 0) - (props.downvotesCount || 0),
+  })
 
   const sendData = () =>
     modal.open('view-image-post', {

@@ -42,7 +42,7 @@ export default function Messages() {
 
         {isLoading ? (
           <div className="p-10 flex justify-center"><PageLoader /></div>
-        ) : (
+        ) : messages && messages.length > 0 ? (
           messages?.map((msg) => (
             <div key={msg.id} className="w-full flex flex-row px-3.5 py-3 hover:bg-[#111827] transition-all rounded-xl cursor-pointer group">
               <div className="relative shrink-0">
@@ -78,6 +78,10 @@ export default function Messages() {
               </div>
             </div>
           ))
+        ) : (
+          <div className="px-6 py-16 text-center text-slate-500">
+            <p className="text-sm">No conversations yet</p>
+          </div>
         )}
       </div>
 

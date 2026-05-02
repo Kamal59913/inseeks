@@ -9,6 +9,7 @@ import { useCurrentUserQuery } from "../../hooks/useCurrentUserQuery";
 import { useUserPostsQuery } from "../../hooks/usePostsQuery";
 import PageLoader from "../Common/PageLoader";
 import ImageWithFallback from "../Common/ImageWithFallback";
+import InfiniteLoader from "../Common/InfiniteLoader";
 
 const FILTERS = [
   { key: "explore", label: "All Posts" },
@@ -23,8 +24,15 @@ export default function MyProfile() {
   );
   const [activeFilter, setActiveFilter] = useState<"explore" | "images" | "videos" | "blogs">("explore");
 
-  const { data: currentUser } = useCurrentUserQuery();
-  const { data: posts } = useUserPostsQuery(currentUser?.username || "", activeFilter, !!currentUser?.username);
+  const { data: currentUser, isLoading: isCurrentUserLoading } = useCurrentUserQuery();
+  const {
+    data: posts,
+    isLoading: isPostsLoading,
+    fetchNextPage: fetchNextPosts,
+    hasNextPage: hasNextPosts,
+    isFetchingNextPage: isFetchingNextPosts,
+  } = useUserPostsQuery(currentUser?.username || "", activeFilter, !!currentUser?.username);
+  const isProfilePageLoading = isCurrentUserLoading || isPostsLoading;
 
   const totalPosts = currentUser
     ? (currentUser.PostsCount || 0) +
@@ -40,7 +48,7 @@ export default function MyProfile() {
         <SearchBar />
 
         <div className="max-w-3xl mx-auto w-full px-4 py-6">
-          {(!currentUser || !posts) ? (
+          {isProfilePageLoading ? (
             <PageLoader />
           ) : (
             <>
@@ -134,9 +142,10 @@ export default function MyProfile() {
                 ))}
               </div>
 
-              {posts.length > 0 ? (
-                <div className="space-y-4">
-                  {posts.map((post: any) => {
+              {(posts?.items || []).length > 0 ? (
+                <>
+                  <div className="space-y-4">
+                    {(posts?.items || []).map((post: any) => {
                     const author = post.author?.[0];
                     if (!author) return null;
                     const common = {
@@ -144,6 +153,13 @@ export default function MyProfile() {
                       postId: post._id,
                       type: post.type,
                       community: post.community,
+                      upvotesCount: post.upvotesCount || 0,
+                      downvotesCount: post.downvotesCount || 0,
+                      userVote: post.userVote || null,
+                      score:
+                        typeof post.score === "number"
+                          ? post.score
+                          : (post.upvotesCount || 0) - (post.downvotesCount || 0),
                       conversationCount: post.conversationCount || 0,
                       author: author.username,
                       avatar: author.avatar || avatar,
@@ -157,8 +173,15 @@ export default function MyProfile() {
                       return <Post {...common} title={post.title} description={post.description} image={post.image} attachments={post.attachments} />;
                     }
                     return null;
-                  })}
-                </div>
+                    })}
+                  </div>
+                  <InfiniteLoader
+                    onLoadMore={fetchNextPosts}
+                    hasMore={hasNextPosts}
+                    isLoading={isFetchingNextPosts}
+                    label="Loading more posts..."
+                  />
+                </>
               ) : (
                 <div className="flex flex-col items-center justify-center py-20 text-slate-500">
                   <i className="fa-regular fa-rectangle-list text-5xl mb-4 text-slate-600"></i>

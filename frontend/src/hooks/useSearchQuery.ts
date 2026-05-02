@@ -1,40 +1,57 @@
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { searchService } from "../services/search.service";
+import { SearchResponse, SearchScope } from "../types/search";
 
-// Placeholder for actual search API
-// In a real app, this would call postService.search or userService.search
-export const useSearchQuery = (query: string) =>
-  useQuery({
-    queryKey: ['search', query],
-    queryFn: async () => {
-      // Mock delay
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      
-      // Return placeholder data
-      return {
-        people: [
-          {
-            name: 'Edward Ford',
-            location: 'Los Angeles, CA',
-            avatar: 'https://res.cloudinary.com/dogyotgp5/image/upload/v1713078910/avatar-dummy-social-app_fx9x9f.png',
-          },
-          {
-            name: 'Sophia Patel',
-            location: 'New York, NY',
-            avatar: 'https://res.cloudinary.com/dogyotgp5/image/upload/v1713078910/avatar-dummy-social-app_fx9x9f.png',
-          },
-          {
-            name: 'Marcus Lee',
-            location: 'San Francisco, CA',
-            avatar: 'https://res.cloudinary.com/dogyotgp5/image/upload/v1713078910/avatar-dummy-social-app_fx9x9f.png',
-          },
-          {
-            name: 'Aisha Rahman',
-            location: 'Chicago, IL',
-            avatar: 'https://res.cloudinary.com/dogyotgp5/image/upload/v1713078910/avatar-dummy-social-app_fx9x9f.png',
-          },
-        ],
-        posts: [],
-      };
+export const useSearchQuery = (
+  query: string,
+  scope: SearchScope = "all",
+  limit = 6,
+) => {
+  const searchQuery = useInfiniteQuery<SearchResponse>({
+    queryKey: ["search", query, scope, limit],
+    queryFn: async ({ pageParam = 0 }) => {
+      const response = await searchService.search(
+        query,
+        scope,
+        limit,
+        pageParam as number,
+      );
+      return response.data.data;
     },
-    enabled: true, // For now enable so it shows results
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) =>
+      lastPage.pagination.hasMore ? lastPage.pagination.nextOffset : undefined,
+    enabled: query.trim().length > 0,
   });
+  return {
+    ...searchQuery,
+    data: searchQuery.data
+      ? searchQuery.data.pages.reduce<SearchResponse>(
+          (accumulator, page, index) => ({
+            query: page.query,
+            scope: page.scope,
+            people: accumulator.people.concat(page.people),
+            spaces: accumulator.spaces.concat(page.spaces),
+            posts: accumulator.posts.concat(page.posts),
+            pagination:
+              index === searchQuery.data.pages.length - 1
+                ? page.pagination
+                : accumulator.pagination,
+          }),
+          {
+            query,
+            scope,
+            people: [],
+            spaces: [],
+            posts: [],
+            pagination: {
+              limit,
+              offset: 0,
+              nextOffset: null,
+              hasMore: false,
+            },
+          },
+        )
+      : undefined,
+  };
+};

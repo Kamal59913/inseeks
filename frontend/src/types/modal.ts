@@ -24,6 +24,7 @@ export interface ModalDataMap {
   'view-blog-post': ViewPostData;
   'view-image-post': ViewPostData;
   'view-video-post': ViewPostData;
+  'log-out': { title: string; action: () => void };
 }
 
 export type ModalName = keyof ModalDataMap;

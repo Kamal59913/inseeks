@@ -47,14 +47,14 @@ export default function DeleteImage({ modalId, data }: DeleteImageProps) {
         <div className="flex justify">
           {loader && (
             <>
-              <p className="absolute text-slate-600 font-semibold">Deleting</p>
+              <p className="absolute font-semibold text-slate-300">Deleting</p>
               <span className="absolute ml-[70px]">
                 <PulseLoader color="#475569" size={6} aria-label="Loading Spinner" data-testid="loader" />
               </span>
             </>
           )}
         </div>
-        <h2 className="w-full text-2xl font-bold leading-tight text-slate-600 mt-12">
+        <h2 className="mt-12 w-full text-2xl font-bold leading-tight text-white">
           Sure you want to delete the image?
         </h2>
         <form onSubmit={handleSubmit(onSubmit)} className="mt-2">
@@ -62,7 +62,7 @@ export default function DeleteImage({ modalId, data }: DeleteImageProps) {
             <button
               type="submit"
               disabled={loader}
-              className="w-full items-center justify-center rounded-md border border-gray-400 bg-white px-3.5 py-2.5 font-semibold text-gray-700 transition-all duration-200 hover:bg-gray-100 hover:text-slate-600 focus:outline-none disabled:opacity-70"
+              className="btn-danger w-full items-center justify-center"
             >
               Delete <i className="fa-regular fa-trash-can ml-3"></i>
             </button>

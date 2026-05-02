@@ -20,23 +20,28 @@ export interface CreateVideoPostPayload {
 }
 
 export const postService = {
-  getHomePosts: () => apiClient.post('/createpost/getposts/h'),
-  getHomeBlogPosts: () => apiClient.post('/createpost/getposts/h/blogs'),
-  getHomeImagePosts: () => apiClient.post('/createpost/getposts/h/images'),
-  getHomeVideoPosts: () => apiClient.post('/createpost/getposts/h/videos'),
+  getHomePosts: (limit = 5, offset = 0) =>
+    apiClient.post('/createpost/getposts/h', { limit, offset }),
+  getHomeBlogPosts: (limit = 5, offset = 0) =>
+    apiClient.post('/createpost/getposts/h/blogs', { limit, offset }),
+  getHomeImagePosts: (limit = 5, offset = 0) =>
+    apiClient.post('/createpost/getposts/h/images', { limit, offset }),
+  getHomeVideoPosts: (limit = 5, offset = 0) =>
+    apiClient.post('/createpost/getposts/h/videos', { limit, offset }),
 
   getAllPosts: () => apiClient.get('/createpost/getallposts'),
   getImagePosts: () => apiClient.get('/createpost/getallposts/images'),
   getVideoPosts: () => apiClient.get('/createpost/getallposts/videos'),
   getBlogPosts: () => apiClient.get('/createpost/getallposts/blogs'),
 
-  getUserPosts: (username: string) => apiClient.get(`/createpost/getalluserposts/${username}`),
-  getUserImagePosts: (username: string) =>
-    apiClient.get(`/createpost/getuserposts/images/${username}`),
-  getUserVideoPosts: (username: string) =>
-    apiClient.get(`/createpost/getuserposts/videos/${username}`),
-  getUserBlogPosts: (username: string) =>
-    apiClient.get(`/createpost/getuserposts/blogs/${username}`),
+  getUserPosts: (username: string, limit = 5, offset = 0) =>
+    apiClient.get(`/createpost/getalluserposts/${username}`, { params: { limit, offset } }),
+  getUserImagePosts: (username: string, limit = 5, offset = 0) =>
+    apiClient.get(`/createpost/getuserposts/images/${username}`, { params: { limit, offset } }),
+  getUserVideoPosts: (username: string, limit = 5, offset = 0) =>
+    apiClient.get(`/createpost/getuserposts/videos/${username}`, { params: { limit, offset } }),
+  getUserBlogPosts: (username: string, limit = 5, offset = 0) =>
+    apiClient.get(`/createpost/getuserposts/blogs/${username}`, { params: { limit, offset } }),
 
   createBlogPost: ({ title, description, attachments = [], envname = '' }: CreateBlogPostPayload) => {
     const formData = new FormData();

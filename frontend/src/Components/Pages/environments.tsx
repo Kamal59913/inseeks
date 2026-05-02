@@ -6,16 +6,39 @@ import EnvCard from '../envComponents/envCard';
 import { useModalData } from '../../store/hooks';
 import { useEnvironmentQuery } from '../../hooks/useEnvironmentQuery';
 import { queryKeys } from '../../hooks/queryKeys';
+import { useSearchQuery } from '../../hooks/useSearchQuery';
+import { SearchSpace } from '../../types/search';
+import ImageWithFallback from '../Common/ImageWithFallback';
+import UnifiedSearch from '../Utilities/UnifiedSearch';
+import PageLoader from '../Common/PageLoader';
+import InfiniteLoader from '../Common/InfiniteLoader';
 
 export default function Environments() {
   const modal = useModalData();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
-  const { data: holdEnvData } = useEnvironmentQuery();
+  const [recommendationQuery, setRecommendationQuery] = useState('');
+  const {
+    data: holdEnvData,
+    isLoading: isEnvironmentsLoading,
+    fetchNextPage: fetchNextEnvironmentPage,
+    hasNextPage: hasNextEnvironmentPage,
+    isFetchingNextPage: isFetchingNextEnvironmentPage,
+  } = useEnvironmentQuery(8);
+  const {
+    data: suggestionResults,
+    isFetching: isSuggestionsLoading,
+    fetchNextPage: fetchNextSuggestionPage,
+    hasNextPage: hasNextSuggestionPage,
+    isFetchingNextPage: isFetchingNextSuggestionPage,
+  } =
+    useSearchQuery(recommendationQuery, 'spaces', 6);
+
+  const recommendations = suggestionResults?.spaces || [];
 
   const filtered = useMemo(
     () =>
-      holdEnvData?.filter(
+      holdEnvData?.items?.filter(
         (e: any) =>
           e.name?.toLowerCase().includes(search.toLowerCase()) ||
           e.description?.toLowerCase().includes(search.toLowerCase()),
@@ -30,49 +53,91 @@ export default function Environments() {
   return (
     <div className="flex h-screen bg-[#090e1a] overflow-hidden">
       <LeftBar />
+
       <main className="flex-1 flex flex-col min-w-0 overflow-y-auto pb-20 lg:pb-0">
         <SearchBar />
 
         <div className="max-w-6xl mx-auto w-full px-4 py-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
             <div>
               <h1 className="text-2xl font-bold text-white">Spaces</h1>
               <p className="text-sm text-slate-400 mt-1">Join communities that match your interests</p>
             </div>
             <button
               onClick={() => modal.open('create-env', { onCreated: refreshEnvs })}
-              className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-all duration-200 shrink-0"
+              className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-all shadow-lg shadow-indigo-600/20"
             >
               <i className="fa-solid fa-plus text-xs"></i>
               Create Space
             </button>
           </div>
 
-          <div className="flex items-center gap-3 mb-6">
- <div className="flex-1 flex items-center gap-3 bg-[#111827] rounded-xl px-4 py-2.5 transition-all">
-              <i className="fa-solid fa-magnifying-glass text-slate-500 text-sm"></i>
-              <input
-                type="text"
-                placeholder="Search spaces..."
+          <div className="mb-8">
+            <div className="max-w-md">
+              <UnifiedSearch<SearchSpace>
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="flex-1 bg-transparent text-slate-200 text-sm placeholder-slate-500 border-none focus:outline-none"
+                onValueChange={setSearch}
+                onInputChange={setRecommendationQuery}
+                onSearch={setSearch}
+                placeholder="Search spaces..."
+                isRecommendationsLoading={isSuggestionsLoading}
+                recommendations={recommendations}
+                getRecommendationLabel={(item) => item.name}
+                renderRecommendation={(item, index, isSelected, onSelect) => (
+                  <button
+                    key={`${item._id}-${index}`}
+                    type="button"
+                    onClick={() => onSelect(item)}
+                    className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-all ${
+                      isSelected ? 'bg-indigo-600/10' : 'hover:bg-[#1a2540]'
+                    }`}
+                  >
+                    <ImageWithFallback
+                      variant="avatar"
+                      src={item.envAvatar}
+                      alt={item.name}
+                      className="h-10 w-10 rounded-xl object-cover"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-semibold text-white">{item.name}</p>
+                      <p className="truncate text-xs text-slate-500">
+                        {item.description || 'Explore this space'}
+                      </p>
+                    </div>
+                  </button>
+                )}
+                emptyMessage="No matching spaces found"
+                hasNextPage={hasNextSuggestionPage}
+                fetchNextPage={fetchNextSuggestionPage}
+                isFetchingNextPage={isFetchingNextSuggestionPage}
               />
             </div>
           </div>
 
-          {filtered && filtered.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {filtered.map((env: any, i: number) => (
+          {isEnvironmentsLoading ? (
+            <PageLoader />
+          ) : filtered && filtered.length > 0 ? (
+            <>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {filtered.map((env: any, index: number) => (
                 <EnvCard
-                  key={i}
+                  key={`${env._id || env.name}-${index}`}
                   title={env.name}
                   description={env.description}
                   avatar={env.envAvatar}
                   isJoined={env.isJoined}
                 />
-              ))}
-            </div>
+                ))}
+              </div>
+              {!search.trim() ? (
+                <InfiniteLoader
+                  onLoadMore={fetchNextEnvironmentPage}
+                  hasMore={hasNextEnvironmentPage}
+                  isLoading={isFetchingNextEnvironmentPage}
+                  label="Loading more spaces..."
+                />
+              ) : null}
+            </>
           ) : (
             <div className="flex flex-col items-center justify-center py-20 text-slate-500">
               <i className="fa-solid fa-seedling text-5xl mb-4 text-slate-600"></i>
@@ -80,7 +145,7 @@ export default function Environments() {
               <p className="text-sm mt-1">Create one to get started!</p>
               <button
                 onClick={() => modal.open('create-env', { onCreated: refreshEnvs })}
-                className="mt-4 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-all"
+                className="mt-6 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold px-6 py-3 rounded-xl transition-all"
               >
                 Create Space
               </button>

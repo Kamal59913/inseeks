@@ -59,32 +59,32 @@ export function CreateEnv({ modalId, data }: CreateEnvProps) {
   return (
     <AppModal onClose={closeModal} contentClassName="max-w-[460px] px-4 py-4 sm:px-6 sm:py-16 lg:px-8">
       <div className="xl:mx-auto xl:w-full xl:max-w-sm 2xl:max-w-md">
-        <h2 className="text-2xl font-bold leading-tight text-slate-600 mt-3">Create a space</h2>
+        <h2 className="mt-3 text-2xl font-bold leading-tight text-white">Create a space</h2>
         <form onSubmit={handleSubmit(onSubmit)} className="mt-2">
           <div className="space-y-3">
             <FormField control={control} name="envName" placeholder="Space Name" maxLength={80} />
             <FormTextarea control={control} name="EnvDescription" placeholder="Space Description (Required)" rows={4} maxLength={500} />
             <div className="mt-3">
-              <p className="inline-flex font-semibold text-lg">Add</p>
+              <p className="inline-flex text-lg font-semibold text-slate-200">Add</p>
               <span className="ml-4 inline-flex">
                 <FormFileField control={control} name="envCoverImage" accept="image/*" />
               </span>
               {loader && (
                 <>
-                  <span className="ml-2 text-slate-800"> Uploading </span>
+                  <span className="ml-2 text-slate-400"> Uploading </span>
                   <span className="ml-2">
                     <PulseLoader color="#475569" size={6} aria-label="Loading Spinner" data-testid="loader" />
                   </span>
                 </>
               )}
             </div>
-            <div className="h-[180px] w-full bg-slate-600 mt-1 flex justify-center">
-              {previewUrl && <ImageWithFallback className="bg-slate-200 h-full w-64" src={previewUrl} alt="" />}
+            <div className="surface-subtle mt-1 flex h-[180px] w-full items-center justify-center rounded-2xl">
+              {previewUrl && <ImageWithFallback className="h-full w-64 bg-slate-200" src={previewUrl} alt="" />}
             </div>
             <button
               type="submit"
               disabled={loader}
-              className="relative inline-flex w-full items-center justify-center rounded-md border border-gray-400 bg-white px-3.5 py-2.5 font-semibold text-gray-700 transition-all duration-200 hover:bg-gray-100 hover:text-slate-600 focus:outline-none disabled:opacity-70"
+              className="btn-primary relative inline-flex w-full"
             >
               Post
             </button>

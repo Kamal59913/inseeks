@@ -20,12 +20,19 @@ const avatar =
 export const UserListProvider = ({ children }: { children: ReactNode }) => {
   const { data: followedUsers } = useFollowedUsersQuery();
   const { data: unfollowedUsers } = useUnfollowedUsersQuery();
+  const normalizeUsers = (users: any[] | undefined): UserListItem[] =>
+    (users || []).filter(
+      (user): user is UserListItem =>
+        typeof user?._id === 'string' &&
+        typeof user?.username === 'string' &&
+        typeof user?.fullname === 'string',
+    );
 
   return (
     <DataContext.Provider
       value={{
-        data: followedUsers || null,
-        datanotfollowed: unfollowedUsers || null,
+        data: normalizeUsers(followedUsers?.items) || null,
+        datanotfollowed: normalizeUsers(unfollowedUsers?.items) || null,
         avatar,
         fetchData: async () => {}, // No-op since react-query handles it
         fetchDataNotFollowed: async () => {},

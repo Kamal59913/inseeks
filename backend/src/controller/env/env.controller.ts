@@ -9,6 +9,87 @@ import { BlogPost } from "../../model/blogpost.model.js";
 import { VideoPost } from "../../model/videopost.model.js";
 import { ImagePost } from "../../model/imagepost.model.js";
 
+const parsePagination = (req, fallbackLimit = 8) => {
+     const parsedLimit = Number.parseInt(req.query.limit, 10)
+     const parsedOffset = Number.parseInt(req.query.offset, 10)
+     const limit = Number.isNaN(parsedLimit) ? fallbackLimit : Math.min(Math.max(parsedLimit, 1), 20)
+     const offset = Number.isNaN(parsedOffset) ? 0 : Math.max(parsedOffset, 0)
+
+     return { limit, offset }
+}
+
+const buildPagination = (totalCount, limit, offset) => {
+     const hasMore = offset + limit < totalCount
+
+     return {
+          limit,
+          offset,
+          nextOffset: hasMore ? offset + limit : null,
+          hasMore
+     }
+}
+
+const buildVoteLookupStages = (targetField, userId) => [
+     {
+          $lookup: {
+               from: "likes",
+               localField: "_id",
+               foreignField: targetField,
+               as: "votes"
+          }
+     },
+     {
+          $addFields: {
+               upvotesCount: {
+                    $size: {
+                         $filter: {
+                              input: "$votes",
+                              as: "vote",
+                              cond: { $eq: ["$$vote.voteType", "upvote"] }
+                         }
+                    }
+               },
+               downvotesCount: {
+                    $size: {
+                         $filter: {
+                              input: "$votes",
+                              as: "vote",
+                              cond: { $eq: ["$$vote.voteType", "downvote"] }
+                         }
+                    }
+               },
+               userVote: {
+                    $let: {
+                         vars: {
+                              myVote: {
+                                   $arrayElemAt: [
+                                        {
+                                             $filter: {
+                                                  input: "$votes",
+                                                  as: "vote",
+                                                  cond: { $eq: ["$$vote.likedBy", userId] }
+                                             }
+                                        },
+                                        0
+                                   ]
+                              }
+                         },
+                         in: "$$myVote.voteType"
+                    }
+               }
+          }
+     },
+     {
+          $addFields: {
+               score: { $subtract: ["$upvotesCount", "$downvotesCount"] }
+          }
+     },
+     {
+          $project: {
+               votes: 0
+          }
+     }
+]
 
 const CreateEnv = asyncHandler(async (req,res) => {
      const {envName, EnvDescription} = req.body
@@ -38,6 +119,7 @@ const CreateEnv = asyncHandler(async (req,res) => {
 })
 
 const getEnvs = asyncHandler(async (req, res) => {
+     const { limit, offset } = parsePagination(req, 8)
      const envs = await Env.aggregate([
           /*Task: We are trying to check if the current user (req.user._id) has joined the community or not*/
           /*Pipeline 1: lookup for the joins*/
@@ -65,7 +147,10 @@ const getEnvs = asyncHandler(async (req, res) => {
      return res
      .status(200)
      .json(
-          new ApiResponse(200, envs, "Successfully liked the post")
+          new ApiResponse(200, {
+               items: envs.slice(offset, offset + limit),
+               pagination: buildPagination(envs.length, limit, offset)
+          }, "Successfully liked the post")
 )})
 
 const joinCommunity = asyncHandler(async (req, res) => {
@@ -104,6 +189,7 @@ const joinCommunity = asyncHandler(async (req, res) => {
 
 const getEnvPosts = asyncHandler(async (req, res) => {
      let { envname } = req.params
+     const { limit, offset } = parsePagination(req, 5)
      console.log(envname)
 
      const blogPosts = await BlogPost.aggregate([
@@ -129,28 +215,7 @@ const getEnvPosts = asyncHandler(async (req, res) => {
                  ]
              }
          },
-         {
-             $lookup: {
-                 from: "likes",
-                 localField: "_id",
-                 foreignField: "blogpost",
-                 as: "likes"
-             }
-         }, 
-         {
-             $addFields: {
-                 isLiked: {
-                     $cond: {
-                         if: {$in: [req.user?._id, "$likes.likedBy"]},
-                         then: true,
-                         else: false
-                     }
-                 },
-                 likesCount: {
-                     $size: "$likes"
-                 }
-             }
-         }
+         ...buildVoteLookupStages("blogpost", req.user?._id)
      ]);
  
      const imagePosts = await ImagePost.aggregate([
@@ -176,28 +241,7 @@ const getEnvPosts = asyncHandler(async (req, res) => {
                  ]
              }
          },
-         {
-             $lookup: {
-                 from: "likes",
-                 localField: "_id",
-                 foreignField: "image",
-                 as: "likes"
-             }
-         }, 
-         {
-             $addFields: {
-                 isLiked: {
-                     $cond: {
-                         if: {$in: [req.user?._id, "$likes.likedBy"]},
-                         then: true,
-                         else: false
-                     }
-                 },
-                 likesCount: {
-                     $size: "$likes"
-                 }
-             }
-         }
+         ...buildVoteLookupStages("image", req.user?._id)
      ]);
      const videoPosts = await VideoPost.aggregate([
           {
@@ -222,28 +266,7 @@ const getEnvPosts = asyncHandler(async (req, res) => {
                  ]
              }
          },
-         {
-             $lookup: {
-                 from: "likes",
-                 localField: "_id",
-                 foreignField: "video",
-                 as: "likes"
-             }
-         }, 
-         {
-             $addFields: {
-                 isLiked: {
-                     $cond: {
-                         if: {$in: [req.user?._id, "$likes.likedBy"]},
-                         then: true,
-                         else: false
-                     }
-                 },
-                 likesCount: {
-                     $size: "$likes"
-                 }
-             }
-         }
+         ...buildVoteLookupStages("video", req.user?._id)
      ]);
      //combining the posts
      const allPosts = [...blogPosts, ...imagePosts, ...videoPosts];
@@ -253,11 +276,12 @@ const getEnvPosts = asyncHandler(async (req, res) => {
      
      res
      .status(201)
-     .json({"done":allPosts})
+     .json({"done":allPosts.slice(offset, offset + limit),"pagination":buildPagination(allPosts.length, limit, offset)})
  })
  
  const getEnvBlogPosts = asyncHandler(async (req, res) => {
      let { envname } = req.params
+     const { limit, offset } = parsePagination(req, 5)
      console.log(envname)
 
      const blogPosts = await BlogPost.aggregate([
@@ -282,7 +306,8 @@ const getEnvPosts = asyncHandler(async (req, res) => {
                      }
                  ]
              }
-         }
+         },
+         ...buildVoteLookupStages("blogpost", req.user?._id)
      ]);
      //combining the posts
      const allPosts = [...blogPosts];
@@ -292,11 +317,12 @@ const getEnvPosts = asyncHandler(async (req, res) => {
      
      res
      .status(201)
-     .json({"done":allPosts})
+     .json({"done":allPosts.slice(offset, offset + limit),"pagination":buildPagination(allPosts.length, limit, offset)})
  })
  
  const getEnvImagePosts = asyncHandler(async (req, res) => {
      let { envname } = req.params
+     const { limit, offset } = parsePagination(req, 5)
      console.log(envname)
 
      const imagePosts = await ImagePost.aggregate([
@@ -321,7 +347,8 @@ const getEnvPosts = asyncHandler(async (req, res) => {
                      }
                  ]
              }
-         }
+         },
+         ...buildVoteLookupStages("image", req.user?._id)
      ]);
  
      //combining the posts
@@ -331,11 +358,12 @@ const getEnvPosts = asyncHandler(async (req, res) => {
  
      res
      .status(201)
-     .json({"done":allPosts})
+     .json({"done":allPosts.slice(offset, offset + limit),"pagination":buildPagination(allPosts.length, limit, offset)})
  })
  
  const getEnvVideoPosts = asyncHandler(async (req, res) => {
      let { envname } = req.params
+     const { limit, offset } = parsePagination(req, 5)
 
      console.log(envname)
      const videoPosts = await VideoPost.aggregate([
@@ -360,7 +388,8 @@ const getEnvPosts = asyncHandler(async (req, res) => {
                      }
                  ]
              }
-         }
+         },
+         ...buildVoteLookupStages("video", req.user?._id)
      ]);
  
      //combining the posts
@@ -369,7 +398,7 @@ const getEnvPosts = asyncHandler(async (req, res) => {
      allPosts.sort((a, b) => b.createdAt - a.createdAt);
      res
      .status(201)
-     .json({"done":allPosts})
+     .json({"done":allPosts.slice(offset, offset + limit),"pagination":buildPagination(allPosts.length, limit, offset)})
  })
  
 

@@ -14,6 +14,26 @@ import path from "path";
 const PUBLIC_DOCS_DIR = path.resolve(process.cwd(), "src/public/uploads/documents");
 const COMMENT_COLLECTION = "commentposts";
 
+const parsePagination = (source = {}, fallbackLimit = 5) => {
+    const parsedLimit = Number.parseInt(source.limit, 10);
+    const parsedOffset = Number.parseInt(source.offset, 10);
+    const limit = Number.isNaN(parsedLimit) ? fallbackLimit : Math.min(Math.max(parsedLimit, 1), 20);
+    const offset = Number.isNaN(parsedOffset) ? 0 : Math.max(parsedOffset, 0);
+
+    return { limit, offset };
+};
+
+const buildPagination = (totalCount, limit, offset) => {
+    const hasMore = offset + limit < totalCount;
+
+    return {
+        limit,
+        offset,
+        nextOffset: hasMore ? offset + limit : null,
+        hasMore
+    };
+};
+
 const ensureDirectory = (directoryPath) => {
     if (!fs.existsSync(directoryPath)) {
         fs.mkdirSync(directoryPath, { recursive: true });
@@ -77,6 +97,68 @@ const discussionLookupStages = [
     {
         $project: {
             discussionEntries: 0
+        }
+    }
+];
+
+const buildVoteLookupStages = (targetField, userId) => [
+    {
+        $lookup: {
+            from: "likes",
+            localField: "_id",
+            foreignField: targetField,
+            as: "votes"
+        }
+    },
+    {
+        $addFields: {
+            upvotesCount: {
+                $size: {
+                    $filter: {
+                        input: "$votes",
+                        as: "vote",
+                        cond: { $eq: ["$$vote.voteType", "upvote"] }
+                    }
+                }
+            },
+            downvotesCount: {
+                $size: {
+                    $filter: {
+                        input: "$votes",
+                        as: "vote",
+                        cond: { $eq: ["$$vote.voteType", "downvote"] }
+                    }
+                }
+            },
+            userVote: {
+                $let: {
+                    vars: {
+                        myVote: {
+                            $arrayElemAt: [
+                                {
+                                    $filter: {
+                                        input: "$votes",
+                                        as: "vote",
+                                        cond: { $eq: ["$$vote.likedBy", userId] }
+                                    }
+                                },
+                                0
+                            ]
+                        }
+                    },
+                    in: "$$myVote.voteType"
+                }
+            }
+        }
+    },
+    {
+        $addFields: {
+            score: { $subtract: ["$upvotesCount", "$downvotesCount"] }
+        }
+    },
+    {
+        $project: {
+            votes: 0
         }
     }
 ];
@@ -320,6 +402,7 @@ const createImagePost = asyncHandler(async (req, res) => {
 })
 
 const homePagePostsDisplay = asyncHandler(async (req, res) => {
+    const { limit, offset } = parsePagination(req.body, 5);
 
     const blogPosts = await BlogPost.aggregate([
         {
@@ -339,28 +422,7 @@ const homePagePostsDisplay = asyncHandler(async (req, res) => {
                 ]
             }
         },
-        {
-            $lookup: {
-                from: "likes",
-                localField: "_id",
-                foreignField: "blogpost",
-                as: "likes"
-            }
-        }, 
-        {
-            $addFields: {
-                isLiked: {
-                    $cond: {
-                        if: {$in: [req.user?._id, "$likes.likedBy"]},
-                        then: true,
-                        else: false
-                    }
-                },
-                likesCount: {
-                    $size: "$likes"
-                }
-            }
-        },
+        ...buildVoteLookupStages("blogpost", req.user?._id),
         ...discussionLookupStages
     ]);
 
@@ -382,28 +444,7 @@ const homePagePostsDisplay = asyncHandler(async (req, res) => {
                 ]
             }
         },
-        {
-            $lookup: {
-                from: "likes",
-                localField: "_id",
-                foreignField: "image",
-                as: "likes"
-            }
-        }, 
-        {
-            $addFields: {
-                isLiked: {
-                    $cond: {
-                        if: {$in: [req.user?._id, "$likes.likedBy"]},
-                        then: true,
-                        else: false
-                    }
-                },
-                likesCount: {
-                    $size: "$likes"
-                }
-            }
-        },
+        ...buildVoteLookupStages("image", req.user?._id),
         ...discussionLookupStages
     ]);
     const videoPosts = await VideoPost.aggregate([
@@ -424,28 +465,7 @@ const homePagePostsDisplay = asyncHandler(async (req, res) => {
                 ]
             }
         },
-        {
-            $lookup: {
-                from: "likes",
-                localField: "_id",
-                foreignField: "video",
-                as: "likes"
-            }
-        }, 
-        {
-            $addFields: {
-                isLiked: {
-                    $cond: {
-                        if: {$in: [req.user?._id, "$likes.likedBy"]},
-                        then: true,
-                        else: false
-                    }
-                },
-                likesCount: {
-                    $size: "$likes"
-                }
-            }
-        },
+        ...buildVoteLookupStages("video", req.user?._id),
         ...discussionLookupStages
     ]);
     //combining the posts
@@ -456,10 +476,11 @@ const homePagePostsDisplay = asyncHandler(async (req, res) => {
     
     res
     .status(201)
-    .json({"done":allPosts})
+    .json({"done":allPosts.slice(offset, offset + limit),"pagination":buildPagination(allPosts.length, limit, offset)})
 })
 
 const videosDisplay = asyncHandler(async (req, res) => {
+    const { limit, offset } = parsePagination(req.body, 5);
     const videoPosts = await VideoPost.aggregate([
         {
             $lookup: {
@@ -478,6 +499,7 @@ const videosDisplay = asyncHandler(async (req, res) => {
                 ]
             }
         },
+        ...buildVoteLookupStages("video", req.user?._id),
         ...discussionLookupStages
     ]);
     //combining the posts
@@ -488,10 +510,11 @@ const videosDisplay = asyncHandler(async (req, res) => {
     
     res
     .status(201)
-    .json({"done":allPosts})
+    .json({"done":allPosts.slice(offset, offset + limit),"pagination":buildPagination(allPosts.length, limit, offset)})
 })
 
 const blogsDisplay = asyncHandler(async (req, res) => {
+    const { limit, offset } = parsePagination(req.body, 5);
 
     const blogPosts = await BlogPost.aggregate([
         {
@@ -511,6 +534,7 @@ const blogsDisplay = asyncHandler(async (req, res) => {
                 ]
             }
         },
+        ...buildVoteLookupStages("blogpost", req.user?._id),
         ...discussionLookupStages
     ]);
 
@@ -521,10 +545,11 @@ const blogsDisplay = asyncHandler(async (req, res) => {
 
     res
     .status(201)
-    .json({"done":allPosts})
+    .json({"done":allPosts.slice(offset, offset + limit),"pagination":buildPagination(allPosts.length, limit, offset)})
 })
 
 const imagesDisplay = asyncHandler(async (req, res) => {
+    const { limit, offset } = parsePagination(req.body, 5);
     const imagePosts = await ImagePost.aggregate([
         {
             $lookup: {
@@ -543,6 +568,7 @@ const imagesDisplay = asyncHandler(async (req, res) => {
                 ]
             }
         },
+        ...buildVoteLookupStages("image", req.user?._id),
         ...discussionLookupStages
     ]);
 
@@ -552,11 +578,12 @@ const imagesDisplay = asyncHandler(async (req, res) => {
     allPosts.sort((a, b) => b.createdAt - a.createdAt);
     res
     .status(201)
-    .json({"done":allPosts})
+    .json({"done":allPosts.slice(offset, offset + limit),"pagination":buildPagination(allPosts.length, limit, offset)})
 })
 
 /*user profile display of posts*/
 const getUsersPosts = asyncHandler(async (req, res) => {
+    const { limit, offset } = parsePagination(req.query, 5);
 
     const { username } = req.params
 
@@ -587,6 +614,7 @@ const getUsersPosts = asyncHandler(async (req, res) => {
                 ]
             }
         },
+        ...buildVoteLookupStages("blogpost", req.user?._id),
         ...discussionLookupStages
     ]);
 
@@ -613,6 +641,7 @@ const getUsersPosts = asyncHandler(async (req, res) => {
                 ]
             }
         },
+        ...buildVoteLookupStages("image", req.user?._id),
         ...discussionLookupStages
     ]);
     const videoPosts = await VideoPost.aggregate([
@@ -638,6 +667,7 @@ const getUsersPosts = asyncHandler(async (req, res) => {
                 ]
             }
         },
+        ...buildVoteLookupStages("video", req.user?._id),
         ...discussionLookupStages
     ]);
     //combining the posts
@@ -647,10 +677,11 @@ const getUsersPosts = asyncHandler(async (req, res) => {
     
     res
     .status(201)
-    .json({"done":allPosts})
+    .json({"done":allPosts.slice(offset, offset + limit),"pagination":buildPagination(allPosts.length, limit, offset)})
 })
 /*user profile display of image only*/
 const getUserimagesDisplay = asyncHandler(async (req, res) => {
+    const { limit, offset } = parsePagination(req.query, 5);
     const { username } = req.params
 
     const user = await User.findOne({
@@ -680,6 +711,7 @@ const getUserimagesDisplay = asyncHandler(async (req, res) => {
                 ]
             }
         },
+        ...buildVoteLookupStages("blogpost", req.user?._id),
         ...discussionLookupStages
     ]);
 
@@ -689,10 +721,11 @@ const getUserimagesDisplay = asyncHandler(async (req, res) => {
     allPosts.sort((a, b) => b.createdAt - a.createdAt);
     res
     .status(201)
-    .json({"done":allPosts})
+    .json({"done":allPosts.slice(offset, offset + limit),"pagination":buildPagination(allPosts.length, limit, offset)})
 })
 /*user profile display of video only*/
 const getUserVideosDisplay = asyncHandler(async (req, res) => {
+    const { limit, offset } = parsePagination(req.query, 5);
     const { username } = req.params
 
     const user = await User.findOne({
@@ -731,10 +764,11 @@ const getUserVideosDisplay = asyncHandler(async (req, res) => {
     
     res
     .status(201)
-    .json({"done":allPosts})
+    .json({"done":allPosts.slice(offset, offset + limit),"pagination":buildPagination(allPosts.length, limit, offset)})
 })
 /*user profile display of blogs only*/
 const getUserblogsDisplay = asyncHandler(async (req, res) => {
+    const { limit, offset } = parsePagination(req.query, 5);
     const { username } = req.params
 
     const user = await User.findOne({
@@ -774,7 +808,7 @@ const getUserblogsDisplay = asyncHandler(async (req, res) => {
 
     res
     .status(201)
-    .json({"done":allPosts})
+    .json({"done":allPosts.slice(offset, offset + limit),"pagination":buildPagination(allPosts.length, limit, offset)})
 })
 
 export {
