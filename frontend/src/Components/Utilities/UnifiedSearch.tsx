@@ -169,17 +169,18 @@ export default function UnifiedSearch<T>({
   };
 
   const wrapperClasses =
-    variant === "header"
-      ? "w-full max-w-2xl mx-auto"
-      : "w-full";
+    variant === "header" ? "w-full max-w-2xl mx-auto" : "w-full";
 
   const shellClasses =
     variant === "header"
-      ? "field-subtle hover:bg-[#1b2742] focus-within:bg-[#1b2742] rounded-3xl"
-      : "field-subtle focus-within:bg-[#1b2742] rounded-3xl";
+      ? "field-subtle hover:bg-[#1b2742] focus-within:bg-[#1b2742] rounded-xl"
+      : "field-subtle focus-within:bg-[#1b2742] rounded-xl";
 
   return (
-    <div ref={containerRef} className={`${wrapperClasses} ${containerClassName}`}>
+    <div
+      ref={containerRef}
+      className={`${wrapperClasses} ${containerClassName}`}
+    >
       <div className={`relative transition-all duration-200 ${shellClasses}`}>
         <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
           <i className="fa-solid fa-magnifying-glass text-slate-500 text-sm"></i>

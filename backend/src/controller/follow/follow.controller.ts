@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { asyncHandler } from "../../utils/response/asyncHandler";
-import { Follow } from "../../model/follow.model.js";
+import { Follow } from "../../model/follow.model";
 import { ApiResponse } from "../../utils/response/ApiResponse";
 
 const requestFollow = asyncHandler(async (req,res) => {

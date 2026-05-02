@@ -6,6 +6,7 @@ import commentRouter from "./comment/comment.route";
 import likeRouter from "./like/like.route";
 import envRouter from "./env/env.route";
 import searchRouter from "./search/search.route";
+import viewRouter from "./view/view.route";
 
 export const initializeRoutes = (app: Express) => {
   app.use("/api/v1/users", userRouter);
@@ -15,4 +16,5 @@ export const initializeRoutes = (app: Express) => {
   app.use("/api/v1/like", likeRouter);
   app.use("/api/v1/env", envRouter);
   app.use("/api/v1/search", searchRouter);
+  app.use("/api/v1/view", viewRouter);
 };

@@ -5,7 +5,12 @@ import SearchBar from "./Utilities/SearchBar";
 import PageLoader from "./Common/PageLoader";
 import ImageWithFallback from "./Common/ImageWithFallback";
 import { useSearchQuery } from "../hooks/useSearchQuery";
-import { SearchPost, SearchScope, SearchPerson, SearchSpace } from "../types/search";
+import {
+  SearchPost,
+  SearchScope,
+  SearchPerson,
+  SearchSpace,
+} from "../types/search";
 import { SEARCH_SCOPE_OPTIONS, getSearchResultHref } from "../utils/search";
 import InfiniteLoader from "./Common/InfiniteLoader";
 
@@ -34,7 +39,7 @@ export default function SearchResults() {
         <SearchBar />
 
         <div className="max-w-4xl mx-auto w-full px-4 py-6 space-y-8">
-          <div className="rounded-3xl border border-[#1f2e47] bg-[#111827] p-6">
+          <div className="rounded-xl border border-[#1f2e47] bg-[#111827] p-6">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-indigo-400">
               Search
             </p>
@@ -60,8 +65,9 @@ export default function SearchResults() {
           {isSearching ? (
             <PageLoader />
           ) : !query ? (
-            <div className="rounded-3xl border border-[#1f2e47] bg-[#0d1424] px-6 py-16 text-center text-slate-500">
-              Enter a search term in the header to explore people, spaces, and posts.
+            <div className="rounded-xl border border-[#1f2e47] bg-[#0d1424] px-6 py-16 text-center text-slate-500">
+              Enter a search term in the header to explore people, spaces, and
+              posts.
             </div>
           ) : (
             <>
@@ -157,7 +163,9 @@ export default function SearchResults() {
                           {post.title || post.description || "Open post"}
                         </p>
                         <p className="mt-1 text-xs text-slate-500">
-                          {post.author?.fullname || post.author?.username || "Unknown author"}
+                          {post.author?.fullname ||
+                            post.author?.username ||
+                            "Unknown author"}
                         </p>
                         {post.description && post.title ? (
                           <p className="mt-2 line-clamp-2 text-sm text-slate-400">
@@ -177,11 +185,13 @@ export default function SearchResults() {
                 label="Loading more results..."
               />
 
-              {people.length === 0 && spaces.length === 0 && posts.length === 0 && (
-                <div className="rounded-3xl border border-[#1f2e47] bg-[#0d1424] px-6 py-16 text-center text-slate-500">
-                  No results found for "{query}".
-                </div>
-              )}
+              {people.length === 0 &&
+                spaces.length === 0 &&
+                posts.length === 0 && (
+                  <div className="rounded-xl border border-[#1f2e47] bg-[#0d1424] px-6 py-16 text-center text-slate-500">
+                    No results found for "{query}".
+                  </div>
+                )}
             </>
           )}
         </div>

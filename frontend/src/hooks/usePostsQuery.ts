@@ -1,4 +1,4 @@
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { envService } from '../services/env.service';
 import { flattenInfiniteItems, getNextOffset } from './infiniteQueryUtils';
 import { postService } from '../services/post.service';
@@ -111,4 +111,15 @@ export const useEnvironmentPostsQuery = (envname: string, filter: FilterType, en
         }
       : undefined,
   };
+};
+
+export const useSinglePostQuery = (postId: string, enabled = true) => {
+  return useQuery({
+    queryKey: queryKeys.singlePost(postId),
+    queryFn: async () => {
+      const response = await postService.getPostById(postId);
+      return response.data.data;
+    },
+    enabled: enabled && !!postId,
+  });
 };

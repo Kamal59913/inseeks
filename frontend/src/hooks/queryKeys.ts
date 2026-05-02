@@ -10,4 +10,5 @@ export const queryKeys = {
   profile: (username: string) => ['profile', username] as const,
   comments: (postId: string) => ['comments', postId] as const,
   vote: (type: string, id: string) => ['vote', type, id] as const,
+  singlePost: (postId: string) => ['post', postId] as const,
 };

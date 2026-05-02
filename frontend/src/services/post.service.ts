@@ -94,4 +94,9 @@ export const postService = {
   },
 
   likePost: (postId: string) => apiClient.post(`/createpost/like/${postId}`),
+
+  recordView: (postId: string, postType: string) =>
+    apiClient.post(`/view/${postId}`, { postType }),
+
+  getPostById: (postId: string) => apiClient.get(`/createpost/getpost/${postId}`),
 };

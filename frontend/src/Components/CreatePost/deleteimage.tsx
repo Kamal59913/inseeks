@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PulseLoader from 'react-spinners/PulseLoader';
 import { useAppForm } from '../../hooks/useAppForm';
-import { deleteAvatarSchema } from '../../utils/formSchemas';
+import { deleteAvatarSchema } from '../../validations/schemas/profile.schema';
 import { useModalData } from '../../store/hooks';
 import AppModal from '../Modal/AppModal';
 import { userService } from '../../services/user.service';

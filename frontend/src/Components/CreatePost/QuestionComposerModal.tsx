@@ -3,7 +3,7 @@ import { useController } from "react-hook-form";
 import PulseLoader from "react-spinners/PulseLoader";
 import AppModal from "../Modal/AppModal";
 import { useAppForm } from "../../hooks/useAppForm";
-import { postQuestionSchema } from "../../utils/formSchemas";
+import { postQuestionSchema } from "../../validations/schemas/post.schema";
 import { preprocessTrimmedFormData } from "../../utils/formValidation";
 import { FormField, FormTextarea } from "../Common/FormFields";
 import { useModalData } from "../../store/hooks";
@@ -247,7 +247,7 @@ export default function QuestionComposerModal({
               name="title"
               label="Question title"
               placeholder="What do you need help with?"
-              maxLength={120}
+              maxLength={121}
               disabled={isSubmitting}
             />
             <FormTextarea
@@ -256,7 +256,7 @@ export default function QuestionComposerModal({
               label="Context"
               placeholder="Describe the problem, expected result, and what you've already tried."
               rows={6}
-              maxLength={500}
+              maxLength={501}
               disabled={isSubmitting}
             />
           </div>

@@ -16,6 +16,7 @@ import Environments from "../Components/Pages/environments";
 import EnvSpecificHomePage from "../Components/Pages/envSpecificHomePage";
 import Messages from "../Components/messages";
 import ForgotPassword from "../Components/AuthenticationPages/ForgotPassword";
+import SinglePostPage from "../Components/Pages/SinglePostPage";
 
 export const routes: RouteObject[] = [
   {

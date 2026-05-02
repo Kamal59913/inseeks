@@ -1,13 +1,13 @@
 // @ts-nocheck
 import { asyncHandler } from "../../utils/response/asyncHandler";
 import { ApiResponse } from "../../utils/response/ApiResponse";
-import { Env } from "../../model/env.model.js";
-import { uploadOnCloudinary } from "../../utils/cloudinary.js";
+import { Env } from "../../model/env.model";
+import { uploadOnCloudinary } from "../../utils/cloudinary";
 import { ApiError } from "../../utils/response/ApiError";
-import { Joins } from "../../model/joins.model.js";
-import { BlogPost } from "../../model/blogpost.model.js";
-import { VideoPost } from "../../model/videopost.model.js";
-import { ImagePost } from "../../model/imagepost.model.js";
+import { Joins } from "../../model/joins.model";
+import { BlogPost } from "../../model/blogpost.model";
+import { VideoPost } from "../../model/videopost.model";
+import { ImagePost } from "../../model/imagepost.model";
 
 const parsePagination = (req, fallbackLimit = 8) => {
      const parsedLimit = Number.parseInt(req.query.limit, 10)

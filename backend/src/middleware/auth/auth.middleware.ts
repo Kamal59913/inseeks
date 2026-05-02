@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import { config } from "dotenv";
 import { Request, Response, NextFunction } from "express";
-import { User } from "../../model/user.model.js";
+import { User } from "../../model/user.model";
 import { ApiError } from "../../utils/response/ApiError";
 import { asyncHandler } from "../../utils/response/asyncHandler";
 

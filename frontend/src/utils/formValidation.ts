@@ -50,6 +50,7 @@ const stringField = (
         minimum: min,
         inclusive: true,
         type: "string",
+        origin: "string",
         message: `${buildLengthMessage(label, type)} with at least ${min} characters`,
       });
     }
@@ -60,6 +61,7 @@ const stringField = (
         maximum: max,
         inclusive: true,
         type: "string",
+        origin: "string",
         message: `${buildLengthMessage(label, type)} with no more than ${max} characters`,
       });
     }

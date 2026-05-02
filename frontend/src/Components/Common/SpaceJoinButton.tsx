@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useJoinEnvironmentMutation } from '../../hooks/useEnvironmentQuery';
+import Button from './Button';
 
 interface SpaceJoinButtonProps {
   title: string;
@@ -49,8 +50,10 @@ export default function SpaceJoinButton({
   };
 
   return (
-    <button
-      type="button"
+    <Button
+      variant="custom"
+      size="none"
+      borderRadius=""
       onClick={handleClick}
       disabled={joinMutation.isPending}
       className={`${className} ${
@@ -58,6 +61,6 @@ export default function SpaceJoinButton({
       } ${joinMutation.isPending ? 'cursor-not-allowed opacity-70' : ''}`}
     >
       {isJoined ? joinedLabel : unjoinedLabel}
-    </button>
+    </Button>
   );
 }

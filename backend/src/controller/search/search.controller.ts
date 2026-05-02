@@ -1,13 +1,13 @@
 // @ts-nocheck
 import { asyncHandler } from "../../utils/response/asyncHandler";
 import { ApiResponse } from "../../utils/response/ApiResponse";
-import { User } from "../../model/user.model.js";
-import { Env } from "../../model/env.model.js";
-import { BlogPost } from "../../model/blogpost.model.js";
-import { ImagePost } from "../../model/imagepost.model.js";
-import { VideoPost } from "../../model/videopost.model.js";
-import { Follow } from "../../model/follow.model.js";
-import { Joins } from "../../model/joins.model.js";
+import { User } from "../../model/user.model";
+import { Env } from "../../model/env.model";
+import { BlogPost } from "../../model/blogpost.model";
+import { ImagePost } from "../../model/imagepost.model";
+import { VideoPost } from "../../model/videopost.model";
+import { Follow } from "../../model/follow.model";
+import { Joins } from "../../model/joins.model";
 
 const SEARCH_SCOPES = ["all", "people", "spaces", "posts"];
 

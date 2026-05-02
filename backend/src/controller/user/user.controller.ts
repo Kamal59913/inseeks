@@ -1,8 +1,8 @@
 // @ts-nocheck
 import { asyncHandler } from "../../utils/response/asyncHandler";
 import { ApiError } from "../../utils/response/ApiError";
-import { User } from "../../model/user.model.js";
-import { uploadOnCloudinary } from "../../utils/cloudinary.js";
+import { User } from "../../model/user.model";
+import { uploadOnCloudinary } from "../../utils/cloudinary";
 import { ApiResponse } from "../../utils/response/ApiResponse";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";

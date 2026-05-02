@@ -39,7 +39,7 @@ interface EmptyStateProps {
 
 function EmptyState({ icon, title, description }: EmptyStateProps) {
   return (
-    <div className="rounded-3xl bg-[#0d1424] px-6 py-20 text-center text-slate-500">
+    <div className="rounded-xl bg-[#0d1424] px-6 py-20 text-center text-slate-500">
       <i className={`${icon} mb-4 text-5xl text-slate-600`}></i>
       <p className="text-base font-medium text-slate-300">{title}</p>
       <p className="mt-2 text-sm">{description}</p>
@@ -51,7 +51,7 @@ function UserCard({ user, fallbackAvatar, mode }: UserCardProps) {
   const isConnected = mode === "connected";
 
   return (
-    <div className="rounded-3xl bg-[#111827] p-5 transition-all duration-200 hover:border-indigo-500/30 hover:bg-[#131d31]">
+    <div className="rounded-xl bg-[#111827] p-5 transition-all duration-200 hover:border-indigo-500/30 hover:bg-[#131d31]">
       <div className="flex items-start gap-4">
         <Link to={`/user/${user.username}`} className="shrink-0">
           <ImageWithFallback
@@ -120,24 +120,21 @@ export default function MyFriends() {
     fetchNextPage: fetchNextDiscoverPage,
     hasNextPage: hasNextDiscoverPage,
     isFetchingNextPage: isFetchingNextDiscoverPage,
-  } =
-    useUnfollowedUsersQuery();
+  } = useUnfollowedUsersQuery();
   const {
     data: connectedData,
     isLoading: isConnectedLoading,
     fetchNextPage: fetchNextConnectedPage,
     hasNextPage: hasNextConnectedPage,
     isFetchingNextPage: isFetchingNextConnectedPage,
-  } =
-    useFollowedUsersQuery();
+  } = useFollowedUsersQuery();
   const {
     data: suggestionResults,
     isFetching: isSuggestionsLoading,
     fetchNextPage: fetchNextSuggestionPage,
     hasNextPage: hasNextSuggestionPage,
     isFetchingNextPage: isFetchingNextSuggestionPage,
-  } =
-    useSearchQuery(recommendationQuery, "people", 6);
+  } = useSearchQuery(recommendationQuery, "people", 6);
   const isNetworkLoading = isDiscoverLoading || isConnectedLoading;
 
   const recommendations = suggestionResults?.people || [];
@@ -177,7 +174,7 @@ export default function MyFriends() {
         <SearchBar />
 
         <div className="mx-auto w-full max-w-5xl px-4 py-6">
-          <div className="mb-8 rounded-3xl bg-gradient-to-r from-[#10192b] via-[#0d1424] to-[#111827] p-8">
+          <div className="mb-8 rounded-xl bg-gradient-to-r from-[#10192b] via-[#0d1424] to-[#111827] p-8">
             <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] text-indigo-400">
@@ -290,12 +287,12 @@ export default function MyFriends() {
             <>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
                 {filteredUsers.map((user) => (
-                <UserCard
-                  key={user._id}
-                  user={user}
-                  fallbackAvatar={fallbackAvatar}
-                  mode={activeTab}
-                />
+                  <UserCard
+                    key={user._id}
+                    user={user}
+                    fallbackAvatar={fallbackAvatar}
+                    mode={activeTab}
+                  />
                 ))}
               </div>
               {!search.trim() ? (

@@ -3,10 +3,10 @@ import mongoose from "mongoose";
 import { asyncHandler } from "../../utils/response/asyncHandler";
 import { ApiResponse } from "../../utils/response/ApiResponse";
 import { ApiError } from "../../utils/response/ApiError";
-import { Likes } from "../../model/likes.model.js";
+import { Likes } from "../../model/likes.model";
 import { getIO } from "../../socket/socketconnect";
-import { CommentPost } from "../../model/comment.model.js";
-import { User } from "../../model/user.model.js";
+import { CommentPost } from "../../model/comment.model";
+import { User } from "../../model/user.model";
 
 const SUPPORTED_TYPES = ["image", "video", "blogpost", "comment"];
 const SUPPORTED_VOTES = ["upvote", "downvote"];

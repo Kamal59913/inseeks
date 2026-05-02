@@ -28,7 +28,7 @@
     "src/middleware/auth/auth.middleware.ts",
     "src/middleware/error/errorHandler.ts",
     "src/middleware/upload/upload.middleware.ts",
-    "src/model/**/*.js",
+    "src/model/**/*.ts",
     "src/routes/index.ts",
     "src/routes/user/**/*",
     "src/routes/createpost/**/*",
@@ -38,7 +38,7 @@
     "src/routes/env/**/*",
     "src/socket/**/*",
     "src/utils/response/**/*",
-    "src/utils/cloudinary.js"
+    "src/utils/cloudinary.ts"
   ],
   "exclude": ["node_modules"]
 }

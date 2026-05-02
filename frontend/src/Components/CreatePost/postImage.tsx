@@ -1,5 +1,5 @@
 import React from 'react';
-import QuestionComposerModal from './QuestionComposerModal';
+import ImagePostComposerModal from './ImagePostComposerModal';
 
 interface PostImagesProps {
   modalId: string;
@@ -10,5 +10,5 @@ interface PostImagesProps {
 }
 
 export function PostImages({ modalId, data }: PostImagesProps) {
-  return <QuestionComposerModal modalId={modalId} data={{ ...data, preset: 'image' }} />;
+  return <ImagePostComposerModal modalId={modalId} data={data} />;
 }

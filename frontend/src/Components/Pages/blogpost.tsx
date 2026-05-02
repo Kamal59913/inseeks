@@ -25,6 +25,7 @@ export default function BlogPost({ modalId, data }: BlogPostProps) {
       <RIGHTCOMMENTBAR
         currentUser={temp.currentUser}
         currentPostId={temp.postId}
+        postType={temp.type}
         summaryText={summaryText}
       />
     </AppModal>

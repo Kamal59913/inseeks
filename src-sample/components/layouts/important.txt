@@ -1,0 +1,190 @@
+
+  const handleFormSubmitPopUp = async () => {
+    const isValid = await formMethods.trigger();
+    
+    if (!isValid) {
+      const errors = formMethods.formState.errors;
+      
+      // Define contact page fields
+      const contactFields = ['whatsapp', 'email', 'text', 'isWhatsApp', 'isEmail', 'isText'];
+      
+      // Check if any contact field has errors
+      const hasContactErrors = contactFields.some(field => errors[field as keyof typeof errors]);
+      
+      if (hasContactErrors) {
+        router.push('/profile/contact');
+        ToastService.error("Please fix errors in Contact section");
+      } else {
+        router.push('/profile/information');
+        ToastService.error("Please fix errors in Information section");
+      }
+      return;
+    }
+  }
+
+
+
+   const handleFormSubmitPopUp = async () => {
+    const isValid = await formMethods.trigger();
+
+    if (!isValid) {
+      const errors = formMethods.formState.errors;
+
+      const contactFields = [
+        "whatsapp",
+        "email",
+        "text",
+        "isWhatsApp",
+        "isEmail",
+        "isText",
+      ];
+      const hasContactErrors = contactFields.some(
+        (field) => errors[field as keyof typeof errors]
+      );
+
+      const infoFields = ["firstName", "lastName", "profileUrl", "bio"];
+      const hasInfoErrors = infoFields.some(
+        (field) => errors[field as keyof typeof errors]
+      );
+
+      if (hasInfoErrors && pathname !== "/profile/information") {
+        router.push("/profile/information");
+      } else if (hasContactErrors && pathname !== "/profile/contact") {
+        router.push("/profile/contact");
+      } else {
+      }
+      return;
+    }
+
+    open("submit-confirmation", {
+      title: "Are you sure you want to submit this form?",
+      description: "",
+      action: async () => {
+        const formData = formMethods.getValues();
+        await handleFormSubmit(formData);
+        close();
+      },
+    });
+  };
+
+
+
+  const handleFormSubmitPopUp = async () => {
+  const isValid = await formMethods.trigger();
+  
+  if (!isValid) {
+    const errors = formMethods.formState.errors;
+    
+    // Define fields for each page
+    const informationFields = ['firstName', 'lastName', 'profileUrl', 'bio'];
+    const contactFields = ['whatsapp', 'email', 'text', 'isWhatsApp', 'isEmail', 'isText'];
+    
+    // Check current page for errors
+    const isOnInformationPage = pathname === '/profile/information';
+    const isOnContactPage = pathname === '/profile/contact';
+    
+    if (isOnInformationPage) {
+      // Check if current page (Information) has errors
+      const hasCurrentPageErrors = informationFields.some(
+        field => errors[field as keyof typeof errors]
+      );
+      
+      if (hasCurrentPageErrors) {
+        ToastService.error("Please fix errors on this page first");
+        return; // Stay on current page
+      }
+      
+      // Current page is valid, check if Contact has errors
+      const hasContactErrors = contactFields.some(
+        field => errors[field as keyof typeof errors]
+      );
+      
+      if (hasContactErrors) {
+        router.push('/profile/contact');
+        ToastService.error("Please fix errors in Contact section");
+        return;
+      }
+    }
+    
+    if (isOnContactPage) {
+      // Check if current page (Contact) has errors
+      const hasCurrentPageErrors = contactFields.some(
+        field => errors[field as keyof typeof errors]
+      );
+      
+      if (hasCurrentPageErrors) {
+        ToastService.error("Please fix errors on this page first");
+        return; // Stay on current page
+      }
+      
+      // Current page is valid, check if Information has errors
+      const hasInfoErrors = informationFields.some(
+        field => errors[field as keyof typeof errors]
+      );
+      
+      if (hasInfoErrors) {
+        router.push('/profile/information');
+        ToastService.error("Please fix errors in Information section");
+        return;
+      }
+    }
+    
+    return;
+  }
+
+  // All validations passed, show confirmation modal
+  open("submit-confirmation", {
+    title: "Are you sure you want to submit this form?",
+    description: "",
+    action: async () => {
+      const formData = formMethods.getValues();
+      await handleFormSubmit(formData);
+      close();
+    },
+  });
+};
+
+
+const handleFormSubmitPopUp = async () => {
+  const isValid = await formMethods.trigger();
+  
+  if (!isValid) {
+    const errors = formMethods.formState.errors;
+    
+    const pageFieldMap = {
+      '/profile/information': ['firstName', 'lastName', 'profileUrl', 'bio'],
+      '/profile/contact': ['whatsapp', 'email', 'text', 'isWhatsApp', 'isEmail', 'isText'],
+    };
+    
+    const currentPageFields = pageFieldMap[pathname as keyof typeof pageFieldMap] || [];
+    
+    const hasCurrentPageErrors = currentPageFields.some(
+      field => errors[field as keyof typeof errors]
+    );
+    
+    if (hasCurrentPageErrors) {
+      return;
+    }
+    
+    const pageWithErrors = Object.entries(pageFieldMap).find(([path, fields]) => {
+      if (path === pathname) return false;
+      return fields.some(field => errors[field as keyof typeof errors]);
+    });
+    
+    if (pageWithErrors) {
+      router.push(pageWithErrors[0]);
+    }
+    
+    return;
+  }
+
+  open("submit-confirmation", {
+    title: "Are you sure you want to submit this form?",
+    description: "",
+    action: async () => {
+      const formData = formMethods.getValues();
+      await handleFormSubmit(formData);
+      close();
+    },
+  });
+};

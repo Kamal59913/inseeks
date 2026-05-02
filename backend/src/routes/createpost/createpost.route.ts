@@ -9,7 +9,8 @@ import { createPost,
          getUsersPosts,
          getUserimagesDisplay,
          getUserVideosDisplay,
-         getUserblogsDisplay
+         getUserblogsDisplay,
+         getPostById
         } from "../../controller/createpost/createpost.controller";
 import { upload } from "../../middleware/upload/upload.middleware";
 import { auth } from "../../middleware/auth/auth.middleware";
@@ -38,5 +39,8 @@ router.route("/getalluserposts/:username").get(auth, getUsersPosts)
 router.route("/getuserposts/images/:username").get(auth, getUserimagesDisplay)
 router.route("/getuserposts/videos/:username").get(auth, getUserVideosDisplay)
 router.route("/getuserposts/blogs/:username").get(auth, getUserblogsDisplay)
+
+/* single post fetch */
+router.route("/getpost/:postId").get(auth, getPostById)
 
 export default router;

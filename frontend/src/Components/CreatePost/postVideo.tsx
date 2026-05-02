@@ -7,5 +7,5 @@ interface PostVideoProps {
 }
 
 export function PostVideo({ modalId, data }: PostVideoProps) {
-  return <QuestionComposerModal modalId={modalId} data={{ ...data, preset: 'video' }} />;
+  return <QuestionComposerModal modalId={modalId} data={data} />;
 }

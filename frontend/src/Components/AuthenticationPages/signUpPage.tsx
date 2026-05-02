@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { FormField } from '../Common/FormFields';
 import { PasswordField } from '../Common/PasswordField';
+import Button from '../Common/Button';
 import { useAppForm } from '../../hooks/useAppForm';
-import { signUpSchema } from '../../utils/formSchemas';
+import { signUpSchema } from '../../validations/schemas/auth.schema';
+import { PASSWORD_POLICY_CONFIG } from '../../config/config';
 import { preprocessTrimmedFormData } from '../../utils/formValidation';
 import { authService } from '../../services/auth.service';
 
@@ -128,7 +130,7 @@ export default function SignUpPage({ togglepage }: SignUpPageProps) {
                 name="fullname"
                 label="Full Name"
                 placeholder="John Doe"
-                maxLength={80}
+                maxLength={101}
                 disabled={loading || success}
               />
               <FormField
@@ -136,7 +138,7 @@ export default function SignUpPage({ togglepage }: SignUpPageProps) {
                 name="username"
                 label="Username"
                 placeholder="johndoe"
-                maxLength={40}
+                maxLength={101}
                 disabled={loading || success}
               />
             </div>
@@ -147,7 +149,7 @@ export default function SignUpPage({ togglepage }: SignUpPageProps) {
               label="Email"
               placeholder="you@example.com"
               type="email"
-              maxLength={150}
+              maxLength={151}
               disabled={loading || success}
             />
 
@@ -156,26 +158,19 @@ export default function SignUpPage({ togglepage }: SignUpPageProps) {
               name="password"
               label="Password"
               placeholder="Create a strong password"
-              maxLength={64}
+              maxLength={PASSWORD_POLICY_CONFIG.INPUT_MAX_LENGTH}
               disabled={loading || success}
             />
 
-            <button
+            <Button
               type="submit"
-              disabled={loading || success}
-              className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-800 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2"
+              loadingState={loading}
+              disabled={success}
+              className="w-full py-3"
+              endIcon={<i className="fa-solid fa-arrow-right text-sm"></i>}
             >
-              {loading ? (
-                <>
-                  <i className="fa-solid fa-circle-notch fa-spin"></i> Creating account…
-                </>
-              ) : (
-                <>
-                  <span>Create Account</span>
-                  <i className="fa-solid fa-arrow-right text-sm"></i>
-                </>
-              )}
-            </button>
+              Create Account
+            </Button>
           </form>
 
           <div className="relative">
@@ -193,25 +188,28 @@ export default function SignUpPage({ togglepage }: SignUpPageProps) {
               { icon: 'fa-github', label: 'GitHub' },
               { icon: 'fa-twitter', label: 'Twitter' },
             ].map((s) => (
-              <button
+              <Button
                 key={s.label}
- className="flex items-center justify-center gap-2 bg-[#111827] text-slate-300 py-2.5 rounded-xl text-sm font-medium transition-all"
+                variant="custom"
+                className="flex items-center justify-center gap-2 bg-[#111827] text-slate-300 py-2.5 rounded-xl text-sm font-medium"
               >
                 <i className={`fa-brands ${s.icon}`}></i>
                 <span className="hidden sm:inline text-xs">{s.label}</span>
-              </button>
+              </Button>
             ))}
           </div>
 
           <p className="text-center text-sm text-slate-400">
             Already have an account?{' '}
-            <button
-              type="button"
+            <Button
+              variant="custom"
+              size="none"
+              borderRadius=""
               onClick={togglepage}
-              className="text-indigo-400 hover:text-indigo-300 font-semibold transition-colors"
+              className="text-indigo-400 hover:text-indigo-300 font-semibold transition-colors inline"
             >
               Sign in
-            </button>
+            </Button>
           </p>
         </div>
       </div>

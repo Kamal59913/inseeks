@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import LeftBar from '../Utilities/LeftBar';
 import SearchBar from '../Utilities/SearchBar';
 import { FormField, FormTextarea } from '../Common/FormFields';
+import Button from '../Common/Button';
 import { useAppForm } from '../../hooks/useAppForm';
-import { profileSettingsSchema } from '../../utils/formSchemas';
+import { profileSettingsSchema } from '../../validations/schemas/profile.schema';
 import { preprocessTrimmedFormData } from '../../utils/formValidation';
 import { useModalData } from '../../store/hooks';
 import ImageWithFallback from '../Common/ImageWithFallback';
@@ -91,26 +92,26 @@ function MyProfileSettings() {
                 </div>
 
                 <div className="flex items-center gap-2 pb-1">
-                  <button
-                    type="button"
+                  <Button
                     onClick={() =>
                       modal.open('replace-avatar', { onComplete: toggleForProfileImageFetch })
                     }
-                    className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-all"
+                    size="sm"
+                    startIcon={<i className="fa-solid fa-arrow-up-from-bracket text-xs"></i>}
                   >
-                    <i className="fa-solid fa-arrow-up-from-bracket text-xs"></i>
                     Replace
-                  </button>
-                  <button
-                    type="button"
+                  </Button>
+                  <Button
+                    variant="custom"
+                    size="icon"
                     onClick={() =>
                       modal.open('delete-avatar', { onComplete: toggleForProfileImageFetch })
                     }
-                    className="flex items-center justify-center h-9 w-9 bg-transparent border border-red-500/30 hover:border-red-500/60 hover:bg-red-500/10 text-red-400 rounded-xl transition-all"
+                    className="flex items-center justify-center h-9 w-9 bg-transparent border border-red-500/30 hover:border-red-500/60 hover:bg-red-500/10 text-red-400"
                     title="Remove Photo"
                   >
                     <i className="fa-regular fa-trash-can text-xs"></i>
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>
@@ -127,14 +128,14 @@ function MyProfileSettings() {
                   name="fullname"
                   label="Full Name"
                   placeholder="Full name"
-                  maxLength={80}
+                  maxLength={101}
                 />
                 <FormField
                   control={control}
                   name="username"
                   label="Username"
                   placeholder="username"
-                  maxLength={40}
+                  maxLength={101}
                 />
               </div>
               <FormField
@@ -143,7 +144,7 @@ function MyProfileSettings() {
                 label="Email"
                 type="email"
                 placeholder="email@example.com"
-                maxLength={150}
+                maxLength={151}
               />
               <FormTextarea
                 control={control}
@@ -151,17 +152,17 @@ function MyProfileSettings() {
                 label="About"
                 rows={4}
                 placeholder="Tell us about yourself..."
-                maxLength={280}
+                maxLength={281}
               />
 
               <div className="flex items-center justify-end pt-4">
-                <button
+                <Button
                   type="submit"
-                  className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-8 py-2.5 rounded-xl transition-all duration-200 min-w-[160px] justify-center"
+                  className="px-8 py-2.5 min-w-[160px]"
+                  startIcon={buttonname === 'Saved! ✓' ? <i className="fa-solid fa-check text-xs"></i> : undefined}
                 >
-                  {buttonname === 'Saved! ✓' && <i className="fa-solid fa-check text-xs"></i>}
                   {buttonname}
-                </button>
+                </Button>
               </div>
             </form>
           </div>

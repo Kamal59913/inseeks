@@ -1,12 +1,12 @@
 // @ts-nocheck
 import { ApiError } from "../../utils/response/ApiError";
 import { asyncHandler } from "../../utils/response/asyncHandler";
-import { BlogPost } from "../../model/blogpost.model.js";
-import { VideoPost } from "../../model/videopost.model.js";
-import { ImagePost } from "../../model/imagepost.model.js";
-import { uploadOnCloudinary } from "../../utils/cloudinary.js";
+import { BlogPost } from "../../model/blogpost.model";
+import { VideoPost } from "../../model/videopost.model";
+import { ImagePost } from "../../model/imagepost.model";
+import { uploadOnCloudinary } from "../../utils/cloudinary";
 import { ApiResponse } from "../../utils/response/ApiResponse";
-import { User } from "../../model/user.model.js";
+import { User } from "../../model/user.model";
 import mongoose from "mongoose";
 import fs from "fs";
 import path from "path";
@@ -805,11 +805,53 @@ const getUserblogsDisplay = asyncHandler(async (req, res) => {
     const allPosts = [...blogPosts];
 
     allPosts.sort((a, b) => b.createdAt - a.createdAt);
-
     res
     .status(201)
     .json({"done":allPosts.slice(offset, offset + limit),"pagination":buildPagination(allPosts.length, limit, offset)})
 })
+
+const getPostById = asyncHandler(async (req, res) => {
+    const { postId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(postId)) {
+        throw new ApiError(400, "Invalid Post ID format");
+    }
+
+    const objectId = new mongoose.Types.ObjectId(postId);
+
+    const matchStage = { $match: { _id: objectId } };
+    const authorLookup = {
+        $lookup: {
+            from: "users",
+            localField: "PostAuthor",
+            foreignField: "_id",
+            as: "author",
+            pipeline: [
+                {
+                    $project: {
+                        fullname: 1,
+                        username: 1,
+                        avatar: 1
+                    }
+                }
+            ]
+        }
+    };
+
+    const userId = req.user?._id;
+    const voteStages = userId ? buildVoteLookupStages(userId) : [];
+
+    const blogPost = await BlogPost.aggregate([matchStage, authorLookup, ...discussionLookupStages, ...voteStages]);
+    if (blogPost.length > 0) return res.status(200).json(new ApiResponse(200, { data: { ...blogPost[0], type: 'blogpost' } }, "Post fetched successfully"));
+
+    const imagePost = await ImagePost.aggregate([matchStage, authorLookup, ...discussionLookupStages, ...voteStages]);
+    if (imagePost.length > 0) return res.status(200).json(new ApiResponse(200, { data: { ...imagePost[0], type: 'image' } }, "Post fetched successfully"));
+
+    const videoPost = await VideoPost.aggregate([matchStage, authorLookup, ...discussionLookupStages, ...voteStages]);
+    if (videoPost.length > 0) return res.status(200).json(new ApiResponse(200, { data: { ...videoPost[0], type: 'video' } }, "Post fetched successfully"));
+
+    throw new ApiError(404, "Post not found");
+});
 
 export {
     createPost,
@@ -822,5 +864,6 @@ export {
     getUsersPosts,
     getUserimagesDisplay,
     getUserVideosDisplay,
-    getUserblogsDisplay
+    getUserblogsDisplay,
+    getPostById
 }

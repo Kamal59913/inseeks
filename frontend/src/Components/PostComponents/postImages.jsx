@@ -4,6 +4,8 @@ import ImageWithFallback from '../Common/ImageWithFallback';
 import { useModalData } from '../../store/hooks';
 import VoteControls from '../Common/VoteControls';
 import { useVoteQuery } from '../../hooks/useVoteQuery';
+import Button from '../Common/Button';
+import { copyToClipboard } from '../../utils/clipboardUtils';
 
 export default function PostImages(props) {
   const modal = useModalData()
@@ -49,9 +51,9 @@ export default function PostImages(props) {
             <span>{new Date(props.time).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
           </div>
         </div>
-        <button className="text-slate-500 hover:text-slate-300 p-1.5 rounded-lg hover:bg-[#1a2540] transition-all">
+        <Button variant="ghost" size="icon" borderRadius="rounded-lg">
           <i className="fa-solid fa-ellipsis-vertical text-sm"></i>
-        </button>
+        </Button>
       </div>
 
       {props.title && <p className="px-4 pb-2 text-base font-semibold text-slate-100">{props.title}</p>}
@@ -73,21 +75,30 @@ export default function PostImages(props) {
  <div className="flex items-center justify-between px-4 py-3 ">
         <div className="flex items-center gap-1">
           <VoteControls summary={summary} onVote={vote} disabled={isVoting} />
-          <button
+          <Button
+            variant="custom"
+            size="none"
+            borderRadius="rounded-lg"
             onClick={sendData}
             title="Real time discussions"
             aria-label="Real time discussions"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-slate-400 hover:text-indigo-400 hover:bg-indigo-500/10 transition-all duration-200"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-400 hover:text-indigo-400 hover:bg-indigo-500/10"
           >
             <i className="fa-regular fa-comments text-base"></i>
             <span>{props.conversationCount || 0}</span>
-          </button>
+          </Button>
         </div>
         <div className="flex items-center gap-3 text-xs text-slate-500">
           {props.views !== undefined && <span className="flex items-center gap-1"><i className="fa-regular fa-eye"></i>{props.views}</span>}
-          <button className="flex items-center gap-1.5 text-slate-400 hover:text-indigo-400 hover:bg-indigo-500/10 px-3 py-1.5 rounded-lg transition-all duration-200">
+          <Button
+            variant="custom"
+            size="none"
+            borderRadius="rounded-lg"
+            onClick={(e) => { e.stopPropagation(); copyToClipboard(`${window.location.origin}/post/${props.postId}`); }}
+            className="flex items-center gap-1.5 text-slate-400 hover:text-indigo-400 hover:bg-indigo-500/10 px-3 py-1.5"
+          >
             <i className="fa-regular fa-share-from-square text-base"></i>
-          </button>
+          </Button>
         </div>
       </div>
     </div>

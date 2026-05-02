@@ -1,5 +1,5 @@
-import React, { ReactNode, useEffect } from 'react';
-import { createPortal } from 'react-dom';
+import React, { ReactNode, useEffect } from "react";
+import { createPortal } from "react-dom";
 
 interface AppModalProps {
   children: ReactNode;
@@ -12,13 +12,13 @@ interface AppModalProps {
 export default function AppModal({
   children,
   onClose,
-  contentClassName = '',
+  contentClassName = "",
   showCloseButton = true,
   outsideClick = true,
 }: AppModalProps) {
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = "hidden";
 
     return () => {
       document.body.style.overflow = previousOverflow;
@@ -34,7 +34,7 @@ export default function AppModal({
         }}
       />
       <div
-        className={`surface-subtle relative z-10 w-full rounded-3xl ${contentClassName}`}
+        className={`surface-subtle relative z-10 w-full rounded-xl ${contentClassName}`}
         onClick={(event) => event.stopPropagation()}
       >
         {showCloseButton ? (

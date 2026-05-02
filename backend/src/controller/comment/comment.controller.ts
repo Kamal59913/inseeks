@@ -3,11 +3,11 @@ import fs from "fs";
 import path from "path";
 import mongoose from "mongoose";
 import { asyncHandler } from "../../utils/response/asyncHandler";
-import { CommentPost } from "../../model/comment.model.js";
+import { CommentPost } from "../../model/comment.model";
 import { ApiResponse } from "../../utils/response/ApiResponse";
 import { ApiError } from "../../utils/response/ApiError";
 import { getIO } from "../../socket/socketconnect";
-import { uploadOnCloudinary } from "../../utils/cloudinary.js";
+import { uploadOnCloudinary } from "../../utils/cloudinary";
 
 const PUBLIC_DISCUSSION_DOCS_DIR = path.resolve(process.cwd(), "src/public/uploads/discussions");
 

@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import PulseLoader from 'react-spinners/PulseLoader';
 import { FormFileField } from '../Common/FormFields';
 import { useAppForm } from '../../hooks/useAppForm';
-import { replaceAvatarSchema } from '../../utils/formSchemas';
+import { replaceAvatarSchema } from '../../validations/schemas/profile.schema';
 import { useModalData } from '../../store/hooks';
 import AppModal from '../Modal/AppModal';
 import { userService } from '../../services/user.service';

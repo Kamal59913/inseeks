@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAppForm } from "../../hooks/useAppForm";
-import { commentSchema } from "../../utils/formSchemas";
+import { commentSchema } from "../../validations/schemas/post.schema";
 import { preprocessTrimmedFormData } from "../../utils/formValidation";
 import { useCommentsQuery } from "../../hooks/useCommentsQuery";
 import { queryKeys } from "../../hooks/queryKeys";
@@ -18,6 +18,7 @@ interface CurrentUser {
 
 interface RightSideCommentBarProps {
   currentPostId: string;
+  postType?: string;
   currentUser?: CurrentUser;
   summaryText?: string;
 }
@@ -31,30 +32,41 @@ const ACTIVITY_TIMEOUT_MS = 3200;
 const TYPING_TIMEOUT_MS = 1600;
 const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024;
 
-const updateConversationCountAcrossPosts = (
+const updatePostInCache = (
   queryClient: ReturnType<typeof useQueryClient>,
   postId: string,
-  delta: number,
+  updater: (post: any) => any
 ) => {
-  queryClient.setQueriesData({ queryKey: ["posts"] }, (previous: any) => {
-    if (!Array.isArray(previous)) return previous;
+  queryClient.setQueriesData({ queryKey: ["posts"] }, (data: any) => {
+    if (!data) return data;
 
-    return previous.map((post) =>
-      post?._id === postId
-        ? {
-            ...post,
-            conversationCount: Math.max(
-              0,
-              (post.conversationCount || 0) + delta,
-            ),
-          }
-        : post,
-    );
+    if (data.pages && Array.isArray(data.pages)) {
+      return {
+        ...data,
+        pages: data.pages.map((page: any) => ({
+          ...page,
+          items: Array.isArray(page.items)
+            ? page.items.map((post: any) =>
+                post?._id === postId ? updater(post) : post
+              )
+            : page.items,
+        })),
+      };
+    }
+
+    if (Array.isArray(data)) {
+      return data.map((post: any) =>
+        post?._id === postId ? updater(post) : post
+      );
+    }
+
+    return data;
   });
 };
 
 export default function RightSideCommentBar({
   currentPostId,
+  postType,
   currentUser,
   summaryText,
 }: RightSideCommentBarProps) {
@@ -108,6 +120,21 @@ export default function RightSideCommentBar({
       selectedFilePreviews.forEach((file) => URL.revokeObjectURL(file.url));
     };
   }, [selectedFilePreviews]);
+
+  useEffect(() => {
+    if (currentPostId && postType) {
+      import("../../services/post.service").then(({ postService }) => {
+        postService.recordView(currentPostId, postType).then((res) => {
+          if (res.data?.data?.views !== undefined) {
+            updatePostInCache(queryClient, currentPostId, (post) => ({
+              ...post,
+              views: res.data.data.views,
+            }));
+          }
+        }).catch(console.error);
+      });
+    }
+  }, [currentPostId, postType, queryClient]);
 
   const showActivityMessage = (message: string) => {
     setActivityMessage(message);
@@ -217,7 +244,10 @@ export default function RightSideCommentBar({
         },
       );
       if (countDelta > 0) {
-        updateConversationCountAcrossPosts(queryClient, currentPostId, 1);
+        updatePostInCache(queryClient, currentPostId, (post) => ({
+          ...post,
+          conversationCount: Math.max(0, (post.conversationCount || 0) + 1),
+        }));
       }
 
       if (payload.comment.username) {
@@ -473,7 +503,6 @@ export default function RightSideCommentBar({
               <div
                 key={member.username}
                 className="flex shrink-0 items-center gap-2 rounded-full bg-indigo-500/10 px-2.5 py-1"
-                className="flex shrink-0 items-center gap-2 rounded-full bg-indigo-500/10 px-2.5 py-1"
                 title={`${member.username} is ${member.online ? "online" : "offline"}`}
               >
                 <div className="relative">
@@ -661,7 +690,7 @@ export default function RightSideCommentBar({
               type="text"
               {...register("comment")}
               placeholder="Send a message or attach files..."
-              maxLength={281}
+              maxLength={1001}
               className="w-full bg-transparent text-xs text-slate-200 placeholder-slate-500 focus:outline-none"
             />
             {errors.comment ? (

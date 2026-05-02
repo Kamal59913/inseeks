@@ -24,6 +24,7 @@ export default function ImagePost({ modalId, data }: ImagePostProps) {
       <RIGHTCOMMENTBAR
         currentUser={temp.currentUser}
         currentPostId={temp.postId}
+        postType={temp.type}
         summaryText={summaryText}
       />
     </AppModal>

@@ -10,5 +10,5 @@ interface PostAnyThingProps {
 }
 
 export function PostAnyThing({ modalId, data }: PostAnyThingProps) {
-  return <QuestionComposerModal modalId={modalId} data={{ ...data, preset: 'any' }} />;
+  return <QuestionComposerModal modalId={modalId} data={data} />;
 }

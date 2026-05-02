@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
+import Button from "../Common/Button";
 import LeftBar from "../Utilities/LeftBar";
 import SearchBar from "../Utilities/SearchBar";
 import Post from "../PostComponents/post";
@@ -94,10 +95,13 @@ export default function Homepage() {
         <div className="max-w-2xl mx-auto w-full py-6 space-y-4">
           <div className="flex items-center gap-1 p-1 bg-[#111827] rounded-xl">
             {FILTERS.map((f) => (
-              <button
+              <Button
                 key={f.key}
+                variant="custom"
+                size="none"
+                borderRadius="rounded-lg"
                 onClick={() => setActiveFilter(f.key)}
-                className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm font-medium ${
                   activeFilter === f.key
                     ? "bg-indigo-600 text-white shadow-sm"
                     : "text-slate-400 hover:text-white hover:bg-[#1a2540]"
@@ -105,7 +109,7 @@ export default function Homepage() {
               >
                 <i className={`fa-solid ${f.icon} text-xs`}></i>
                 <span className="hidden sm:inline">{f.label}</span>
-              </button>
+              </Button>
             ))}
           </div>
 
@@ -204,17 +208,20 @@ export default function Homepage() {
             { key: "people", label: "People" },
             { key: "spaces", label: "Spaces" },
           ].map((tab) => (
-            <button
+            <Button
               key={tab.key}
+              variant="custom"
+              size="none"
+              borderRadius="rounded-lg"
               onClick={() => setSidebarTab(tab.key as "people" | "spaces")}
-              className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+              className={`flex-1 py-2 text-sm font-medium ${
                 sidebarTab === tab.key
                   ? "bg-indigo-600 text-white"
                   : "text-slate-400 hover:text-white hover:bg-[#1a2540]"
               }`}
             >
               {tab.label}
-            </button>
+            </Button>
           ))}
         </div>
 

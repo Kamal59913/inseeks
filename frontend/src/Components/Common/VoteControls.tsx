@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { VoteSummary, VoteType } from '../../services/like.service';
+import Button from './Button';
 
 interface VoteControlsProps {
   summary: VoteSummary;
@@ -49,11 +50,13 @@ export default function VoteControls({
 
   return (
     <div className={`flex items-center ${compact ? 'gap-1' : 'gap-2'}`}>
-      <button
-        type="button"
+      <Button
+        variant="custom"
+        size="none"
+        borderRadius="rounded-lg"
         disabled={disabled}
         onClick={() => onVote('upvote')}
-        className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-all duration-200 ${
+        className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium ${
           upvoteBump ? 'scale-110 shadow-[0_0_0_1px_rgba(52,211,153,0.25)]' : ''
         } ${
           upActive
@@ -63,13 +66,15 @@ export default function VoteControls({
       >
         <i className={`fa-solid fa-arrow-up text-sm ${upvoteBump ? 'animate-pulse' : ''}`}></i>
         <span>{summary.upvotesCount}</span>
-      </button>
+      </Button>
 
-      <button
-        type="button"
+      <Button
+        variant="custom"
+        size="none"
+        borderRadius="rounded-lg"
         disabled={disabled}
         onClick={() => onVote('downvote')}
-        className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-all duration-200 ${
+        className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium ${
           downvoteBump ? 'scale-110 shadow-[0_0_0_1px_rgba(251,113,133,0.25)]' : ''
         } ${
           downActive
@@ -79,7 +84,7 @@ export default function VoteControls({
       >
         <i className={`fa-solid fa-arrow-down text-sm ${downvoteBump ? 'animate-pulse' : ''}`}></i>
         <span>{summary.downvotesCount}</span>
-      </button>
+      </Button>
     </div>
   );
 }

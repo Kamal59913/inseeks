@@ -3,8 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import SignUpPage from "./signUpPage";
 import { FormField } from "../Common/FormFields";
 import { PasswordField } from "../Common/PasswordField";
+import Button from "../Common/Button";
 import { useAppForm } from "../../hooks/useAppForm";
-import { loginSchema } from "../../utils/formSchemas";
+import { loginSchema } from "../../validations/schemas/auth.schema";
+import { PASSWORD_POLICY_CONFIG } from "../../config/config";
 import { preprocessTrimmedFormData } from "../../utils/formValidation";
 import { authService } from "../../services/auth.service";
 import { useAppDispatch } from "../../store/hooks";
@@ -122,7 +124,7 @@ export default function LoginPage() {
               name="identifier"
               label="Email or Username"
               placeholder="you@example.com or username"
-              maxLength={150}
+              maxLength={151}
               disabled={loading}
             />
 
@@ -132,7 +134,7 @@ export default function LoginPage() {
                 name="password"
                 label="Password"
                 placeholder="Enter your password"
-                maxLength={64}
+                maxLength={PASSWORD_POLICY_CONFIG.INPUT_MAX_LENGTH}
                 disabled={loading}
               />
               <div className="flex justify-end">
@@ -145,23 +147,14 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <button
+            <Button
               type="submit"
-              disabled={loading}
-              className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-800 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2"
+              loadingState={loading}
+              className="w-full py-3"
+              endIcon={<i className="fa-solid fa-arrow-right text-sm"></i>}
             >
-              {loading ? (
-                <>
-                  <i className="fa-solid fa-circle-notch fa-spin"></i> Signing
-                  in…
-                </>
-              ) : (
-                <>
-                  <span>Sign In</span>
-                  <i className="fa-solid fa-arrow-right text-sm"></i>
-                </>
-              )}
-            </button>
+              Sign In
+            </Button>
           </form>
 
           {/* Social login */}
@@ -178,13 +171,15 @@ export default function LoginPage() {
 
           <p className="text-centertext-sm text-slate-400">
             Don't have an account?{" "}
-            <button
-              type="button"
+            <Button
+              variant="custom"
+              size="none"
+              borderRadius=""
               onClick={() => setToggle(true)}
-              className="text-indigo-400 hover:text-indigo-300 font-semibold transition-colors"
+              className="text-indigo-400 hover:text-indigo-300 font-semibold transition-colors inline"
             >
               Create a free account
-            </button>
+            </Button>
           </p>
         </div>
       </div>
