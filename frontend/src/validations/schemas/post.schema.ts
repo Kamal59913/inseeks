@@ -10,6 +10,7 @@ export const postQuestionSchema = z.object({
   envname: validationUtils.requiredString("Space"),
   title: validationUtils.customField("Title", 5, 120),
   description: validationUtils.customField("Description", 5, 500),
+  attachments: z.array(z.any()).optional(),
 });
 
 export const imagePostSchema = z.object({
