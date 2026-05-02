@@ -143,9 +143,10 @@ export default function ImagePostComposerModal({
 
     setSubmitError(null);
     const uniqueFiles = nextFiles.filter(
-      (file) => !images.some((img) => img.name === file.name && img.size === file.size)
+      (file) =>
+        !images.some((img) => img.name === file.name && img.size === file.size),
     );
-    
+
     if (uniqueFiles.length > 0) {
       const updatedImages = [...images, ...uniqueFiles];
       setImages(updatedImages);
@@ -219,7 +220,7 @@ export default function ImagePostComposerModal({
       onClose={closeModal}
       contentClassName="max-w-3xl bg-transparent p-0 text-slate-100 overflow-hidden"
     >
-      <div className="surface-subtle max-h-[90vh] overflow-y-auto rounded-[28px]">
+      <div className="surface-subtle max-h-[90vh] overflow-y-auto">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 p-6">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-300/80">
