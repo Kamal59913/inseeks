@@ -17,6 +17,11 @@ import SpaceJoinButton from "../Common/SpaceJoinButton";
 import InfiniteLoader from "../Common/InfiniteLoader";
 import { prependInfiniteItems } from "../../hooks/infiniteQueryUtils";
 import { APP_CONFIG } from "../../config/app.config";
+import ContextMenu, { ContextMenuItem } from '../Common/ContextMenu';
+import Button from '../Common/Button';
+import { useModalData } from '../../store/hooks';
+import { envService } from '../../services/env.service';
+import { copyToClipboard } from '../../utils/clipboardUtils';
 
 const FILTERS = [
   { key: 'explore', label: 'All', icon: 'fa-border-all' },
@@ -29,6 +34,7 @@ export default function EnvHomepage() {
   const { envname } = useParams<{ envname: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const modal = useModalData();
   const fallback =
     'https://res.cloudinary.com/dogyotgp5/image/upload/v1713078910/avatar-dummy-social-app_fx9x9f.png';
   const [activeFilter, setActiveFilter] = useState<'explore' | 'images' | 'videos' | 'blogs'>('explore');
@@ -46,6 +52,8 @@ export default function EnvHomepage() {
   const isEnvironmentPageLoading =
     isCurrentUserLoading || isPostsLoading || isEnvironmentsLoading;
 
+  const isOwner = currentUser && currentEnvironment?.CreatedBy && currentUser._id === currentEnvironment.CreatedBy;
+
   const logout = () => {
     navigate('/');
     authService.logout().catch(() => {});
@@ -59,6 +67,45 @@ export default function EnvHomepage() {
         prependInfiniteItems(previous, Array.isArray(newposts) ? newposts : [newposts]),
     );
   };
+
+  const handleShareSpace = () => {
+    copyToClipboard(`${window.location.origin}/env-home-page/${envname}`);
+  };
+
+  const handleEditSpace = () => {
+    modal.open('edit-space', {
+      envname: envname || '',
+      description: currentEnvironment?.description || '',
+      avatar: currentEnvironment?.envAvatar,
+    });
+  };
+
+  const handleDeleteSpace = () => {
+    modal.open('confirm-delete' as any, {
+      title: 'Delete Space',
+      description: `Are you sure you want to delete ${envname}? This will remove all posts inside it.`,
+      confirmLabel: 'Delete',
+      onConfirm: async () => {
+        try {
+          await envService.deleteEnvironment(envname || '');
+          queryClient.invalidateQueries({ queryKey: queryKeys.environments });
+          navigate('/environments');
+        } catch (err) {
+          console.error('Failed to delete space:', err);
+        }
+      },
+    });
+  };
+
+  const spaceMenuItems: ContextMenuItem[] = [
+    { label: 'Share', icon: 'fa-share-from-square', onClick: handleShareSpace },
+  ];
+  if (isOwner) {
+    spaceMenuItems.push(
+      { label: 'Edit', icon: 'fa-pen', onClick: handleEditSpace },
+      { label: 'Delete', icon: 'fa-trash-can', onClick: handleDeleteSpace, variant: 'danger' },
+    );
+  }
 
   return (
     <div className="flex h-screen bg-[#090e1a] overflow-hidden">
@@ -86,6 +133,14 @@ export default function EnvHomepage() {
                   unjoinedClassName="bg-indigo-600 hover:bg-indigo-500 text-white"
                 />
               ) : null}
+              <ContextMenu
+                items={spaceMenuItems}
+                trigger={
+                  <Button variant="ghost" size="icon" borderRadius="rounded-lg">
+                    <i className="fa-solid fa-ellipsis-vertical text-sm"></i>
+                  </Button>
+                }
+              />
               <Link
                 to="/environments"
                 className="flex items-center gap-2 text-sm text-slate-400 hover:text-indigo-400 transition-colors"

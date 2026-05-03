@@ -33,6 +33,6 @@ export const envService = {
   deleteEnvironment: (envname: string) =>
     apiClient.delete(`/env/${envname}`),
 
-  updateEnvironment: (envname: string, data: { EnvDescription?: string }) =>
+  updateEnvironment: (envname: string, data: { EnvDescription?: string } | FormData | any) =>
     apiClient.patch(`/env/${envname}`, data),
 };

@@ -32,7 +32,11 @@ export default function EnvCard({ title, description, avatar, isJoined, creatorI
   };
 
   const handleEdit = () => {
-    // Add logic for editing space if needed, perhaps through a generic edit modal
+    modal.open('edit-space', {
+      envname: title,
+      description: description,
+      avatar: avatar,
+    });
   };
 
   const handleDelete = () => {
@@ -57,6 +61,7 @@ export default function EnvCard({ title, description, avatar, isJoined, creatorI
 
   if (isOwner) {
     menuItems.push(
+      { label: 'Edit', icon: 'fa-pen', onClick: handleEdit },
       { label: 'Delete', icon: 'fa-trash-can', onClick: handleDelete, variant: 'danger' }
     );
   }

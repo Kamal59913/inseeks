@@ -10,6 +10,7 @@ import { PostVideo } from '../CreatePost/postVideo';
 import ReplaceImages from '../CreatePost/replaceprofileimage';
 import ConfirmationModal from './ConfirmationModal';
 import EditPostModal from './EditPostModal';
+import EditSpaceModal from './EditSpaceModal';
 import { ModalName } from '../../types/modal';
 
 type ModalComponent = React.ComponentType<{ modalId: string; data?: any }>;
@@ -27,4 +28,5 @@ export const MODAL_REGISTRY: Record<ModalName, ModalComponent> = {
   'log-out': ConfirmationModal as any,
   'confirm-delete': ConfirmationModal as any,
   'edit-post': EditPostModal as any,
+  'edit-space': EditSpaceModal as any,
 };

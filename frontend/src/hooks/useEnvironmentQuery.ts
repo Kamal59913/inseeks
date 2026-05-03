@@ -10,6 +10,7 @@ type EnvironmentItem = {
   description?: string;
   envAvatar?: string;
   isJoined?: boolean;
+  CreatedBy?: string;
 };
 
 export const useEnvironmentQuery = (limit = 8) =>

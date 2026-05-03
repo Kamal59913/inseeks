@@ -10,7 +10,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   borderRadius?: string;
 }
 
-const Button: React.FC<ButtonProps> = ({
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
   type = "button",
   children,
   size = "md",
@@ -23,7 +23,7 @@ const Button: React.FC<ButtonProps> = ({
   loadingState,
   borderRadius = "rounded-xl",
   ...props
-}) => {
+}, ref) => {
   const sizeClasses = {
     sm: "px-3 py-1.5 text-sm",
     md: "px-4 py-2",
@@ -51,6 +51,7 @@ const Button: React.FC<ButtonProps> = ({
   return (
     <button
       {...props}
+      ref={ref}
       type={type}
       className={`transition-all duration-200 flex items-center justify-center gap-2 ${borderRadius} ${sizeClasses[size]} ${variantClasses[variant]} ${
         disabled || loadingState ? "cursor-not-allowed opacity-50" : "cursor-pointer"
@@ -78,6 +79,9 @@ const Button: React.FC<ButtonProps> = ({
       {!loadingState && endIcon && <span className="flex items-center">{endIcon}</span>}
     </button>
   );
-};
+});
+
+Button.displayName = "Button";
 
 export default Button;
+
